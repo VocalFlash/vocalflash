@@ -3,45 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VocalFlash - Trasforma 2 minuti di vocale in 3 righe</title>
+<title>VocalFlash - Basta sbobbinare. Leggilo.</title>
+<title>VocalFlash - Basta sbobbinare. Sintetizzalo.</title>
+<link rel="icon" type="image/webp" href="iconaQ.webp">
 <style>
-body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin:0; padding:0; background:#fff; color:#111; text-align:center; }
-.hero { padding:60px 20px; }
-.hero h1 { font-size:42px; margin-bottom:10px; }
-.hero p { font-size:18px; color:#555; }
-.cta-main { display:inline-block; background:#111; color:#fff; padding:16px 28px; border-radius:12px; text-decoration:none; font-weight:bold; margin-top:20px; }
-.demo { background:#f8f8f8; padding:50px 20px; }
-.demo-box { max-width:700px; margin:0 auto; text-align:left; }
-.demo-card { background:#fff; border-radius:16px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.06); margin-top:20px; }
-.label { font-weight:bold; font-size:13px; margin-bottom:8px; color:#666; }
-.before { margin-bottom:20px; padding:12px; background:#fff5f5; border-radius:10px; }
-.after { padding:12px; background:#f0fdf4; border-radius:10px; }
+*{margin:0;padding:0;box-sizing:border-box}
+@@ -21,7 +21,6 @@
+.hero h1 .gradient{background:linear-gradient(90deg,#8b5cf6 0%,#ec4899 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block}
+.hero .sub{color:#6b7280;font-size:clamp(16px,2.2vw,20px);line-height:1.5;margin:0 auto 36px;max-width:500px}
+.cta-main{background:linear-gradient(135deg,#8b5cf6 0%,#ec4899 100%);color:white;padding:18px 36px;border-radius:16px;text-decoration:none;font-weight:800;font-size:18px;display:inline-block;box-shadow:0 12px 24px rgba(139,92,246,0.25)}
+/* PARTE NUOVA SOTTO */
+.demo{max-width:900px;margin:80px auto;padding:0 24px}
+.demo-box{border:2px dashed #a78bfa;border-radius:20px;padding:32px;background:white}
+.demo h2{text-align:center;font-size:28px;font-weight:800;margin-bottom:8px}
+@@ -38,50 +37,28 @@
 </style>
 </head>
 <body>
 
+<div class="header">
+<div class="header-left">
+<a href="/" class="logo"><img src="logo.webp" alt="VocalFlash"> vocalflash.it</a>
+<div class="nav"><a href="#come-funziona">Come funziona</a><a href="#prezzi">Prezzi</a></div>
+</div>
+<a href="https://wa.me/?text=Ciao%21%20Ho%20scoperto%20vocalflash.it" class="btn-login" target="_blank">Login</a>
+<a href="https://wa.me/" class="btn-login" target="_blank">Login</a>
+</div>
+
 <div class="hero">
-  <h1>VocalFlash ⚡</h1>
-  <p>Trasforma 2 minuti di vocale in 3 righe.<br>Veloce, in italiano, su WhatsApp.<br>Nessuna app da installare.</p>
-  <a href="https://wa.me/" class="cta-main" target="_blank">Provalo su WhatsApp - Gratis</a>
+<h1><span class="black">Basta sbobinare.</span><span class="gradient">Leggilo.</span></h1>
+<h1><span class="black">Basta sbobinare.</span><span class="gradient">Sintetizzalo.</span></h1>
+<p class="sub">Trasforma 2 minuti di vocale in 3 righe.<br>Veloce, in italiano, su WhatsApp.<br>Nessuna app da installare.</p>
+<a href="https://wa.me/?text=Ciao%21%20Ho%20scoperto%20vocalflash.it%20%F0%9F%8E%99%EF%B8%8F%20Sintetizza%20i%20vocali%20lunghi%20di%20WhatsApp%20in%202%20secondi%3A%20https%3A%2F%2Fwww.vocalflash.it" class="cta-main" target="_blank">Provalo su WhatsApp - Gratis</a>
+<a href="https://wa.me/" class="cta-main" target="_blank">Provalo su WhatsApp - Gratis</a>
 </div>
 
 <div class="demo">
-  <div class="demo-box">
-    <h2>Da vocale infinito a sintesi in 2 secondi ⚡</h2>
-    <p class="demo-sub">Ecco cosa succede quando inoltri un vocale a VocalFlash</p>
-    <div class="demo-card">
-      <div class="before"><div class="label">🎙️ Vocale originale (2:34)</div>"Oh fra ciao allora senti domani volevo dirti che..."</div>
-      <div class="after"><div class="label">⚡ Sintesi VocalFlash (3 sec)</div><b>Calcetto domani 18:00 da Mario (campo 2). Porta scarpini. Conferma entro stasera.</b></div>
-    </div>
-  </div>
+<div class="demo-box">
+<h2>Da vocale infinito a sintesi in 2 secondi 👇</h2>
+<p class="demo-sub">Ecco cosa succede quando inoltri un vocale a VocalFlash</p>
+
+<div class="demo-card">
+<div class="before"><div class="label">🎙️ Vocale originale (2:34)</div>"Oh fra ciao allora senti domani volevo dirti che c'è calcetto alle 18 però non al solito campo, siamo da Mario, quello nuovo vicino al centro commerciale..."</div>
+<div class="before"><div class="label">🎙️ Vocale originale (2:34)</div>"Oh fra ciao allora senti domani volevo dirti che c'è calcetto alle 18 però non al solito campo, siamo da Mario..."</div>
+<div class="after"><div class="label">⚡ Sintesi VocalFlash (3 sec)</div><b>Calcetto domani 18:00 da Mario (campo nuovo). Porta scarpini + birra. Conferma presenza.</b></div>
 </div>
 
-<footer style="text-align:center; padding:40px 20px; color:#999; font-size:13px; border-top:1px solid #eee; margin-top:40px;">
-  <a href="/privacy.html" style="color:#999; text-decoration:underline; margin-right:15px;">Privacy</a>
-  <a href="/termini.html" style="color:#999; text-decoration:underline;">Termini</a>
-  <p style="margin-top:10px;">VocalFlash © 2026 - I tuoi vocali vengono cancellati dopo 60s 🔒</p>
-</footer>
+<div class="demo-card">
+<div class="before"><div class="label">🎙️ Vocale originale (1:45)</div>"Amore sono la mamma, allora per stasera prendi il pane, quello integrale non quello bianco, poi le uova, 6..."</div>
+<div class="after"><div class="label">⚡ Sintesi VocalFlash (3 sec)</div><b>Spesa: pane integrale, 6 uova, basilico fresco. Passa da nonna.</b></div>
+</div>
 
+</div>
+</div>
+
+<div class="features" id="come-funziona">
+<div class="feature"><h3>1. Inoltra il vocale</h3><p>Invii il vocale lungo a VocalFlash su WhatsApp.</p></div>
+<div class="feature"><h3>2. Sintetizziamo noi</h3><p>L'AI capisce e crea un riassunto breve.</p></div>
+<div class="feature"><h3>3. Capisci subito</h3><p>Leggi in 5 secondi invece di ascoltare per 5 minuti.</p></div>
+</div>
+
+<div class="footer">
+© 2026 VocalFlash.it - Trasforma 2 minuti in 3 righe.<br><br>
+<a href="/privacy.html">Privacy Policy</a> · <a href="mailto:info@vocalflash.it">Contatti</a><br>
+Made in Italy
+</div>
+
+<div class="footer">© 2026 VocalFlash.it · <a href="/privacy.html">Privacy</a></div>
 </body>
 </html>
