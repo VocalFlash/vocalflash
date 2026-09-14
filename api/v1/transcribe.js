@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import formidable from "formidable";
 import fs from "fs";
+import path from "path";
 
 export const config = {
   api: {
@@ -11,10 +12,6 @@ export const config = {
 const openaiKey =
   process.env.OPENAI_API_KEY ||
   process.env.OPENAI_KEY;
-
-const client = new OpenAI({
-  apiKey: openaiKey
-});
 
 function getValidApiKeys() {
   return (process.env.VOCALFLASH_API_KEYS || "")
@@ -40,9 +37,17 @@ export default async function handler(req, res) {
     "POST, OPTIONS"
   );
 
+  // --------------------------------------------------
+  // PREFLIGHT CORS
+  // --------------------------------------------------
+
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
+
+  // --------------------------------------------------
+  // SOLO POST
+  // --------------------------------------------------
 
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -51,7 +56,7 @@ export default async function handler(req, res) {
   }
 
   // --------------------------------------------------
-  // VERIFICA API KEY
+  // VERIFICA API KEY VOCALFLASH
   // --------------------------------------------------
 
   const apiKey = req.headers["x-api-key"];
@@ -69,7 +74,7 @@ export default async function handler(req, res) {
   }
 
   // --------------------------------------------------
-  // CONTROLLO CONFIGURAZIONE OPENAI
+  // CONTROLLO OPENAI KEY
   // --------------------------------------------------
 
   if (!openaiKey) {
@@ -78,6 +83,14 @@ export default async function handler(req, res) {
     });
   }
 
+  const client = new OpenAI({
+    apiKey: openaiKey
+  });
+
+  // --------------------------------------------------
+  // LETTURA FORM-DATA
+  // --------------------------------------------------
+
   const form = formidable({
     multiples: false
   });
@@ -85,7 +98,11 @@ export default async function handler(req, res) {
   form.parse(req, async (err, fields, files) => {
 
     if (err) {
-      console.error("Errore parsing form:", err);
+
+      console.error(
+        "Errore parsing form:",
+        err
+      );
 
       return res.status(400).json({
         error: "File non leggibile"
@@ -103,23 +120,87 @@ export default async function handler(req, res) {
       });
     }
 
-    const filePath = audioFile.filepath;
+    let filePath = null;
 
     try {
 
       // --------------------------------------------------
-      // 1. TRASCRIZIONE
+      // CONSERVA ESTENSIONE ORIGINALE DEL FILE
+      //
+      // Formidable su Vercel può creare il file temporaneo
+      // senza estensione.
+      //
+      // OpenAI ha invece bisogno di riconoscere correttamente
+      // il formato: .ogg, .mp3, .m4a, .wav, ecc.
+      // --------------------------------------------------
+
+      const originalName =
+        audioFile.originalFilename ||
+        "audio.ogg";
+
+      const extension =
+        path.extname(originalName).toLowerCase() ||
+        ".ogg";
+
+      const supportedExtensions = [
+        ".flac",
+        ".m4a",
+        ".mp3",
+        ".mp4",
+        ".mpeg",
+        ".mpga",
+        ".oga",
+        ".ogg",
+        ".wav",
+        ".webm"
+      ];
+
+      if (!supportedExtensions.includes(extension)) {
+        return res.status(400).json({
+          error: `Formato audio non supportato: ${extension}`
+        });
+      }
+
+      const tempFilePath =
+        audioFile.filepath;
+
+      filePath =
+        `${tempFilePath}${extension}`;
+
+      await fs.promises.rename(
+        tempFilePath,
+        filePath
+      );
+
+      // --------------------------------------------------
+      // 1. TRASCRIZIONE AUDIO
       // --------------------------------------------------
 
       const transcription =
         await client.audio.transcriptions.create({
-          file: fs.createReadStream(filePath),
-          model: "whisper-1",
-          response_format: "verbose_json"
+
+          file:
+            fs.createReadStream(filePath),
+
+          model:
+            "whisper-1",
+
+          response_format:
+            "verbose_json"
+
         });
 
-      const transcript = transcription.text || "";
-      const language = transcription.language || null;
+      const transcript =
+        transcription.text || "";
+
+      const language =
+        transcription.language || null;
+
+      if (!transcript.trim()) {
+        throw new Error(
+          "La trascrizione del vocale è vuota"
+        );
+      }
 
       // --------------------------------------------------
       // 2. MOTORE INTELLIGENTE VOCALFLASH
@@ -168,63 +249,137 @@ SINTESI ADATTIVA:
   e dall'importanza delle informazioni, non solo dalla durata del vocale.
 - Sii il più sintetico possibile senza perdere informazioni rilevanti.
 - Se il contenuto è breve e semplice, usa pochissimi punti.
-- Se è medio, usa indicativamente 3-5 punti salienti se realmente utili.
-- Se è lungo o complesso, mantieni comunque la sintesi iniziale compatta
-  e usa più punti soltanto quando servono.
+- Se è medio, usa indicativamente 3-5 punti salienti
+  se realmente utili.
+- Se è lungo o complesso, mantieni comunque la sintesi iniziale
+  compatta e usa più punti soltanto quando servono.
 - Evita duplicazioni tra summary e salient_points.
 - Non riempire il formato con informazioni inutili.
 
 ESTRAZIONE DELLE INFORMAZIONI IMPORTANTI:
 
-- Individua con particolare attenzione appuntamenti, scadenze,
-  importi, persone, decisioni, richieste e cambiamenti.
+- Individua con particolare attenzione appuntamenti,
+  scadenze, importi, persone, decisioni,
+  richieste e cambiamenti.
+
 - Se nel vocale un dato viene corretto o modificato,
   considera valido il dato finale.
-- Non presentare come validi dati successivamente annullati,
-  sostituiti o corretti.
+
+Esempio:
+"Non alle 9, facciamo alle 11"
+significa che l'orario valido è 11:00.
+
+- Non presentare come validi dati successivamente
+  annullati, sostituiti o corretti.
+
 - Distingui una decisione definitiva da una proposta,
   ipotesi o possibilità.
-- Non trasformare "potremmo farlo venerdì"
+
+- Non trasformare:
+  "potremmo farlo venerdì"
   in un appuntamento confermato.
+
 - Distingui una scadenza da una semplice data citata.
-- Per gli importi conserva valuta, unità, eventuali decimali
-  e il contesto a cui si riferiscono.
-- Se una data o un orario sono relativi, come "domani",
-  non inventare una data assoluta non ricavabile con certezza.
+
+- Per gli importi conserva valuta, unità,
+  eventuali decimali e il contesto
+  a cui si riferiscono.
+
+- Se una data o un orario sono relativi,
+  come "domani",
+  non inventare una data assoluta
+  non ricavabile con certezza.
+
 - Se un'informazione è incerta o condizionale,
   mantieni esplicitamente tale incertezza.
+
+PERSONE E ORGANIZZAZIONI:
+
+- Riporta soltanto persone, professionisti,
+  aziende o organizzazioni realmente citati.
+
+- Non inventare cognomi, ruoli o società
+  non presenti nella trascrizione.
 
 RICONOSCIMENTO DEL CONTESTO PROFESSIONALE:
 
 - Riconosci automaticamente l'ambito professionale
   quando è chiaramente deducibile dal contenuto.
-- Gli ambiti possono includere, a titolo di esempio:
-  edilizia/cantiere, immobiliare, legale,
-  finanziario-creditizio, medico/sanitario,
-  ricettivo/alberghiero e altri settori.
-- Se riconosci il settore, usa terminologia coerente
-  con quel contesto.
-- Mantieni termini tecnici, sigle, ruoli professionali,
-  procedure, documenti, misure, importi e concetti
-  specialistici realmente presenti.
-- Non inventare gergo, diagnosi, conclusioni tecniche
+
+Gli ambiti possono includere, a titolo di esempio:
+
+- edilizia / cantiere
+- finanziario / creditizio
+- immobiliare
+- legale
+- medico / sanitario
+- ricettivo / alberghiero
+- commerciale
+- assicurativo
+- amministrativo
+- tecnico
+- altri settori professionali
+
+- Se riconosci il settore,
+  usa terminologia coerente con quel contesto.
+
+- Mantieni termini tecnici,
+  sigle,
+  ruoli professionali,
+  procedure,
+  documenti,
+  misure,
+  importi
+  e concetti specialistici
+  realmente presenti.
+
+- Non inventare gergo,
+  diagnosi,
+  conclusioni tecniche
   o informazioni specialistiche.
+
+- Non correggere arbitrariamente
+  un termine tecnico ambiguo.
+
 - Se il settore non è chiaramente riconoscibile,
   usa "generico".
-- In ambito medico/sanitario non formulare nuove diagnosi,
-  prescrizioni o indicazioni cliniche.
+
+AMBITO MEDICO / SANITARIO:
+
+- Puoi riconoscere e mantenere
+  terminologia medica realmente presente.
+
+- Non formulare nuove diagnosi.
+
+- Non prescrivere farmaci.
+
+- Non aggiungere consigli clinici
+  non presenti nel messaggio.
 
 TASK:
 
 - Estrai un task soltanto se dal vocale emerge realmente
   un'attività da svolgere.
-- Non trasformare automaticamente ogni appuntamento
-  o informazione in un task.
-- Se una frase è soltanto ipotetica, non creare un task definitivo.
-- Se non ci sono attività da svolgere, restituisci un array vuoto.
 
-DEVI RESTITUIRE ESCLUSIVAMENTE UN JSON VALIDO
-CON QUESTA STRUTTURA:
+Esempio:
+
+"Mandami il contratto entro venerdì"
+
+può generare un task.
+
+- Non trasformare automaticamente
+  ogni appuntamento o informazione in un task.
+
+- Se una frase è soltanto ipotetica,
+  non creare un task definitivo.
+
+- Se non ci sono attività da svolgere,
+  restituisci un array vuoto.
+
+OUTPUT:
+
+Devi restituire ESCLUSIVAMENTE
+un JSON valido con questa struttura:
 
 {
   "context": "settore riconosciuto oppure generico",
@@ -254,8 +409,10 @@ REGOLE DEL JSON:
 - Usa array vuoti quando non esistono elementi.
 - Non inserire proprietà aggiuntive.
 - Non inventare valori mancanti.
-- Se deadline o time non sono presenti, usa null.
-- summary deve essere una stringa, non un array.
+- Se deadline o time non sono presenti,
+  usa null.
+- summary deve essere una stringa,
+  non un array.
 `
             },
 
@@ -268,6 +425,10 @@ REGOLE DEL JSON:
 
         });
 
+      // --------------------------------------------------
+      // 3. LETTURA RISPOSTA GPT
+      // --------------------------------------------------
+
       const rawResult =
         completion.choices?.[0]?.message?.content;
 
@@ -277,10 +438,11 @@ REGOLE DEL JSON:
         );
       }
 
-      const result = JSON.parse(rawResult);
+      const result =
+        JSON.parse(rawResult);
 
       // --------------------------------------------------
-      // 3. RISPOSTA API
+      // 4. RISPOSTA FINALE API
       // --------------------------------------------------
 
       return res.status(200).json({
@@ -292,10 +454,12 @@ REGOLE DEL JSON:
         language,
 
         context:
-          result.context || "generico",
+          result.context ||
+          "generico",
 
         summary:
-          result.summary || "",
+          result.summary ||
+          "",
 
         salient_points:
           Array.isArray(result.salient_points)
@@ -318,16 +482,28 @@ REGOLE DEL JSON:
 
     } catch (e) {
 
+      // --------------------------------------------------
+      // LOG TECNICO SU VERCEL
+      // --------------------------------------------------
+
       console.error(
         "Errore VocalFlash API:",
         e
       );
 
+      // Non mostriamo dettagli tecnici
+      // o informazioni sensibili al client.
+
       return res.status(500).json({
-        error: "Errore durante l'elaborazione del vocale"
+        error:
+          "Errore durante l'elaborazione del vocale"
       });
 
     } finally {
+
+      // --------------------------------------------------
+      // CANCELLAZIONE FILE TEMPORANEO
+      // --------------------------------------------------
 
       try {
 
@@ -335,7 +511,11 @@ REGOLE DEL JSON:
           filePath &&
           fs.existsSync(filePath)
         ) {
-          await fs.promises.unlink(filePath);
+
+          await fs.promises.unlink(
+            filePath
+          );
+
         }
 
       } catch (cleanupError) {
