@@ -64,23 +64,18 @@ export default async function handler(req, res) {
   // VERIFICA API KEY VOCALFLASH
   // ==================================================
 
-  const apiKey =
-    req.headers["x-api-key"];
-
-  const validApiKeys =
-    getValidApiKeys();
+  const apiKey = req.headers["x-api-key"];
+  const validApiKeys = getValidApiKeys();
 
   if (
     !apiKey ||
     validApiKeys.length === 0 ||
     !validApiKeys.includes(apiKey)
   ) {
-
     return res.status(401).json({
       error:
         "API Key non valida. Richiedi l'accesso a info@vocalflash.it"
     });
-
   }
 
   // ==================================================
@@ -88,34 +83,28 @@ export default async function handler(req, res) {
   // ==================================================
 
   if (!openaiKey) {
-
     return res.status(500).json({
-      error:
-        "OPENAI_API_KEY non configurata"
+      error: "OPENAI_API_KEY non configurata"
     });
-
   }
 
-  const client =
-    new OpenAI({
-      apiKey: openaiKey
-    });
+  const client = new OpenAI({
+    apiKey: openaiKey
+  });
 
   // ==================================================
   // LETTURA FORM-DATA
   // ==================================================
 
-  const form =
-    formidable({
-      multiples: false
-    });
+  const form = formidable({
+    multiples: false
+  });
 
   form.parse(
     req,
     async (err, fields, files) => {
 
       if (err) {
-
         console.error(
           "Errore parsing form:",
           err
@@ -124,7 +113,6 @@ export default async function handler(req, res) {
         return res.status(400).json({
           error: "File non leggibile"
         });
-
       }
 
       const audioFile =
@@ -134,13 +122,14 @@ export default async function handler(req, res) {
         );
 
       if (!audioFile) {
-
         return res.status(400).json({
           error:
             "Manca file audio. Usa il campo 'file' oppure 'audio'."
         });
-
       }
+
+      let tempFilePath =
+        audioFile.filepath || null;
 
       let filePath = null;
 
@@ -178,16 +167,11 @@ export default async function handler(req, res) {
             extension
           )
         ) {
-
           return res.status(400).json({
             error:
               `Formato audio non supportato: ${extension}`
           });
-
         }
-
-        const tempFilePath =
-          audioFile.filepath;
 
         filePath =
           `${tempFilePath}${extension}`;
@@ -197,12 +181,11 @@ export default async function handler(req, res) {
           filePath
         );
 
+        // Il vecchio percorso non esiste più dopo rename.
+        tempFilePath = null;
+
         // ==================================================
-        // 1. TRASCRIZIONE
-        // ==================================================
-        //
-        // Utilizzata internamente.
-        // Non viene restituita al client.
+        // 1. TRASCRIZIONE INTERNA
         // ==================================================
 
         const transcription =
@@ -228,11 +211,9 @@ export default async function handler(req, res) {
           transcription.language || null;
 
         if (!transcript.trim()) {
-
           throw new Error(
             "La trascrizione del vocale è vuota"
           );
-
         }
 
         // ==================================================
@@ -310,6 +291,7 @@ Possono includere:
 - decisioni
 - richieste
 - conclusioni
+- eventi
 - appuntamenti
 - scadenze
 - date
@@ -365,8 +347,6 @@ Queste regole hanno PRIORITÀ MOLTO ALTA.
 NON devi mai inventare
 una parte mancante di una data o di un orario.
 
-In particolare:
-
 NON inventare:
 
 - giorno
@@ -376,24 +356,24 @@ NON inventare:
 - minuti
 
 soltanto per trasformare
-un'espressione in un formato completo.
+un'espressione temporale
+in un formato completo.
 
 ==================================================
 ANNO NON PRESENTE
 ==================================================
 
-Se nel messaggio viene detto:
+Se viene detto:
 
 "4 dicembre"
 
-e NON viene pronunciato o stabilito chiaramente
-l'anno,
+e l'anno NON viene indicato chiaramente,
 
 devi conservare:
 
 "4 dicembre"
 
-NON devi trasformarlo in:
+NON trasformarlo in:
 
 "4 dicembre 2023"
 
@@ -406,42 +386,36 @@ NON devi trasformarlo in:
 o qualsiasi altra data
 contenente un anno inventato.
 
-Questa regola vale SEMPRE,
-anche se pensi di poter dedurre l'anno
-dalla data corrente.
+NON utilizzare automaticamente:
 
-NON usare automaticamente
-l'anno corrente.
-
-NON usare automaticamente
-l'anno precedente.
-
-NON usare automaticamente
-l'anno successivo.
+- anno corrente
+- anno precedente
+- anno successivo
 
 ==================================================
-DATA COMPLETA
+GRANULARITÀ DELLA DATA
 ==================================================
 
-Puoi utilizzare una data completa
-soltanto se tutte le sue componenti
-sono realmente presenti
-o ricavabili senza ambiguità
-dal contenuto del messaggio.
+Preserva la granularità
+dell'informazione originale.
 
-Esempio:
+"dicembre"
+deve rimanere:
+
+"dicembre"
+
+"4 dicembre"
+deve rimanere:
+
+"4 dicembre"
+
+"4 dicembre 2026"
+può rimanere:
 
 "4 dicembre 2026"
 
-può essere riportato come:
-
-"4 dicembre 2026"
-
-Non è necessario convertire
-la data in formato ISO.
-
-Preferisci preservare
-la forma naturale pronunciata.
+Non completare mai
+le componenti mancanti.
 
 ==================================================
 DATE RELATIVE
@@ -456,10 +430,10 @@ Espressioni come:
 - lunedì prossimo
 - questa sera
 - domattina
-- la settimana prossima
-- il mese prossimo
+- settimana prossima
+- mese prossimo
 
-devono normalmente essere mantenute
+devono normalmente rimanere
 nella loro forma naturale.
 
 Esempio:
@@ -470,13 +444,8 @@ deadline:
 
 "domani"
 
-NON:
-
-"2026-09-15"
-
-a meno che la conversione
-sia esplicitamente richiesta
-e sia disponibile un riferimento temporale certo.
+NON trasformare automaticamente
+"domani" in una data assoluta.
 
 ==================================================
 ORARI
@@ -486,75 +455,172 @@ Se viene detto:
 
 "alle 15"
 
-puoi riportare:
+puoi normalizzare come:
 
 "15:00"
 
-perché si tratta soltanto
-di una normalizzazione dell'orario espresso.
+Se viene detto:
 
-Ma NON devi aggiungere un orario
+"alle 15 e 30"
+
+puoi normalizzare come:
+
+"15:30"
+
+NON aggiungere un orario
 se non è stato indicato.
 
-Esempio:
-
-"Ci vediamo martedì"
-
-NON deve diventare:
-
-"martedì alle 09:00"
-
 ==================================================
-CORREZIONI DI DATE E ORARI
+CORREZIONI
 ==================================================
 
-Se un dato viene corretto durante il vocale,
-considera valido SOLO quello finale.
+Se un'informazione temporale
+viene corretta durante il vocale,
+considera valida SOLO quella finale.
 
 Esempio:
 
 "Ci vediamo alle 9,
 anzi facciamo alle 11."
 
-Orario valido:
+Dato valido:
 
 11:00
 
-NON riportare le 09:00
-come appuntamento valido.
+NON mantenere le 09:00
+come informazione valida.
 
-Altro esempio:
+Esempio:
 
 "Facciamo martedì...
 no, meglio mercoledì."
 
-La data valida è:
+Dato valido:
 
 mercoledì
 
-NON martedì.
-
 ==================================================
-DATA VS SCADENZA VS APPUNTAMENTO
+CLASSIFICAZIONE TEMPORALE
 ==================================================
 
-Devi distinguere semanticamente
-il ruolo della data.
+Devi distinguere attentamente:
 
-Non classificare automaticamente
-ogni riferimento temporale come "data".
+- evento
+- appuntamento
+- scadenza
+- data
+- orario
 
-------------------------------
-SCADENZA
-------------------------------
+La classificazione deve dipendere
+dal SIGNIFICATO del riferimento temporale,
+non semplicemente dalla presenza di una data.
 
-Una data è una SCADENZA
-quando indica il termine entro cui
-deve essere completata un'attività.
+==================================================
+EVENTO
+==================================================
+
+Usa:
+
+"type": "evento"
+
+quando il riferimento temporale riguarda
+un evento o un'attività programmata
+che avviene in una determinata data.
+
+Esempi:
+
+- gita scolastica
+- conferenza
+- convegno
+- recita
+- manifestazione
+- fiera
+- cerimonia
+- corso programmato
+- presentazione
+- evento aziendale
+- viaggio programmato
+- uscita scolastica
 
 Esempio:
 
-"Mandami il documento entro il 4 dicembre."
+"Gita a Catania il 5 dicembre."
+
+important_details:
+
+{
+  "type": "evento",
+  "value": "Gita a Catania il 5 dicembre",
+  "status": "confermato"
+}
+
+NON classificare automaticamente
+una gita come "appuntamento".
+
+==================================================
+APPUNTAMENTO
+==================================================
+
+Usa:
+
+"type": "appuntamento"
+
+quando viene fissato
+un incontro o un impegno
+con una persona o un soggetto.
+
+Esempi:
+
+- riunione
+- visita
+- colloquio
+- incontro
+- chiamata programmata
+- appuntamento con cliente
+- appuntamento con medico
+- sopralluogo fissato
+- incontro con consulente
+
+Esempio:
+
+"Riunione con il cliente
+il 5 dicembre alle 10."
+
+important_details:
+
+{
+  "type": "appuntamento",
+  "value":
+    "Riunione con il cliente il 5 dicembre alle 10:00",
+  "status": "confermato"
+}
+
+==================================================
+SCADENZA
+==================================================
+
+Usa:
+
+"type": "scadenza"
+
+quando la data rappresenta
+il termine entro cui
+qualcosa deve essere completato.
+
+Espressioni tipiche:
+
+- entro
+- non oltre
+- scade
+- scadenza
+- da consegnare entro
+- da completare entro
+- deve essere pronto per
+
+Esempio:
+
+"Le bambole devono essere
+completate entro il 4 dicembre."
 
 important_details:
 
@@ -564,36 +630,151 @@ important_details:
   "status": "confermato"
 }
 
-------------------------------
-APPUNTAMENTO
-------------------------------
+==================================================
+DATA
+==================================================
 
-Una data è un APPUNTAMENTO
-quando indica un incontro,
-una riunione,
-una visita,
-un evento programmato
-o un'attività fissata nel tempo.
+Usa:
+
+"type": "data"
+
+quando una data importante
+viene semplicemente menzionata
+e NON rappresenta:
+
+- evento
+- appuntamento
+- scadenza
 
 Esempio:
 
-"Ci vediamo il 5 dicembre alle 10."
+"Il contratto è stato firmato
+il 5 dicembre."
 
-important_details può contenere:
+important_details:
 
 {
-  "type": "appuntamento",
-  "value": "5 dicembre alle 10:00",
+  "type": "data",
+  "value": "5 dicembre",
   "status": "confermato"
 }
 
-------------------------------
-DATA
-------------------------------
+==================================================
+ORARIO
+==================================================
 
-Usa "data" quando il riferimento temporale
-è importante ma NON rappresenta
-né una scadenza né un appuntamento.
+Usa:
+
+"type": "orario"
+
+per un orario rilevante
+che non è già più correttamente rappresentato
+all'interno di evento,
+appuntamento o scadenza.
+
+Evita duplicazioni inutili.
+
+Se hai già:
+
+{
+  "type": "appuntamento",
+  "value":
+    "Riunione il 5 dicembre alle 10:00"
+}
+
+NON è normalmente necessario aggiungere anche:
+
+{
+  "type": "orario",
+  "value": "10:00"
+}
+
+==================================================
+PRINCIPIO DI SPECIFICITÀ
+==================================================
+
+Quando più categorie potrebbero applicarsi,
+scegli quella semanticamente
+PIÙ INFORMATIVA.
+
+Priorità concettuale:
+
+scadenza
+>
+appuntamento / evento
+>
+data
+
+Esempio:
+
+"Consegna entro il 4 dicembre."
+
+NON produrre contemporaneamente:
+
+data = 4 dicembre
+scadenza = 4 dicembre
+
+Produci soltanto:
+
+scadenza = 4 dicembre
+
+==================================================
+EVENTO VS APPUNTAMENTO
+==================================================
+
+Non sono sinonimi.
+
+EVENTO:
+
+descrive principalmente
+qualcosa che accadrà
+in una determinata data.
+
+APPUNTAMENTO:
+
+descrive principalmente
+un incontro o un impegno fissato.
+
+Esempio:
+
+"Gita a Catania il 5 dicembre."
+
+=> evento
+
+"Riunione con le maestre
+il 5 dicembre."
+
+=> appuntamento
+
+"Recita scolastica
+il 20 dicembre."
+
+=> evento
+
+"Visita dal medico
+il 20 dicembre alle 15."
+
+=> appuntamento
+
+==================================================
+EVENTO NON SIGNIFICA TASK
+==================================================
+
+La presenza di un evento
+NON implica automaticamente
+la presenza di un task.
+
+Esempio:
+
+"La recita sarà il 20 dicembre."
+
+important_details:
+
+evento
+
+tasks:
+
+[]
 
 ==================================================
 DECISIONE VS PROPOSTA
@@ -605,29 +786,21 @@ Distingui sempre tra:
 - proposto
 - incerto
 
-Esempio:
-
 "Ci vediamo venerdì alle 10."
 
-può essere:
-
-confermato
+=> confermato
 
 "Potremmo vederci venerdì alle 10."
 
-deve essere:
-
-proposto
+=> proposto
 
 "Credo che forse sia venerdì."
 
-deve essere:
-
-incerto
+=> incerto
 
 NON trasformare mai
 una proposta o un'ipotesi
-in una decisione definitiva.
+in qualcosa di confermato.
 
 ==================================================
 IMPORTI
@@ -645,11 +818,7 @@ Esempio:
 
 "Il preventivo è di 2.500 euro."
 
-Non limitarti a:
-
-"2.500"
-
-Preserva il significato:
+Preserva:
 
 "Preventivo: 2.500 euro"
 
@@ -670,10 +839,9 @@ NON inventare:
 - ruoli
 - qualifiche
 - aziende
-- relazioni tra persone
+- relazioni
 
-non presenti o non deducibili
-dal messaggio.
+non presenti nel messaggio.
 
 ==================================================
 RICONOSCIMENTO DEL CONTESTO PROFESSIONALE
@@ -702,7 +870,8 @@ ma NON sono limitati a:
 
 Se emerge chiaramente
 un settore non presente nell'elenco,
-puoi utilizzare il nome appropriato.
+puoi utilizzare
+il nome appropriato.
 
 Se NON è possibile determinarlo
 con sufficiente sicurezza:
@@ -711,13 +880,11 @@ usa:
 
 "generico"
 
-NON forzare la classificazione.
-
 ==================================================
 TERMINOLOGIA PROFESSIONALE
 ==================================================
 
-Mantieni correttamente
+Mantieni correttamente,
 quando realmente presenti:
 
 - termini tecnici
@@ -754,9 +921,6 @@ NON:
 - formulare conclusioni mediche
   non presenti nel messaggio
 
-Il compito è sintetizzare
-ciò che è stato detto.
-
 ==================================================
 TASK
 ==================================================
@@ -779,35 +943,33 @@ può produrre:
 }
 
 ==================================================
-REGOLA FONDAMENTALE PER TASK.DEADLINE
+TASK.DEADLINE
 ==================================================
 
-La deadline del task deve rispettare
-ESATTAMENTE le stesse regole
+La deadline deve rispettare
+le stesse regole rigorose
 stabilite per le date.
 
 NON aggiungere MAI
 un anno non presente.
 
-Esempio:
+"entro il 4 dicembre"
 
-"Preparare il materiale entro il 4 dicembre."
-
-CORRETTO:
+deve produrre:
 
 "deadline": "4 dicembre"
 
-ERRATO:
+NON:
 
-"deadline": "2023-12-04"
+"2023-12-04"
 
-ERRATO:
+NON:
 
-"deadline": "2026-12-04"
+"2026-12-04"
 
-ERRATO:
+NON:
 
-"deadline": "04/12/2026"
+"04/12/2026"
 
 Se viene detto:
 
@@ -817,17 +979,12 @@ usa:
 
 "deadline": "domani"
 
-NON convertire automaticamente
-in una data assoluta.
-
 ==================================================
 TASK.TIME
 ==================================================
 
 Inserisci un orario
 soltanto quando è realmente presente.
-
-Esempio:
 
 "Chiamalo domani alle 15."
 
@@ -847,8 +1004,6 @@ COERENZA TRA DETAILS E TASK
 important_details e tasks
 devono essere semanticamente coerenti.
 
-Esempio:
-
 "Invia il documento entro il 4 dicembre."
 
 Se tasks contiene:
@@ -858,14 +1013,12 @@ Se tasks contiene:
   "deadline": "4 dicembre"
 }
 
-important_details dovrebbe classificare
-"4 dicembre" come:
+important_details deve classificare
+il 4 dicembre come:
 
-"scadenza"
+scadenza
 
-e NON semplicemente come:
-
-"data"
+e NON come semplice data.
 
 ==================================================
 NESSUN TASK INVENTATO
@@ -873,10 +1026,11 @@ NESSUN TASK INVENTATO
 
 NON trasformare automaticamente:
 
+- un evento
+- un appuntamento
 - una semplice informazione
 - una persona citata
 - una data storica
-- un appuntamento
 - una possibilità
 - una considerazione
 
@@ -896,7 +1050,8 @@ Restituisci ESCLUSIVAMENTE
 un JSON valido con questa struttura:
 
 {
-  "context": "settore riconosciuto oppure generico",
+  "context":
+    "settore riconosciuto oppure generico",
 
   "summary":
     "sintesi breve e naturale del contenuto principale",
@@ -908,7 +1063,7 @@ un JSON valido con questa struttura:
   "important_details": [
     {
       "type":
-        "data|orario|appuntamento|scadenza|luogo|persona|importo|numero|decisione|altro",
+        "data|orario|evento|appuntamento|scadenza|luogo|persona|importo|numero|decisione|altro",
 
       "value":
         "dato estratto",
@@ -940,64 +1095,82 @@ CONTROLLO FINALE OBBLIGATORIO
 ==================================================
 
 Prima di restituire il JSON,
-esegui mentalmente questi controlli:
+controlla:
 
 1. Ho inventato un anno?
 
 Se sì:
 RIMUOVILO.
 
-2. Ho trasformato una data incompleta
-in una data completa?
+2. Ho completato una data
+con informazioni non presenti?
 
 Se sì:
-RIPRISTINA LA FORMA ORIGINALE.
+RIPRISTINA LA GRANULARITÀ ORIGINALE.
 
-3. Ho trasformato "domani",
-"lunedì" o espressioni simili
+3. Ho trasformato
+"domani", "lunedì" o simili
 in una data assoluta?
 
 Se sì:
 RIPRISTINA L'ESPRESSIONE ORIGINALE.
 
-4. Una scadenza è stata classificata
-semplicemente come "data"?
+4. Una scadenza
+è stata classificata come data?
 
 Se sì:
-CLASSIFICALA COME "scadenza".
+usa "scadenza".
 
-5. Un appuntamento è stato classificato
-semplicemente come "data"?
+5. Un evento programmato
+è stato classificato genericamente
+come appuntamento?
 
 Se sì:
-CLASSIFICALO COME "appuntamento"
-quando semanticamente appropriato.
+valuta se "evento"
+è semanticamente più corretto.
 
-6. Ho trasformato una proposta
+6. Un vero incontro fissato
+è stato classificato come evento?
+
+Se sì:
+usa "appuntamento".
+
+7. Sto duplicando lo stesso riferimento
+come data + evento,
+data + appuntamento
+o data + scadenza?
+
+Se sì:
+mantieni soltanto
+la categoria più informativa.
+
+8. Ho trasformato una proposta
 in qualcosa di confermato?
 
 Se sì:
-CORREGGI LO STATUS.
+correggi lo status.
 
-7. Ho creato un task
-che non rappresenta realmente
-un'attività da svolgere?
-
-Se sì:
-RIMUOVILO.
-
-8. Ho perso un'informazione importante
-per rendere la risposta troppo breve?
+9. Ho creato un task
+da un semplice evento
+o appuntamento?
 
 Se sì:
-RECUPERALA.
+rimuovilo,
+a meno che esista davvero
+un'attività da svolgere.
 
-9. Sto ripetendo inutilmente
-la stessa informazione
+10. Ho perso informazioni importanti
+per rendere la sintesi troppo breve?
+
+Se sì:
+recuperale.
+
+11. Sto ripetendo inutilmente
+le stesse informazioni
 in summary e salient_points?
 
 Se sì:
-ELIMINA LA DUPLICAZIONE.
+riduci la duplicazione.
 
 ==================================================
 REGOLE JSON FINALI
@@ -1039,23 +1212,21 @@ REGOLE JSON FINALI
             ?.content;
 
         if (!rawResult) {
-
           throw new Error(
             "Nessuna risposta dal motore di sintesi"
           );
-
         }
 
         const result =
-          JSON.parse(
-            rawResult
-          );
+          JSON.parse(rawResult);
 
         // ==================================================
         // 4. RISPOSTA PUBBLICA API
         // ==================================================
         //
-        // La trascrizione NON viene restituita.
+        // IMPORTANTE:
+        // la trascrizione resta interna e NON viene
+        // restituita attraverso l'API pubblica.
         // ==================================================
 
         return res.status(200).json({
@@ -1101,10 +1272,6 @@ REGOLE JSON FINALI
 
       } catch (e) {
 
-        // ==================================================
-        // LOG TECNICO VERCEL
-        // ==================================================
-
         console.error(
           "Errore VocalFlash API:",
           e
@@ -1118,21 +1285,33 @@ REGOLE JSON FINALI
       } finally {
 
         // ==================================================
-        // CANCELLAZIONE FILE TEMPORANEO
+        // CANCELLAZIONE FILE TEMPORANEI
         // ==================================================
 
         try {
 
-          if (
-            filePath &&
-            fs.existsSync(
-              filePath
-            )
+          const pathsToDelete =
+            [...new Set(
+              [
+                filePath,
+                tempFilePath
+              ].filter(Boolean)
+            )];
+
+          for (
+            const currentPath
+            of pathsToDelete
           ) {
 
-            await fs.promises.unlink(
-              filePath
-            );
+            if (
+              fs.existsSync(
+                currentPath
+              )
+            ) {
+              await fs.promises.unlink(
+                currentPath
+              );
+            }
 
           }
 
