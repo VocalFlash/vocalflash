@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import OpenAI, { toFile } from "openai";
 import formidable from "formidable";
 import fs from "fs";
 import path from "path";
@@ -23,6 +23,23 @@ function getValidApiKeys() {
 function normalizeUploadedFile(file) {
   if (!file) return null;
   return Array.isArray(file) ? file[0] : file;
+}
+
+function getMimeType(extension) {
+  const mimeTypes = {
+    ".flac": "audio/flac",
+    ".m4a": "audio/mp4",
+    ".mp3": "audio/mpeg",
+    ".mp4": "audio/mp4",
+    ".mpeg": "audio/mpeg",
+    ".mpga": "audio/mpeg",
+    ".oga": "audio/ogg",
+    ".ogg": "audio/ogg",
+    ".wav": "audio/wav",
+    ".webm": "audio/webm"
+  };
+
+  return mimeTypes[extension] || "application/octet-stream";
 }
 
 export default async function handler(req, res) {
@@ -128,15 +145,13 @@ export default async function handler(req, res) {
         });
       }
 
-      let tempFilePath =
+      const tempFilePath =
         audioFile.filepath || null;
-
-      let filePath = null;
 
       try {
 
         // ==================================================
-        // CONSERVAZIONE ESTENSIONE AUDIO
+        // CONTROLLO FORMATO AUDIO
         // ==================================================
 
         const originalName =
@@ -173,16 +188,40 @@ export default async function handler(req, res) {
           });
         }
 
-        filePath =
-          `${tempFilePath}${extension}`;
+        // ==================================================
+        // PREPARAZIONE FILE PER OPENAI
+        // ==================================================
+        //
+        // Non ci affidiamo al nome temporaneo di Vercel.
+        //
+        // Leggiamo direttamente i byte del file e costruiamo
+        // un upload con:
+        //
+        // - filename esplicito
+        // - estensione originale
+        // - MIME type corretto
+        //
+        // ==================================================
 
-        await fs.promises.rename(
-          tempFilePath,
-          filePath
-        );
+        const audioBuffer =
+          await fs.promises.readFile(
+            tempFilePath
+          );
 
-        // Il vecchio percorso non esiste più dopo rename.
-        tempFilePath = null;
+        const safeFileName =
+          `audio${extension}`;
+
+        const mimeType =
+          getMimeType(extension);
+
+        const openAIFile =
+          await toFile(
+            audioBuffer,
+            safeFileName,
+            {
+              type: mimeType
+            }
+          );
 
         // ==================================================
         // 1. TRASCRIZIONE INTERNA
@@ -191,13 +230,9 @@ export default async function handler(req, res) {
         const transcription =
           await client.audio.transcriptions.create({
 
-            file:
-              fs.createReadStream(
-                filePath
-              ),
+            file: openAIFile,
 
-            model:
-              "whisper-1",
+            model: "whisper-1",
 
             response_format:
               "verbose_json"
@@ -223,8 +258,7 @@ export default async function handler(req, res) {
         const completion =
           await client.chat.completions.create({
 
-            model:
-              "gpt-4o-mini",
+            model: "gpt-4o-mini",
 
             response_format: {
               type: "json_object"
@@ -674,21 +708,6 @@ appuntamento o scadenza.
 
 Evita duplicazioni inutili.
 
-Se hai già:
-
-{
-  "type": "appuntamento",
-  "value":
-    "Riunione il 5 dicembre alle 10:00"
-}
-
-NON è normalmente necessario aggiungere anche:
-
-{
-  "type": "orario",
-  "value": "10:00"
-}
-
 ==================================================
 PRINCIPIO DI SPECIFICITÀ
 ==================================================
@@ -705,18 +724,10 @@ appuntamento / evento
 >
 data
 
-Esempio:
-
-"Consegna entro il 4 dicembre."
-
-NON produrre contemporaneamente:
-
-data = 4 dicembre
-scadenza = 4 dicembre
-
-Produci soltanto:
-
-scadenza = 4 dicembre
+Non duplicare lo stesso riferimento
+come data + scadenza,
+data + appuntamento
+o data + evento.
 
 ==================================================
 EVENTO VS APPUNTAMENTO
@@ -735,24 +746,19 @@ APPUNTAMENTO:
 descrive principalmente
 un incontro o un impegno fissato.
 
-Esempio:
-
 "Gita a Catania il 5 dicembre."
 
 => evento
 
-"Riunione con le maestre
-il 5 dicembre."
+"Riunione con le maestre il 5 dicembre."
 
 => appuntamento
 
-"Recita scolastica
-il 20 dicembre."
+"Recita scolastica il 20 dicembre."
 
 => evento
 
-"Visita dal medico
-il 20 dicembre alle 15."
+"Visita dal medico il 20 dicembre alle 15."
 
 => appuntamento
 
@@ -763,8 +769,6 @@ EVENTO NON SIGNIFICA TASK
 La presenza di un evento
 NON implica automaticamente
 la presenza di un task.
-
-Esempio:
 
 "La recita sarà il 20 dicembre."
 
@@ -870,8 +874,7 @@ ma NON sono limitati a:
 
 Se emerge chiaramente
 un settore non presente nell'elenco,
-puoi utilizzare
-il nome appropriato.
+puoi utilizzare il nome appropriato.
 
 Se NON è possibile determinarlo
 con sufficiente sicurezza:
@@ -1098,79 +1101,57 @@ Prima di restituire il JSON,
 controlla:
 
 1. Ho inventato un anno?
-
-Se sì:
-RIMUOVILO.
+Se sì, RIMUOVILO.
 
 2. Ho completato una data
 con informazioni non presenti?
-
-Se sì:
-RIPRISTINA LA GRANULARITÀ ORIGINALE.
+Se sì, RIPRISTINA LA GRANULARITÀ ORIGINALE.
 
 3. Ho trasformato
 "domani", "lunedì" o simili
 in una data assoluta?
-
-Se sì:
-RIPRISTINA L'ESPRESSIONE ORIGINALE.
+Se sì, RIPRISTINA L'ESPRESSIONE ORIGINALE.
 
 4. Una scadenza
 è stata classificata come data?
-
-Se sì:
-usa "scadenza".
+Se sì, usa "scadenza".
 
 5. Un evento programmato
 è stato classificato genericamente
 come appuntamento?
-
-Se sì:
-valuta se "evento"
+Se sì, valuta se "evento"
 è semanticamente più corretto.
 
 6. Un vero incontro fissato
 è stato classificato come evento?
-
-Se sì:
-usa "appuntamento".
+Se sì, usa "appuntamento".
 
 7. Sto duplicando lo stesso riferimento
 come data + evento,
 data + appuntamento
 o data + scadenza?
-
-Se sì:
-mantieni soltanto
+Se sì, mantieni soltanto
 la categoria più informativa.
 
 8. Ho trasformato una proposta
 in qualcosa di confermato?
-
-Se sì:
-correggi lo status.
+Se sì, correggi lo status.
 
 9. Ho creato un task
 da un semplice evento
 o appuntamento?
-
-Se sì:
-rimuovilo,
+Se sì, rimuovilo,
 a meno che esista davvero
 un'attività da svolgere.
 
 10. Ho perso informazioni importanti
 per rendere la sintesi troppo breve?
-
-Se sì:
-recuperale.
+Se sì, recuperale.
 
 11. Sto ripetendo inutilmente
 le stesse informazioni
 in summary e salient_points?
-
-Se sì:
-riduci la duplicazione.
+Se sì, riduci la duplicazione.
 
 ==================================================
 REGOLE JSON FINALI
@@ -1222,11 +1203,6 @@ REGOLE JSON FINALI
 
         // ==================================================
         // 4. RISPOSTA PUBBLICA API
-        // ==================================================
-        //
-        // IMPORTANTE:
-        // la trascrizione resta interna e NON viene
-        // restituita attraverso l'API pubblica.
         // ==================================================
 
         return res.status(200).json({
@@ -1285,34 +1261,18 @@ REGOLE JSON FINALI
       } finally {
 
         // ==================================================
-        // CANCELLAZIONE FILE TEMPORANEI
+        // CANCELLAZIONE FILE TEMPORANEO VERCEL
         // ==================================================
 
         try {
 
-          const pathsToDelete =
-            [...new Set(
-              [
-                filePath,
-                tempFilePath
-              ].filter(Boolean)
-            )];
-
-          for (
-            const currentPath
-            of pathsToDelete
+          if (
+            tempFilePath &&
+            fs.existsSync(tempFilePath)
           ) {
-
-            if (
-              fs.existsSync(
-                currentPath
-              )
-            ) {
-              await fs.promises.unlink(
-                currentPath
-              );
-            }
-
+            await fs.promises.unlink(
+              tempFilePath
+            );
           }
 
         } catch (cleanupError) {
