@@ -49,24 +49,17 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
             text-decoration: none;
-            color: #111;
-            font-weight: 800;
-            font-size: 22px;
-            letter-spacing: -0.5px;
         }
 
-        .logo-v {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #7c3aed, #ec4899);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 900;
+        /* LOGO UFFICIALE VOCALFLASH */
+
+        .logo-image {
+            display: block;
+            width: auto;
+            height: 48px;
+            max-width: 100%;
+            object-fit: contain;
         }
 
         .nav {
@@ -532,9 +525,12 @@
 
     <div class="header">
 
-        <a class="logo" href="/">
-            <div class="logo-v">V</div>
-            vocalflash.it
+        <a class="logo" href="/" aria-label="VocalFlash - Torna alla home">
+            <img
+                class="logo-image"
+                src="/logo.webp"
+                alt="VocalFlash"
+            >
         </a>
 
         <div class="nav">
