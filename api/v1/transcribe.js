@@ -191,6 +191,15 @@ Se ricevi più messaggi vocali:
 10. Se i messaggi riguardano più argomenti, organizza
     la sintesi per contenuto senza perdere informazioni.
 
+Prima di produrre il JSON, verifica separatamente ciascun
+MESSAGGIO numerato: identifica le informazioni nuove e
+rilevanti che aggiunge all'insieme. Assicurati che tutte
+quelle non ripetitive siano rappresentate nel JSON finale,
+anche se un messaggio è più breve degli altri. Non citare
+il numero dei messaggi se non è utile al lettore e non
+aggiungere dettagli irrilevanti soltanto per dimostrare
+che un messaggio è stato letto.
+
 Esempio:
 
 MESSAGGIO 1:
@@ -756,6 +765,10 @@ export default async function handler(req, res) {
 
     audioFiles = normalizeFiles(parsedForm.files);
 
+    console.info(
+      `[VF DIAG] File ricevuti: ${audioFiles.length}`
+    );
+
     if (audioFiles.length === 0) {
       return res.status(400).json({
         error:
@@ -801,6 +814,11 @@ export default async function handler(req, res) {
       }
 
       totalSize += fileSize;
+
+      console.info(
+        `[VF DIAG] Audio ${audioFiles.indexOf(audioFile) + 1}/${audioFiles.length}: ` +
+        `dimensione=${fileSize} byte, formato=${extension}`
+      );
     }
 
     if (totalSize > MAX_TOTAL_SIZE) {
@@ -841,6 +859,10 @@ export default async function handler(req, res) {
         }
       );
 
+      console.info(
+        `[VF DIAG] Trascrizione ${index + 1}/${audioFiles.length}: avvio`
+      );
+
       const transcription =
         await client.audio.transcriptions.create({
           file: openAIFile,
@@ -859,6 +881,11 @@ export default async function handler(req, res) {
         `MESSAGGIO ${index + 1}:\n${transcriptText}`
       );
 
+      console.info(
+        `[VF DIAG] Trascrizione ${index + 1}/${audioFiles.length}: ` +
+        `completata, caratteri=${transcriptText.length}`
+      );
+
       if (!language) {
         language = transcription.language || null;
       }
@@ -870,6 +897,11 @@ export default async function handler(req, res) {
 
     const combinedTranscript = transcripts.join("\n\n");
 
+    console.info(
+      `[VF DIAG] Testo unificato: messaggi=${transcripts.length}, ` +
+      `caratteri=${combinedTranscript.length}`
+    );
+
     if (!combinedTranscript.trim()) {
       throw new Error("Nessuna trascrizione disponibile");
     }
@@ -877,6 +909,10 @@ export default async function handler(req, res) {
     // ==================================================
     // 3. SINTESI INTELLIGENTE
     // ==================================================
+
+    console.info(
+      `[VF DIAG] Sintesi GPT: avvio, messaggi=${transcripts.length}`
+    );
 
     const completion =
       await client.chat.completions.create({
@@ -912,6 +948,11 @@ export default async function handler(req, res) {
 
     const result = JSON.parse(rawResult);
 
+    console.info(
+      `[VF DIAG] Sintesi GPT: risposta ricevuta, ` +
+      `caratteri_json=${rawResult.length}`
+    );
+
     if (
       !result ||
       typeof result !== "object" ||
@@ -920,6 +961,14 @@ export default async function handler(req, res) {
     ) {
       throw new Error("Sintesi non valida");
     }
+
+    console.info(
+      `[VF DIAG] Risposta pronta: audio=${audioFiles.length}, ` +
+      `trascrizioni=${transcripts.length}, ` +
+      `caratteri_sintesi=${result.summary.trim().length}, ` +
+      `punti=${Array.isArray(result.salient_points) ? result.salient_points.length : 0}, ` +
+      `dettagli=${Array.isArray(result.important_details) ? result.important_details.length : 0}`
+    );
 
     // ==================================================
     // 5. RISPOSTA API
@@ -957,13 +1006,13 @@ export default async function handler(req, res) {
 
     });
 
-  } catch {
+  } catch (error) {
 
     // Non registriamo trascrizioni, contenuti dei vocali,
     // chiavi API o dettagli riservati delle richieste.
 
     console.error(
-      "Errore durante l'elaborazione API VocalFlash"
+      `[VF DIAG] Errore elaborazione: ${error?.name || "Errore"}`
     );
 
     return res.status(500).json({
