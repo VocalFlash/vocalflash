@@ -122,10 +122,10 @@ export default async function handler(req, res) {
     async (err, fields, files) => {
 
       if (err) {
-        console.error(
-          "Errore parsing form:",
-          err
-        );
+
+        // Non registriamo l'oggetto di errore:
+        // potrebbe contenere dettagli della richiesta.
+        console.error("Errore durante la lettura del form audio");
 
         return res.status(400).json({
           error: "File non leggibile"
@@ -1248,9 +1248,11 @@ REGOLE JSON FINALI
 
       } catch (e) {
 
+        // Non stampiamo l'eccezione grezza:
+        // potrebbe contenere dati della richiesta,
+        // informazioni del fornitore o dettagli riservati.
         console.error(
-          "Errore VocalFlash API:",
-          e
+          "Errore durante l'elaborazione API VocalFlash"
         );
 
         return res.status(500).json({
@@ -1277,9 +1279,10 @@ REGOLE JSON FINALI
 
         } catch (cleanupError) {
 
+          // Non stampiamo percorsi temporanei
+          // o dettagli dell'errore nei log.
           console.error(
-            "Errore cancellazione file temporaneo:",
-            cleanupError
+            "Errore durante la cancellazione del file temporaneo"
           );
 
         }
