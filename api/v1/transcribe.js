@@ -30,12 +30,45 @@ const SUPPORTED_EXTENSIONS = new Set([
   ".webm"
 ]);
 
+// Suggerimento contestuale per Whisper.
+//
+// NON imponiamo language: "it", perché VocalFlash
+// deve poter ricevere anche messaggi in altre lingue.
+//
+// Il prompt aiuta il riconoscimento dei termini italiani,
+// ma non garantisce l'assenza di errori.
+
+const TRANSCRIPTION_PROMPT = `
+Trascrizione di un messaggio vocale.
+
+Se il parlato è in italiano, presta particolare attenzione
+alla corretta trascrizione dei giorni della settimana:
+lunedì, martedì, mercoledì, giovedì, venerdì, sabato,
+domenica.
+
+Presta attenzione anche a date, orari, appuntamenti,
+scadenze, nomi propri, importi e termini professionali.
+
+Mantieni le parole effettivamente pronunciate.
+Non inventare informazioni e non completare date mancanti.
+`.trim();
+
+
+// ==================================================
+// AUTENTICAZIONE
+// ==================================================
+
 function getValidApiKeys() {
   return (process.env.VOCALFLASH_API_KEYS || "")
     .split(",")
     .map(key => key.trim())
     .filter(Boolean);
 }
+
+
+// ==================================================
+// FORMATI AUDIO
+// ==================================================
 
 function getMimeType(extension) {
   const mimeTypes = {
@@ -54,6 +87,7 @@ function getMimeType(extension) {
   return mimeTypes[extension] || "application/octet-stream";
 }
 
+
 function normalizeFiles(files) {
   const uploaded = [
     files?.file,
@@ -67,6 +101,7 @@ function normalizeFiles(files) {
     })
     .filter(Boolean);
 }
+
 
 function parseForm(req) {
   return new Promise((resolve, reject) => {
@@ -89,6 +124,11 @@ function parseForm(req) {
   });
 }
 
+
+// ==================================================
+// ELIMINAZIONE FILE TEMPORANEI
+// ==================================================
+
 async function deleteTemporaryFiles(files) {
   const paths = files
     .map(file => file?.filepath)
@@ -99,11 +139,12 @@ async function deleteTemporaryFiles(files) {
       try {
         await fs.promises.unlink(filePath);
       } catch {
-        // Evita di registrare percorsi o dati riservati.
+        // Non registrare percorsi o dati riservati.
       }
     })
   );
 }
+
 
 // ==================================================
 // ISTRUZIONI DEL MOTORE DI SINTESI
@@ -169,6 +210,103 @@ Rispondi in italiano anche se i vocali sono in
 un'altra lingua.
 
 ==================================================
+ERRORI DELLA TRASCRIZIONE AUTOMATICA
+==================================================
+
+Il testo ricevuto proviene da un sistema di riconoscimento
+vocale e può contenere errori.
+
+Prima di sintetizzare, interpreta il testo tenendo conto
+del significato complessivo delle frasi.
+
+Presta particolare attenzione a:
+- giorni della settimana;
+- date;
+- orari;
+- appuntamenti;
+- scadenze;
+- importi;
+- nomi propri;
+- termini tecnici.
+
+I giorni della settimana in italiano sono:
+lunedì, martedì, mercoledì, giovedì, venerdì,
+sabato e domenica.
+
+Una parola trascritta in modo anomalo può essere
+corretta SOLO quando il contesto permette di
+ricostruire con sufficiente sicurezza il termine
+effettivamente inteso.
+
+ESEMPIO DI CORREZIONE CONTESTUALE:
+
+Trascrizione:
+"Ci vediamo UNIDI alle nove."
+
+Se il contesto rende chiaramente riconoscibile
+il riferimento al giorno lunedì, puoi riportare:
+
+"Appuntamento lunedì alle 9:00."
+
+Non conservare una parola evidentemente errata
+soltanto perché compare nella trascrizione.
+
+ATTENZIONE:
+"UNIDI" non deve essere sostituito automaticamente
+con "lunedì" in qualsiasi frase.
+
+Non utilizzare correzioni rigide basate esclusivamente
+sulla somiglianza tra parole.
+
+Se una parola può corrispondere a più interpretazioni,
+non sceglierne arbitrariamente una.
+
+Se il riferimento temporale è rilevante ma non
+ricostruibile con sufficiente sicurezza, indica
+che il giorno o la data sono da confermare.
+
+Non trasformare mai un'informazione incerta
+in un appuntamento confermato.
+
+Non inventare:
+- nomi;
+- date;
+- orari;
+- importi;
+- luoghi;
+- termini tecnici.
+
+Non modificare arbitrariamente sigle, acronimi
+o nomi propri che potrebbero essere corretti.
+
+==================================================
+COERENZA TRA LE SEZIONI
+==================================================
+
+Un errore di trascrizione non deve propagarsi
+in più sezioni del JSON.
+
+Prima di produrre il risultato, verifica che:
+- summary;
+- salient_points;
+- important_details;
+- tasks;
+
+utilizzino la stessa interpretazione delle
+informazioni importanti.
+
+Se una data è incerta, non presentarla come
+confermata in un'altra sezione.
+
+Se una parola è stata corretta con sufficiente
+sicurezza, utilizza la forma corretta in modo
+coerente in tutto il risultato.
+
+Non riportare contemporaneamente la parola errata
+e quella corretta come se fossero due informazioni
+differenti.
+
+==================================================
 GESTIONE DI PIÙ VOCALI
 ==================================================
 
@@ -193,12 +331,14 @@ Se ricevi più messaggi vocali:
 
 Prima di produrre il JSON, verifica separatamente ciascun
 MESSAGGIO numerato: identifica le informazioni nuove e
-rilevanti che aggiunge all'insieme. Assicurati che tutte
-quelle non ripetitive siano rappresentate nel JSON finale,
-anche se un messaggio è più breve degli altri. Non citare
-il numero dei messaggi se non è utile al lettore e non
-aggiungere dettagli irrilevanti soltanto per dimostrare
-che un messaggio è stato letto.
+rilevanti che aggiunge all'insieme.
+
+Assicurati che tutte quelle non ripetitive siano
+rappresentate nel JSON finale, anche se un messaggio
+è più breve degli altri.
+
+Non citare il numero dei messaggi se non è utile
+al lettore.
 
 Esempio:
 
@@ -645,6 +785,16 @@ Prima di restituire il JSON, verifica:
     contraddittorie?
     Se sì, segnala l'incertezza.
 
+14. Ho ripetuto un evidente errore di
+    trascrizione in più sezioni?
+    Se sì, verifica il contesto e correggi
+    soltanto se l'interpretazione è affidabile.
+
+15. Ho inventato un giorno della settimana
+    per correggere una parola ambigua?
+    Se sì, rimuovi la correzione e segnala
+    che il giorno è da confermare.
+
 ==================================================
 REGOLE JSON FINALI
 ==================================================
@@ -663,6 +813,7 @@ REGOLE JSON FINALI
 - tasks deve essere un array.
 - NON includere la trascrizione completa.
 `;
+
 
 // ==================================================
 // ENDPOINT PRINCIPALE
@@ -731,7 +882,9 @@ export default async function handler(req, res) {
     process.env.OPENAI_KEY;
 
   if (!openaiKey) {
-    console.error("Configurazione OpenAI mancante");
+    console.error(
+      "Configurazione OpenAI mancante"
+    );
 
     return res.status(500).json({
       error: "OPENAI_API_KEY non configurata"
@@ -755,7 +908,9 @@ export default async function handler(req, res) {
     try {
       parsedForm = await parseForm(req);
     } catch {
-      console.error("Errore durante la lettura del form audio");
+      console.error(
+        "Errore durante la lettura del form audio"
+      );
 
       return res.status(400).json({
         error:
@@ -763,7 +918,9 @@ export default async function handler(req, res) {
       });
     }
 
-    audioFiles = normalizeFiles(parsedForm.files);
+    audioFiles = normalizeFiles(
+      parsedForm.files
+    );
 
     console.info(
       `[VF DIAG] File ricevuti: ${audioFiles.length}`
@@ -789,10 +946,18 @@ export default async function handler(req, res) {
 
     let totalSize = 0;
 
-    for (const audioFile of audioFiles) {
+    for (
+      let index = 0;
+      index < audioFiles.length;
+      index++
+    ) {
+
+      const audioFile = audioFiles[index];
 
       const extension = path
-        .extname(audioFile.originalFilename || "audio.ogg")
+        .extname(
+          audioFile.originalFilename || "audio.ogg"
+        )
         .toLowerCase() || ".ogg";
 
       if (!SUPPORTED_EXTENSIONS.has(extension)) {
@@ -801,7 +966,9 @@ export default async function handler(req, res) {
         });
       }
 
-      const fileSize = Number(audioFile.size || 0);
+      const fileSize = Number(
+        audioFile.size || 0
+      );
 
       if (
         fileSize <= 0 ||
@@ -816,7 +983,7 @@ export default async function handler(req, res) {
       totalSize += fileSize;
 
       console.info(
-        `[VF DIAG] Audio ${audioFiles.indexOf(audioFile) + 1}/${audioFiles.length}: ` +
+        `[VF DIAG] Audio ${index + 1}/${audioFiles.length}: ` +
         `dimensione=${fileSize} byte, formato=${extension}`
       );
     }
@@ -833,6 +1000,7 @@ export default async function handler(req, res) {
     // ==================================================
 
     const transcripts = [];
+
     let language = null;
 
     for (
@@ -844,12 +1012,15 @@ export default async function handler(req, res) {
       const audioFile = audioFiles[index];
 
       const extension = path
-        .extname(audioFile.originalFilename || "audio.ogg")
+        .extname(
+          audioFile.originalFilename || "audio.ogg"
+        )
         .toLowerCase() || ".ogg";
 
-      const audioBuffer = await fs.promises.readFile(
-        audioFile.filepath
-      );
+      const audioBuffer =
+        await fs.promises.readFile(
+          audioFile.filepath
+        );
 
       const openAIFile = await toFile(
         audioBuffer,
@@ -865,16 +1036,27 @@ export default async function handler(req, res) {
 
       const transcription =
         await client.audio.transcriptions.create({
+
           file: openAIFile,
+
           model: "whisper-1",
-          response_format: "verbose_json"
+
+          response_format: "verbose_json",
+
+          // Suggerimento linguistico:
+          // non forza l'italiano.
+          prompt: TRANSCRIPTION_PROMPT
+
         });
 
-      const transcriptText =
-        String(transcription.text || "").trim();
+      const transcriptText = String(
+        transcription.text || ""
+      ).trim();
 
       if (!transcriptText) {
-        throw new Error("Trascrizione vuota");
+        throw new Error(
+          "Trascrizione vuota"
+        );
       }
 
       transcripts.push(
@@ -886,8 +1068,12 @@ export default async function handler(req, res) {
         `completata, caratteri=${transcriptText.length}`
       );
 
+      // Non registriamo il testo della trascrizione:
+      // potrebbe contenere informazioni riservate.
+
       if (!language) {
-        language = transcription.language || null;
+        language =
+          transcription.language || null;
       }
     }
 
@@ -895,7 +1081,8 @@ export default async function handler(req, res) {
     // 2. UNIONE DELLE TRASCRIZIONI
     // ==================================================
 
-    const combinedTranscript = transcripts.join("\n\n");
+    const combinedTranscript =
+      transcripts.join("\n\n");
 
     console.info(
       `[VF DIAG] Testo unificato: messaggi=${transcripts.length}, ` +
@@ -903,7 +1090,9 @@ export default async function handler(req, res) {
     );
 
     if (!combinedTranscript.trim()) {
-      throw new Error("Nessuna trascrizione disponibile");
+      throw new Error(
+        "Nessuna trascrizione disponibile"
+      );
     }
 
     // ==================================================
@@ -943,10 +1132,14 @@ export default async function handler(req, res) {
       completion.choices?.[0]?.message?.content;
 
     if (!rawResult) {
-      throw new Error("Nessuna risposta dal motore di sintesi");
+      throw new Error(
+        "Nessuna risposta dal motore di sintesi"
+      );
     }
 
-    const result = JSON.parse(rawResult);
+    const result = JSON.parse(
+      rawResult
+    );
 
     console.info(
       `[VF DIAG] Sintesi GPT: risposta ricevuta, ` +
@@ -959,7 +1152,9 @@ export default async function handler(req, res) {
       typeof result.summary !== "string" ||
       !result.summary.trim()
     ) {
-      throw new Error("Sintesi non valida");
+      throw new Error(
+        "Sintesi non valida"
+      );
     }
 
     console.info(
@@ -1008,8 +1203,8 @@ export default async function handler(req, res) {
 
   } catch (error) {
 
-    // Non registriamo trascrizioni, contenuti dei vocali,
-    // chiavi API o dettagli riservati delle richieste.
+    // Non registriamo trascrizioni,
+    // contenuti dei vocali o chiavi API.
 
     console.error(
       `[VF DIAG] Errore elaborazione: ${error?.name || "Errore"}`
@@ -1026,7 +1221,9 @@ export default async function handler(req, res) {
     // ELIMINAZIONE FILE TEMPORANEI
     // ==================================================
 
-    await deleteTemporaryFiles(audioFiles);
+    await deleteTemporaryFiles(
+      audioFiles
+    );
 
   }
 }
