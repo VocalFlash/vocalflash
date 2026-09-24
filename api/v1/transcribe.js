@@ -294,6 +294,14 @@ Non inventare:
 Non modificare arbitrariamente sigle, acronimi
 o nomi propri che potrebbero essere corretti.
 
+Non tentare di "aggiustare" un nome di via, piazza o
+località scegliendo autonomamente un nome più plausibile.
+Se la trascrizione del luogo è incerta e non esistono
+elementi sufficienti nei messaggi per ricostruirlo con
+sicurezza, evita di trasformare l'incertezza in una
+correzione inventata. Conserva soltanto ciò che è
+supportato dalla trascrizione.
+
 Per nomi propri e luoghi vale una cautela aggiuntiva:
 non trasformare una trascrizione plausibile ma
 semanticamente insolita in un altro nome o luogo soltanto
@@ -559,6 +567,14 @@ important_details:
 SCADENZA:
 il termine entro cui qualcosa deve essere completato.
 
+Una data NON è una scadenza soltanto perché è futura.
+La data o l'espressione temporale associata a un
+appuntamento o evento appartiene a quell'appuntamento
+o evento e NON deve essere duplicata come scadenza.
+
+Crea una scadenza solo quando il linguaggio indica
+realmente un termine entro cui completare qualcosa.
+
 Espressioni tipiche:
 - entro;
 - non oltre;
@@ -566,6 +582,10 @@ Espressioni tipiche:
 - scadenza;
 - da consegnare entro;
 - da completare entro.
+
+Esempio:
+"Sopralluogo domani alle 11."
+=> appuntamento; NON creare "Scadenza: domani".
 
 Esempio:
 "Il documento deve essere consegnato entro il 4 dicembre."
@@ -836,8 +856,13 @@ Prima di restituire il JSON, verifica:
    in una data assoluta?
    Se sì, ripristina l'espressione originale.
 
-4. Una scadenza è stata classificata come data?
+4. Una vera scadenza è stata classificata come data?
    Se sì, usa "scadenza".
+
+4A. Ho creato una scadenza soltanto perché un
+    appuntamento o evento ha una data futura?
+    Se sì, rimuovi la scadenza: la data appartiene
+    all'appuntamento o all'evento.
 
 5. Un evento programmato è stato classificato
    genericamente come appuntamento?
