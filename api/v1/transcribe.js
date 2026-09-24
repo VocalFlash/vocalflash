@@ -1068,14 +1068,11 @@ export default async function handler(req, res) {
         `completata, caratteri=${transcriptText.length}`
       );
 
-      // DEBUG TEMPORANEO: stampa il testo solo se esplicitamente abilitato.
-      // Disattivare VF_DEBUG_TRANSCRIPTS dopo il test perché i vocali
-      // possono contenere informazioni riservate.
-      if (process.env.VF_DEBUG_TRANSCRIPTS === "1") {
-        console.info(
-          `[VF DEBUG TRANSCRIPT ${index + 1}/${audioFiles.length}] ${transcriptText}`
-        );
-      }
+      // DEBUG TEMPORANEO: stampa direttamente la trascrizione nei log Vercel.
+      // Rimuovere dopo il test perché può contenere informazioni riservate.
+      console.info(
+        `[VF DEBUG TRANSCRIPT ${index + 1}/${audioFiles.length}] ${transcriptText}`
+      );
 
       if (!language) {
         language =
