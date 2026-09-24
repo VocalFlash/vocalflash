@@ -47,10 +47,18 @@ lunedì, martedì, mercoledì, giovedì, venerdì, sabato,
 domenica.
 
 Presta attenzione anche a date, orari, appuntamenti,
-scadenze, nomi propri, importi e termini professionali.
+scadenze, nomi propri, nomi di vie e luoghi, importi e
+termini professionali.
+
+In particolare, in contesti di lavoro presta attenzione a
+parole come sopralluogo, planimetria, preventivo, misure,
+locale, cliente, cantiere, tecnico ed elettricista.
 
 Mantieni le parole effettivamente pronunciate.
 Non inventare informazioni e non completare date mancanti.
+Se un nome proprio o un luogo non è chiaro nell'audio,
+trascrivilo per quanto effettivamente riconosciuto senza
+inventare una correzione.
 `.trim();
 
 
@@ -279,6 +287,17 @@ Non inventare:
 Non modificare arbitrariamente sigle, acronimi
 o nomi propri che potrebbero essere corretti.
 
+Per nomi propri e luoghi vale una cautela aggiuntiva:
+non trasformare una trascrizione plausibile ma
+semanticamente insolita in un altro nome o luogo soltanto
+perché quest'ultimo sembrerebbe più logico.
+
+Se un luogo trascritto è grammaticalmente utilizzabile ma
+il contesto non consente di ricostruire con sicurezza il
+nome realmente pronunciato, non inventare una sostituzione.
+Puoi conservarlo come dato trascritto soltanto se è utile,
+senza attribuirgli una correzione non supportata.
+
 ==================================================
 COERENZA TRA LE SEZIONI
 ==================================================
@@ -329,13 +348,36 @@ Se ricevi più messaggi vocali:
 10. Se i messaggi riguardano più argomenti, organizza
     la sintesi per contenuto senza perdere informazioni.
 
-Prima di produrre il JSON, verifica separatamente ciascun
-MESSAGGIO numerato: identifica le informazioni nuove e
-rilevanti che aggiunge all'insieme.
+Prima di produrre il JSON, esegui internamente una verifica
+di copertura messaggio per messaggio.
 
-Assicurati che tutte quelle non ripetitive siano
-rappresentate nel JSON finale, anche se un messaggio
-è più breve degli altri.
+Per OGNI MESSAGGIO numerato:
+1. individua ogni fatto operativo o informazione concreta;
+2. individua date, orari, luoghi, importi, documenti,
+   misure, persone, decisioni e attività da svolgere;
+3. individua eventuali correzioni esplicite di messaggi
+   precedenti;
+4. marca mentalmente ogni elemento come:
+   - superato da una correzione successiva;
+   - duplicato;
+   - oppure ancora valido.
+
+Prima del JSON finale, controlla che OGNI elemento ancora
+valido e non duplicato sia rappresentato almeno una volta
+in summary, salient_points, important_details oppure tasks.
+
+Un dettaglio operativo concreto non deve sparire soltanto
+per rendere la sintesi più breve. Per esempio, se un
+messaggio dice di controllare delle misure, portare un
+documento o chiamare qualcuno, quell'azione deve rimanere
+rappresentata se non viene successivamente annullata.
+
+Non è però necessario ripetere lo stesso fatto in più
+campi del JSON: rappresentalo nella posizione più utile.
+
+Assicurati che le informazioni nuove e non ripetitive di
+un messaggio breve abbiano lo stesso diritto di essere
+preservate di quelle contenute nei messaggi più lunghi.
 
 Non citare il numero dei messaggi se non è utile
 al lettore.
@@ -376,8 +418,31 @@ Se i contenuti sono lunghi o complessi, organizza
 logicamente le informazioni senza trasformare
 la sintesi in una trascrizione mascherata.
 
-Evita duplicazioni inutili tra summary,
-salient_points e important_details.
+Evita duplicazioni tra summary, salient_points,
+important_details e tasks.
+
+Regola di non duplicazione:
+- summary descrive il quadro principale;
+- salient_points contiene SOLO informazioni importanti
+  non già espresse in modo sostanziale nel summary e non
+  già rappresentate meglio in important_details o tasks;
+- important_details contiene dati strutturati utili come
+  appuntamenti, scadenze, luoghi, importi o decisioni;
+- tasks contiene le azioni concrete da svolgere.
+
+Se un fatto è già chiaramente presente nel summary,
+non ripeterlo in salient_points soltanto per enfatizzarlo.
+
+Se un appuntamento è già rappresentato in
+important_details, non creare anche un salient_point che
+ripeta soltanto lo stesso appuntamento.
+
+Se un'azione è già rappresentata come task, non ripeterla
+in salient_points salvo che aggiunga un'informazione
+distinta e necessaria.
+
+salient_points può essere []: non deve essere riempito
+artificialmente.
 
 ==================================================
 DATE E ORARI
@@ -795,6 +860,17 @@ Prima di restituire il JSON, verifica:
     Se sì, rimuovi la correzione e segnala
     che il giorno è da confermare.
 
+16. Ho verificato ogni MESSAGGIO numerato e perso
+    un fatto operativo ancora valido, come un controllo,
+    una misura, un documento o una chiamata?
+    Se sì, reinseriscilo nella sezione più appropriata.
+
+17. summary, salient_points, important_details e tasks
+    stanno ripetendo lo stesso fatto senza aggiungere
+    informazione?
+    Se sì, conserva quel fatto una sola volta nella
+    posizione più utile.
+
 ==================================================
 REGOLE JSON FINALI
 ==================================================
@@ -1068,11 +1144,8 @@ export default async function handler(req, res) {
         `completata, caratteri=${transcriptText.length}`
       );
 
-      // DEBUG TEMPORANEO: stampa direttamente la trascrizione nei log Vercel.
-      // Rimuovere dopo il test perché può contenere informazioni riservate.
-      console.info(
-        `[VF DEBUG TRANSCRIPT ${index + 1}/${audioFiles.length}] ${transcriptText}`
-      );
+      // Non registriamo il testo della trascrizione:
+      // potrebbe contenere informazioni riservate.
 
       if (!language) {
         language =
