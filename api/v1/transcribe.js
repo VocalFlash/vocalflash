@@ -54,6 +54,13 @@ In particolare, in contesti di lavoro presta attenzione a
 parole come sopralluogo, planimetria, preventivo, misure,
 locale, cliente, cantiere, tecnico ed elettricista.
 
+Per nomi propri, vie, piazze e località italiane, presta
+particolare attenzione alla segmentazione delle parole e
+alla grafia effettivamente pronunciata. Non trasformare un
+nome di strada in una parola comune o in un altro luogo.
+Usa il contesto soltanto per riconoscere meglio l'audio,
+mai per inventare un nome non pronunciato.
+
 Mantieni le parole effettivamente pronunciate.
 Non inventare informazioni e non completare date mancanti.
 Se un nome proprio o un luogo non è chiaro nell'audio,
@@ -610,8 +617,26 @@ Distingui sempre:
 "Credo che forse sia venerdì."
 => incerto.
 
+Per le attività da svolgere, espressioni imperative o di
+necessità come:
+- "dobbiamo chiamare";
+- "devo inviare";
+- "bisogna controllare";
+- "ricordati di portare";
+- "porta il documento";
+
+indicano un'azione da svolgere e quindi, salvo elementi
+contrari nel contesto, hanno status "confermato".
+
+Usa "proposto" soltanto quando il linguaggio esprime
+realmente una possibilità o proposta, per esempio:
+- "potremmo chiamare";
+- "forse conviene chiamare";
+- "si potrebbe fare".
+
 Non trasformare una proposta o un'ipotesi
-in qualcosa di confermato.
+in qualcosa di confermato e non trasformare un obbligo
+o un'azione esplicita in una semplice proposta.
 
 Se più vocali riportano informazioni discordanti
 e non è possibile individuare una correzione
@@ -870,6 +895,12 @@ Prima di restituire il JSON, verifica:
     informazione?
     Se sì, conserva quel fatto una sola volta nella
     posizione più utile.
+
+18. Ho classificato come "proposto" un'attività espressa
+    con "dobbiamo", "devo", "bisogna", "ricordati di" o
+    con un'altra formulazione chiaramente operativa?
+    Se sì, usa "confermato", salvo che il contesto renda
+    davvero l'attività ipotetica.
 
 ==================================================
 REGOLE JSON FINALI
