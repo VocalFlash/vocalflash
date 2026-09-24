@@ -14,6 +14,17 @@ export const config = {
 // ==================================================
 
 const MAX_FILES = 5;
+
+// V4 TEST CONTROLLATO: keywords temporanee.
+// Servono solo a verificare il riconoscimento dei termini pronunciati
+// nei 5 vocali di prova; il vocabolario definitivo sarà dinamico.
+const TRANSCRIPTION_KEYWORDS = [
+  "Via Etnea",
+  "sopralluogo",
+  "planimetria",
+  "preventivo",
+  "elettricista"
+];
 const MAX_FILE_SIZE = 12 * 1024 * 1024;
 const MAX_TOTAL_SIZE = 25 * 1024 * 1024;
 
@@ -1166,8 +1177,7 @@ export default async function handler(req, res) {
         `[VF DIAG] Trascrizione ${index + 1}/${audioFiles.length}: avvio`
       );
 
-      const transcription =
-        await client.audio.transcriptions.create({
+      const transcriptionRequest = {
 
           file: openAIFile,
 
@@ -1175,13 +1185,22 @@ export default async function handler(req, res) {
 
           response_format: "json",
 
-          // Test controllato del nuovo motore:
-          // manteniamo invariato il prompt e non forziamo
-          // una singola lingua, così il confronto con
-          // Whisper-1 resta il più pulito possibile.
           prompt: TRANSCRIPTION_PROMPT
 
-        });
+        };
+
+      // `keywords` viene passato nel body aggiuntivo secondo
+      // il formato documentato per l'SDK JavaScript OpenAI.
+      const transcription =
+        await client.audio.transcriptions.create(
+          transcriptionRequest,
+          {
+            body: {
+              ...transcriptionRequest,
+              keywords: TRANSCRIPTION_KEYWORDS
+            }
+          }
+        );
 
       const transcriptText = String(
         transcription.text || ""
