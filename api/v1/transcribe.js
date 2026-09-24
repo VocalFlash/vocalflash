@@ -695,6 +695,18 @@ semanticamente coerenti.
 Non creare task duplicati se più vocali
 richiedono la stessa attività.
 
+REGOLE ANTI-DUPLICAZIONE DEI TASK:
+- Se un’informazione è già rappresentata correttamente in tasks, non ripeterla in salient_points soltanto per renderla visibile.
+- Un task può comparire nel summary solo se è indispensabile per comprendere il contenuto principale; in tal caso non ripeterlo anche nei salient_points.
+- Evita che la stessa attività compaia contemporaneamente come salient_point e task.
+
+ASSOCIAZIONE DI DATE E ORARI AI TASK:
+- Assegna deadline e time a un task SOLO quando il parlato collega esplicitamente o inequivocabilmente quel riferimento temporale a quella specifica attività.
+- Non trasferire automaticamente a un task date, giorni, espressioni relative o orari appartenenti a un appuntamento, evento o altra informazione presente nello stesso vocale o in un altro messaggio.
+- In particolare, se un messaggio precedente contiene “domani”, “alle 19” o un altro riferimento temporale relativo a un appuntamento, e un messaggio successivo contiene soltanto un promemoria come “Non scordare i calzettoni”, il task deve avere deadline: null e time: null.
+- La vicinanza tra messaggi non implica che condividano la stessa data o lo stesso orario.
+- In caso di dubbio sull’associazione temporale, usa null invece di inferire.
+
 ==================================================
 OUTPUT
 ==================================================
