@@ -1115,12 +1115,14 @@ export default async function handler(req, res) {
 
           file: openAIFile,
 
-          model: "whisper-1",
+          model: "gpt-transcribe",
 
-          response_format: "verbose_json",
+          response_format: "json",
 
-          // Suggerimento linguistico:
-          // non forza l'italiano.
+          // Test controllato del nuovo motore:
+          // manteniamo invariato il prompt e non forziamo
+          // una singola lingua, così il confronto con
+          // Whisper-1 resta il più pulito possibile.
           prompt: TRANSCRIPTION_PROMPT
 
         });
@@ -1149,7 +1151,9 @@ export default async function handler(req, res) {
 
       if (!language) {
         language =
-          transcription.language || null;
+          transcription.language ||
+          transcription.languages?.[0]?.code ||
+          null;
       }
     }
 
