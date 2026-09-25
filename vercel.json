@@ -3,5 +3,15 @@
     "api/**/*.js": {
       "includeFiles": "**"
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/questionario",
+      "destination": "/questionario.html"
+    },
+    {
+      "source": "/questionario-risultati",
+      "destination": "/questionario-risultati.html"
+    }
+  ]
 }
