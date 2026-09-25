@@ -3,102 +3,767 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Questionario VocalFlash</title>
-<meta name="description" content="Questionario su WhatsApp e messaggi vocali di lavoro">
+
+<meta
+  name="description"
+  content="Questionario su WhatsApp e messaggi vocali di lavoro"
+>
+
 <style>
-:root{--a:#6d35d7;--b:#d83b9b;--bg:#f7f7fb;--line:#e7e7ef;--muted:#666775}
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:#17171b}
-main{max-width:760px;margin:auto;padding:18px 14px 48px}.hero{background:linear-gradient(135deg,var(--a),var(--b));color:#fff;padding:26px 22px;border-radius:22px;margin-bottom:16px;box-shadow:0 12px 30px rgba(86,42,154,.15)}
-h1{margin:0 0 7px;font-size:28px}.hero p{margin:0;opacity:.95}.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:18px;margin:12px 0}
-.q{font-weight:750;font-size:18px;margin-bottom:10px}.hint{font-size:14px;color:var(--muted);margin-bottom:10px}
-label.opt{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:11px;padding:10px 11px;margin:7px 0;cursor:pointer}
-input{margin-top:3px;accent-color:var(--a);transform:scale(1.08)}textarea{width:100%;min-height:115px;border:1px solid var(--line);border-radius:11px;padding:11px;font:inherit;resize:vertical}
-button{width:100%;border:0;border-radius:13px;padding:14px 16px;font-weight:750;font-size:16px;cursor:pointer;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;margin-top:10px}
-button:disabled{opacity:.6;cursor:default}.status{display:none;margin-top:14px;padding:14px;border-radius:12px}.ok{background:#eef9f0;border:1px solid #bfe0c5}.err{background:#fff0f0;border:1px solid #efc6c6}.privacy{font-size:12px;color:var(--muted);margin-top:12px}.hp{position:absolute;left:-9999px;opacity:0}
+:root{
+  --a:#6d35d7;
+  --b:#d83b9b;
+  --bg:#f7f7fb;
+  --line:#e7e7ef;
+  --muted:#666775;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  background:var(--bg);
+  color:#17171b;
+}
+
+main{
+  max-width:760px;
+  margin:auto;
+  padding:18px 14px 48px;
+}
+
+.hero{
+  background:linear-gradient(135deg,var(--a),var(--b));
+  color:#fff;
+  padding:26px 22px;
+  border-radius:22px;
+  margin-bottom:16px;
+  box-shadow:0 12px 30px rgba(86,42,154,.15);
+}
+
+h1{
+  margin:0 0 7px;
+  font-size:28px;
+}
+
+.hero p{
+  margin:0;
+  opacity:.95;
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:18px;
+  margin:12px 0;
+}
+
+.q{
+  font-weight:750;
+  font-size:18px;
+  margin-bottom:10px;
+}
+
+.hint{
+  font-size:14px;
+  color:var(--muted);
+  margin-bottom:10px;
+}
+
+label.opt{
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
+  border:1px solid var(--line);
+  border-radius:11px;
+  padding:10px 11px;
+  margin:7px 0;
+  cursor:pointer;
+}
+
+input{
+  margin-top:3px;
+  accent-color:var(--a);
+  transform:scale(1.08);
+}
+
+textarea{
+  width:100%;
+  min-height:115px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  padding:11px;
+  font:inherit;
+  resize:vertical;
+}
+
+button{
+  width:100%;
+  border:0;
+  border-radius:13px;
+  padding:14px 16px;
+  font-weight:750;
+  font-size:16px;
+  cursor:pointer;
+  background:linear-gradient(135deg,var(--a),var(--b));
+  color:#fff;
+  margin-top:10px;
+}
+
+button:disabled{
+  opacity:.6;
+  cursor:default;
+}
+
+.status{
+  display:none;
+  margin-top:14px;
+  padding:14px;
+  border-radius:12px;
+}
+
+.ok{
+  background:#eef9f0;
+  border:1px solid #bfe0c5;
+}
+
+.err{
+  background:#fff0f0;
+  border:1px solid #efc6c6;
+}
+
+.privacy{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:12px;
+}
+
+.hp{
+  position:absolute;
+  left:-9999px;
+  opacity:0;
+}
 </style>
 </head>
-<body><main>
-<section class="hero"><h1>Questionario VocalFlash</h1><p>WhatsApp e messaggi vocali di lavoro · circa 2 minuti</p></section>
+
+<body>
+
+<main>
+
+<section class="hero">
+  <h1>Questionario VocalFlash</h1>
+  <p>
+    WhatsApp e messaggi vocali di lavoro · circa 2 minuti
+  </p>
+</section>
+
 <form id="survey">
-<div class="hp"><label>Lascia vuoto<input name="website" autocomplete="off"></label></div>
 
-<div class="card"><div class="q">1. Quanto utilizzi WhatsApp per lavoro?</div>
-<label class="opt"><input required type="radio" name="q1" value="Poco">Poco</label>
-<label class="opt"><input type="radio" name="q1" value="Ogni giorno">Ogni giorno</label>
-<label class="opt"><input type="radio" name="q1" value="Molto durante la giornata">Molto durante la giornata</label>
-<label class="opt"><input type="radio" name="q1" value="È uno dei miei principali strumenti di lavoro">È uno dei miei principali strumenti di lavoro</label></div>
+<div class="hp">
+  <label>
+    Lascia vuoto
+    <input name="website" autocomplete="off">
+  </label>
+</div>
 
-<div class="card"><div class="q">2. Quanti vocali ricevi mediamente in una giornata lavorativa?</div>
-<label class="opt"><input required type="radio" name="q2" value="0–5">0–5</label>
-<label class="opt"><input type="radio" name="q2" value="6–15">6–15</label>
-<label class="opt"><input type="radio" name="q2" value="16–30">16–30</label>
-<label class="opt"><input type="radio" name="q2" value="Più di 30">Più di 30</label>
-<label class="opt"><input type="radio" name="q2" value="Non saprei">Non saprei</label></div>
+<div class="card">
 
-<div class="card"><div class="q">3. Ti capita di dover riascoltare un vocale per recuperare un'informazione?</div>
-<label class="opt"><input required type="radio" name="q3" value="Quasi mai">Quasi mai</label>
-<label class="opt"><input type="radio" name="q3" value="Qualche volta">Qualche volta</label>
-<label class="opt"><input type="radio" name="q3" value="Spesso">Spesso</label>
-<label class="opt"><input type="radio" name="q3" value="Molto spesso">Molto spesso</label></div>
+  <div class="q">
+    1. Quanto utilizzi WhatsApp per lavoro?
+  </div>
 
-<div class="card"><div class="q">4. Ti è mai capitato di dimenticare un appuntamento, una richiesta o un'attività contenuta in un vocale?</div>
-<label class="opt"><input required type="radio" name="q4" value="Mai">Mai</label>
-<label class="opt"><input type="radio" name="q4" value="Raramente">Raramente</label>
-<label class="opt"><input type="radio" name="q4" value="Qualche volta">Qualche volta</label>
-<label class="opt"><input type="radio" name="q4" value="Spesso">Spesso</label></div>
+  <label class="opt">
+    <input
+      required
+      type="radio"
+      name="q1"
+      value="Poco"
+    >
+    Poco
+  </label>
 
-<div class="card"><div class="q">5. Se WhatsApp potesse capire automaticamente un vocale, quali funzioni utilizzeresti?</div><div class="hint">Puoi scegliere più risposte.</div>
-<label class="opt"><input type="checkbox" name="q5" value="Sintesi del messaggio">Sintesi del messaggio</label>
-<label class="opt"><input type="checkbox" name="q5" value="Creazione appuntamento">Creazione appuntamento</label>
-<label class="opt"><input type="checkbox" name="q5" value="Promemoria">Promemoria</label>
-<label class="opt"><input type="checkbox" name="q5" value="Attività da fare">Attività da fare</label>
-<label class="opt"><input type="checkbox" name="q5" value="Sopralluogo/intervento">Sopralluogo/intervento</label>
-<label class="opt"><input type="checkbox" name="q5" value="Dati del cliente">Dati del cliente</label>
-<label class="opt"><input type="checkbox" name="q5" value="Inoltro a un collaboratore">Inoltro a un collaboratore</label>
-<label class="opt"><input type="checkbox" name="q5" value="Altro">Altro</label></div>
+  <label class="opt">
+    <input
+      type="radio"
+      name="q1"
+      value="Ogni giorno"
+    >
+    Ogni giorno
+  </label>
 
-<div class="card"><div class="q">6. Se un cliente potesse inviare un vocale e il sistema organizzasse automaticamente la richiesta, cosa vorresti che facesse?</div><div class="hint">Puoi scegliere più risposte.</div>
-<label class="opt"><input type="checkbox" name="q6" value="Raccolga la richiesta">Raccolga la richiesta</label>
-<label class="opt"><input type="checkbox" name="q6" value="Chieda le informazioni mancanti">Chieda le informazioni mancanti</label>
-<label class="opt"><input type="checkbox" name="q6" value="Proponga appuntamenti disponibili">Proponga appuntamenti disponibili</label>
-<label class="opt"><input type="checkbox" name="q6" value="Prenoti dopo mia conferma">Prenoti dopo mia conferma</label>
-<label class="opt"><input type="checkbox" name="q6" value="Mi mandi un riepilogo e decido io">Mi mandi un riepilogo e decido io</label>
-<label class="opt"><input type="checkbox" name="q6" value="Altro">Altro</label></div>
+  <label class="opt">
+    <input
+      type="radio"
+      name="q1"
+      value="Molto durante la giornata"
+    >
+    Molto durante la giornata
+  </label>
 
-<div class="card"><div class="q">7. Quanto saresti disposto a pagare al mese per un servizio che ti facesse realmente risparmiare tempo?</div>
-<label class="opt"><input required type="radio" name="q7" value="Non pagherei">Non pagherei</label>
-<label class="opt"><input type="radio" name="q7" value="Fino a €5">Fino a €5</label>
-<label class="opt"><input type="radio" name="q7" value="€6–10">€6–10</label>
-<label class="opt"><input type="radio" name="q7" value="€11–20">€11–20</label>
-<label class="opt"><input type="radio" name="q7" value="€21–40">€21–40</label>
-<label class="opt"><input type="radio" name="q7" value="Più di €40">Più di €40</label>
-<label class="opt"><input type="radio" name="q7" value="Dipende dal tempo che mi fa risparmiare">Dipende dal tempo che mi fa risparmiare</label></div>
+  <label class="opt">
+    <input
+      type="radio"
+      name="q1"
+      value="È uno dei miei principali strumenti di lavoro"
+    >
+    È uno dei miei principali strumenti di lavoro
+  </label>
 
-<div class="card"><div class="q">Ultima domanda</div><div class="hint">Qual è la cosa che ti fa perdere più tempo oggi nella gestione di WhatsApp e dei messaggi vocali di lavoro?</div>
-<textarea name="q8" maxlength="1200" placeholder="Scrivi qui..."></textarea></div>
+</div>
 
-<button id="send" type="submit">Invia risposte</button>
-<div id="status" class="status"></div>
-<div class="privacy">Il questionario non richiede nome, telefono o e-mail. Le risposte vengono utilizzate per analizzare esigenze e priorità del servizio.</div>
+<div class="card">
+
+  <div class="q">
+    2. Quanti vocali ricevi mediamente in una giornata lavorativa?
+  </div>
+
+  <label class="opt">
+    <input
+      required
+      type="radio"
+      name="q2"
+      value="0–5"
+    >
+    0–5
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q2"
+      value="6–15"
+    >
+    6–15
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q2"
+      value="16–30"
+    >
+    16–30
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q2"
+      value="Più di 30"
+    >
+    Più di 30
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q2"
+      value="Non saprei"
+    >
+    Non saprei
+  </label>
+
+</div>
+
+<div class="card">
+
+  <div class="q">
+    3. Ti capita di dover riascoltare un vocale per recuperare un'informazione?
+  </div>
+
+  <label class="opt">
+    <input
+      required
+      type="radio"
+      name="q3"
+      value="Quasi mai"
+    >
+    Quasi mai
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q3"
+      value="Qualche volta"
+    >
+    Qualche volta
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q3"
+      value="Spesso"
+    >
+    Spesso
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q3"
+      value="Molto spesso"
+    >
+    Molto spesso
+  </label>
+
+</div>
+
+<div class="card">
+
+  <div class="q">
+    4. Ti è mai capitato di dimenticare un appuntamento, una richiesta o un'attività contenuta in un vocale?
+  </div>
+
+  <label class="opt">
+    <input
+      required
+      type="radio"
+      name="q4"
+      value="Mai"
+    >
+    Mai
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q4"
+      value="Raramente"
+    >
+    Raramente
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q4"
+      value="Qualche volta"
+    >
+    Qualche volta
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q4"
+      value="Spesso"
+    >
+    Spesso
+  </label>
+
+</div>
+
+<div class="card">
+
+  <div class="q">
+    5. Se WhatsApp potesse capire automaticamente un vocale, quali funzioni utilizzeresti?
+  </div>
+
+  <div class="hint">
+    Puoi scegliere più risposte.
+  </div>
+
+  <label class="opt">
+    <input
+      type="checkbox"
+      name="q5"
+      value="Sintesi del messaggio"
+    >
+    Sintesi del messaggio
+  </label>
+
+  <label class="opt">
+    <input
+      type="checkbox"
+      name="q5"
+      value="Creazione appuntamento"
+    >
+    Creazione appuntamento
+  </label>
+
+  <label class="opt">
+    <input
+      type="checkbox"
+      name="q5"
+      value="Promemoria"
+    >
+    Promemoria
+  </label>
+
+  <label class="opt">
+    <input
+      type="checkbox"
+      name="q5"
+      value="Attività da fare"
+    >
+    Attività da fare
+  </label>
+
+  <label class="opt">
+    <input
+      type="checkbox"
+      name="q5"
+      value="Sopralluogo/intervento"
+    >
+    Sopralluogo/intervento
+  </label>
+
+  <label class="opt">
+    <input
+      type="checkbox"
+      name="q5"
+      value="Dati del cliente"
+    >
+    Dati del cliente
+  </label>
+
+  <label class="opt">
+    <input
+      type="checkbox"
+      name="q5"
+      value="Inoltro a un collaboratore"
+    >
+    Inoltro a un collaboratore
+  </label>
+
+  <label class="opt">
+    <input
+      type="checkbox"
+      name="q5"
+      value="Altro"
+    >
+    Altro
+  </label>
+
+</div>
+
+<div class="card">
+
+  <div class="q">
+    6. Dopo un vocale ricevuto da un cliente, cosa vorresti che facesse automaticamente il sistema?
+  </div>
+
+  <div class="hint">
+    Puoi scegliere più risposte.
+  </div>
+
+  <label class="opt">
+    <input
+      type="checkbox"
+      name="q6"
+      value="Capire e riassumere la richiesta"
+    >
+    Capire e riassumere la richiesta
+  </label>
+
+  <label class="opt">
+    <input
+      type="checkbox"
+      name="q6"
+      value="Chiedere al cliente le informazioni mancanti"
+    >
+    Chiedere al cliente le informazioni mancanti
+  </label>
+
+  <label class="opt">
+    <input
+      type="checkbox"
+      name="q6"
+      value="Proporre gli appuntamenti disponibili"
+    >
+    Proporre gli appuntamenti disponibili
+  </label>
+
+  <label class="opt">
+    <input
+      type="checkbox"
+      name="q6"
+      value="Prenotare solo dopo la mia conferma"
+    >
+    Prenotare solo dopo la mia conferma
+  </label>
+
+  <label class="opt">
+    <input
+      type="checkbox"
+      name="q6"
+      value="Mandarmi un riepilogo e lasciare decidere a me"
+    >
+    Mandarmi un riepilogo e lasciare decidere a me
+  </label>
+
+  <label class="opt">
+    <input
+      type="checkbox"
+      name="q6"
+      value="Altro"
+    >
+    Altro
+  </label>
+
+</div>
+
+<div class="card">
+
+  <div class="q">
+    7. Quanto saresti disposto a pagare al mese per un servizio che ti facesse realmente risparmiare tempo?
+  </div>
+
+  <label class="opt">
+    <input
+      required
+      type="radio"
+      name="q7"
+      value="Non pagherei"
+    >
+    Non pagherei
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q7"
+      value="Fino a €5"
+    >
+    Fino a €5
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q7"
+      value="€6–10"
+    >
+    €6–10
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q7"
+      value="€11–20"
+    >
+    €11–20
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q7"
+      value="€21–40"
+    >
+    €21–40
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q7"
+      value="Più di €40"
+    >
+    Più di €40
+  </label>
+
+  <label class="opt">
+    <input
+      type="radio"
+      name="q7"
+      value="Dipende dal tempo che mi fa risparmiare"
+    >
+    Dipende dal tempo che mi fa risparmiare
+  </label>
+
+</div>
+
+<div class="card">
+
+  <div class="q">
+    Ultima domanda
+  </div>
+
+  <div class="hint">
+    Qual è la cosa che ti fa perdere più tempo oggi nella gestione di WhatsApp e dei messaggi vocali di lavoro?
+  </div>
+
+  <textarea
+    name="q8"
+    maxlength="1200"
+    placeholder="Scrivi qui..."
+  ></textarea>
+
+</div>
+
+<button id="send" type="submit">
+  Invia risposte
+</button>
+
+<div
+  id="status"
+  class="status"
+></div>
+
+<div class="privacy">
+  Il questionario non richiede nome, telefono o e-mail.
+  Le risposte vengono utilizzate per analizzare esigenze e priorità del servizio.
+</div>
+
 </form>
+
 </main>
+
 <script>
-const f=document.getElementById('survey'), btn=document.getElementById('send'), st=document.getElementById('status');
-const checked=n=>[...document.querySelectorAll(`input[name="${n}"]:checked`)].map(x=>x.value);
-f.addEventListener('submit',async e=>{
- e.preventDefault();
- if(!checked('q5').length||!checked('q6').length){alert('Seleziona almeno una risposta nelle domande 5 e 6.');return;}
- btn.disabled=true;btn.textContent='Invio in corso…';st.style.display='none';
- const fd=new FormData(f);
- const body={q1:fd.get('q1'),q2:fd.get('q2'),q3:fd.get('q3'),q4:fd.get('q4'),q5:checked('q5'),q6:checked('q6'),q7:fd.get('q7'),q8:(fd.get('q8')||'').trim(),website:fd.get('website')||''};
- try{
-  const r=await fetch('/api/questionario-submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const j=await r.json();
-  if(!r.ok) throw new Error(j.error||'Errore');
-  f.reset();st.className='status ok';st.textContent='Grazie! Le tue risposte sono state registrate.';st.style.display='block';
-  st.scrollIntoView({behavior:'smooth'});
- }catch(err){st.className='status err';st.textContent='Non è stato possibile inviare le risposte. Riprova tra poco.';st.style.display='block'}
- finally{btn.disabled=false;btn.textContent='Invia risposte'}
-});
+
+const form =
+  document.getElementById("survey");
+
+const button =
+  document.getElementById("send");
+
+const statusBox =
+  document.getElementById("status");
+
+function checked(name) {
+  return [
+    ...document.querySelectorAll(
+      `input[name="${name}"]:checked`
+    )
+  ].map(element => element.value);
+}
+
+form.addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+    if (
+      !checked("q5").length ||
+      !checked("q6").length
+    ) {
+      alert(
+        "Seleziona almeno una risposta nelle domande 5 e 6."
+      );
+
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent =
+      "Invio in corso…";
+
+    statusBox.style.display =
+      "none";
+
+    const formData =
+      new FormData(form);
+
+    const body = {
+
+      q1:
+        formData.get("q1"),
+
+      q2:
+        formData.get("q2"),
+
+      q3:
+        formData.get("q3"),
+
+      q4:
+        formData.get("q4"),
+
+      q5:
+        checked("q5"),
+
+      q6:
+        checked("q6"),
+
+      q7:
+        formData.get("q7"),
+
+      q8:
+        (
+          formData.get("q8") || ""
+        ).trim(),
+
+      website:
+        formData.get("website") || ""
+    };
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/questionario-submit",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify(body)
+          }
+        );
+
+      const result =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.error || "Errore"
+        );
+      }
+
+      form.reset();
+
+      statusBox.className =
+        "status ok";
+
+      statusBox.textContent =
+        "Grazie! Le tue risposte sono state registrate.";
+
+      statusBox.style.display =
+        "block";
+
+      statusBox.scrollIntoView({
+        behavior: "smooth"
+      });
+
+    } catch (error) {
+
+      statusBox.className =
+        "status err";
+
+      statusBox.textContent =
+        "Non è stato possibile inviare le risposte. Riprova tra poco.";
+
+      statusBox.style.display =
+        "block";
+
+    } finally {
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        "Invia risposte";
+
+    }
+
+  }
+);
+
 </script>
-</body></html>
+
+</body>
+</html>
