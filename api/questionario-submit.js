@@ -15,7 +15,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // Controllo campi obbligatori a risposta singola
+    // Controllo campi obbligatori
     for (const key of ["q1", "q2", "q3", "q4", "q7"]) {
       if (!body[key]) {
         return res.status(400).json({
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // Controllo domande a risposta multipla
+    // Controllo risposte multiple
     if (
       !Array.isArray(body.q5) ||
       body.q5.length === 0 ||
@@ -36,7 +36,9 @@ export default async function handler(req, res) {
       });
     }
 
-    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseUrl =
+      process.env.SUPABASE_URL;
+
     const supabaseSecretKey =
       process.env.SUPABASE_SECRET_KEY;
 
@@ -52,8 +54,11 @@ export default async function handler(req, res) {
 
     const payload = {
       q1: String(body.q1).slice(0, 120),
+
       q2: String(body.q2).slice(0, 80),
+
       q3: String(body.q3).slice(0, 80),
+
       q4: String(body.q4).slice(0, 80),
 
       q5: body.q5
@@ -82,15 +87,8 @@ export default async function handler(req, res) {
 
         headers: {
           apikey: supabaseSecretKey,
-
-          Authorization:
-            `Bearer ${supabaseSecretKey}`,
-
-          "Content-Type":
-            "application/json",
-
-          Prefer:
-            "return=minimal"
+          "Content-Type": "application/json",
+          Prefer: "return=minimal"
         },
 
         body: JSON.stringify(payload)
@@ -108,8 +106,7 @@ export default async function handler(req, res) {
       );
 
       return res.status(500).json({
-        error:
-          "Errore durante il salvataggio"
+        error: "Errore durante il salvataggio"
       });
     }
 
