@@ -33,7 +33,7 @@ export default async function handler(req, res) {
       !supabaseSecretKey
     ) {
       console.error(
-        "Variabili Supabase mancanti"
+        "Variabili SUPABASE_URL o SUPABASE_SECRET_KEY mancanti"
       );
 
       return res.status(500).end();
@@ -43,11 +43,7 @@ export default async function handler(req, res) {
       `${supabaseUrl}/rest/v1/questionario_vocalflash?select=*&order=created_at.desc`,
       {
         headers: {
-          apikey:
-            supabaseSecretKey,
-
-          Authorization:
-            `Bearer ${supabaseSecretKey}`
+          apikey: supabaseSecretKey
         }
       }
     );
