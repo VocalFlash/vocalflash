@@ -29,12 +29,11 @@ export default async function handler(req, res) {
       !supabaseSecretKey
     ) {
       console.error(
-        "Variabili Supabase mancanti"
+        "Variabili SUPABASE_URL o SUPABASE_SECRET_KEY mancanti"
       );
 
       return res.status(500).json({
-        error:
-          "Configurazione database mancante"
+        error: "Configurazione database mancante"
       });
     }
 
@@ -42,11 +41,7 @@ export default async function handler(req, res) {
       `${supabaseUrl}/rest/v1/questionario_vocalflash?select=*&order=created_at.desc`,
       {
         headers: {
-          apikey:
-            supabaseSecretKey,
-
-          Authorization:
-            `Bearer ${supabaseSecretKey}`
+          apikey: supabaseSecretKey
         }
       }
     );
@@ -62,8 +57,7 @@ export default async function handler(req, res) {
       );
 
       return res.status(500).json({
-        error:
-          "Errore lettura risultati"
+        error: "Errore lettura risultati"
       });
     }
 
