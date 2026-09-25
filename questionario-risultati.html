@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>Risultati Questionario VocalFlash</title>
+
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #f7f7fb;
+      margin: 0;
+      color: #17171b;
+    }
+
+    main {
+      max-width: 1050px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    .box,
+    .card {
+      background: #fff;
+      border: 1px solid #e7e7ef;
+      border-radius: 15px;
+      padding: 16px;
+      margin-top: 14px;
+    }
+
+    input,
+    button {
+      padding: 11px;
+      border-radius: 10px;
+      font: inherit;
+    }
+
+    .login input {
+      border: 1px solid #ddd;
+      width: min(320px, 100%);
+    }
+
+    button {
+      border: 0;
+      background: #6d35d7;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+    }
+
+    .num {
+      font-size: 32px;
+      font-weight: 800;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      padding: 9px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #fff;
+    }
+
+    .scroll {
+      overflow: auto;
+      max-height: 520px;
+    }
+
+    .muted {
+      color: #666;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .err {
+      color: #a11;
+      margin-top: 10px;
+    }
+
+    .ok {
+      color: #176b2c;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+
+    <div class="top">
+      <div>
+        <h1>Risultati questionario</h1>
+        <div class="muted">VocalFlash</div>
+      </div>
+
+      <button id="exportBtn" class="hidden">
+        Scarica CSV
+      </button>
+    </div>
+
+    <div class="box login" id="login">
+      <strong>Accesso riservato</strong>
+
+      <p class="muted">
+        Inserisci la password amministratore.
+      </p>
+
+      <input
+        id="pwd"
+        type="password"
+        placeholder="Password"
+      >
+
+      <button id="go">
+        Apri risultati
+      </button>
+
+      <div id="msg"></div>
+    </div>
+
+    <div id="dash" class="hidden">
+
+      <div class="grid">
+
+        <div class="card">
+          <div class="muted">
+            Risposte totali
+          </div>
+
+          <div class="num" id="total">
+            0
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="muted">
+            Ultima risposta
+          </div>
+
+          <div id="last">
+            —
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <h2>Distribuzioni</h2>
+
+        <div id="summary"></div>
+      </div>
+
+      <div class="card">
+        <h2>Risposte complete</h2>
+
+        <div class="scroll">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Uso WhatsApp</th>
+                <th>Vocali</th>
+                <th>Riascolto</th>
+                <th>Dimenticanze</th>
+                <th>Funzioni</th>
+                <th>Sistema</th>
+                <th>Prezzo</th>
+                <th>Risposta aperta</th>
+              </tr>
+            </thead>
+
+            <tbody id="rows"></tbody>
+
+          </table>
+
+        </div>
+      </div>
+
+    </div>
+
+    <script>
+      let password = '';
+
+      const labels = {
+        q1: 'Uso WhatsApp',
+        q2: 'Vocali al giorno',
+        q3: 'Riascolto',
+        q4: 'Dimenticanze',
+        q7: 'Disponibilità a pagare'
+      };
+
+      function escapeHtml(value) {
+        return String(value ?? '').replace(
+          /[&<>"']/g,
+          function(character) {
+            return {
+              '&': '&amp;',
+              '<': '&lt;',
+              '>': '&gt;',
+              '"': '&quot;',
+              "'": '&#039;'
+            }[character];
+          }
+        );
+      }
+
+      function counts(data, key) {
+        const result = {};
+
+        data.forEach(row => {
+
+          const value = row[key];
+
+          if (Array.isArray(value)) {
+
+            value.forEach(item => {
+              result[item] = (result[item] || 0) + 1;
+            });
+
+          } else if (value) {
+
+            result[value] = (result[value] || 0) + 1;
+
+          }
+
+        });
+
+        return result;
+      }
+
+      async function loadResults() {
+
+        const response = await fetch(
+          '/api/questionario-results',
+          {
+            method: 'POST',
+
+            headers: {
+              'Content-Type': 'application/json'
+            },
+
+            body: JSON.stringify({
+              password
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error || 'Accesso negato'
+          );
+        }
+
+        const responses = data.responses || [];
+
+        document.getElementById('total').textContent =
+          responses.length;
+
+        document.getElementById('last').textContent =
+          responses[0]
+            ? new Date(
+                responses[0].created_at
+              ).toLocaleString('it-IT')
+            : '—';
+
+        const keys = [
+          'q1',
+          'q2',
+          'q3',
+          'q4',
+          'q5',
+          'q6',
+          'q7'
+        ];
+
+        document.getElementById('summary').innerHTML =
+          keys.map(key => {
+
+            const distribution =
+              counts(responses, key);
+
+            const title =
+              labels[key] ||
+              (
+                key === 'q5'
+                  ? 'Funzioni desiderate'
+                  : 'Cosa dovrebbe fare il sistema'
+              );
+
+            return `
+              <h3>${escapeHtml(title)}</h3>
+
+              ${
+                Object.entries(distribution)
+                  .sort(
+                    (a, b) => b[1] - a[1]
+                  )
+                  .map(
+                    ([value, number]) =>
+                      `
+                      <div>
+                        ${escapeHtml(value)}:
+                        <strong>${number}</strong>
+                      </div>
+                      `
+                  )
+                  .join('')
+              }
+            `;
+
+          }).join('');
+
+        document.getElementById('rows').innerHTML =
+          responses.map(row => {
+
+            return `
+              <tr>
+
+                <td>
+                  ${
+                    escapeHtml(
+                      new Date(
+                        row.created_at
+                      ).toLocaleString('it-IT')
+                    )
+                  }
+                </td>
+
+                <td>
+                  ${escapeHtml(row.q1)}
+                </td>
+
+                <td>
+                  ${escapeHtml(row.q2)}
+                </td>
+
+                <td>
+                  ${escapeHtml(row.q3)}
+                </td>
+
+                <td>
+                  ${escapeHtml(row.q4)}
+                </td>
+
+                <td>
+                  ${
+                    escapeHtml(
+                      (row.q5 || []).join(', ')
+                    )
+                  }
+                </td>
+
+                <td>
+                  ${
+                    escapeHtml(
+                      (row.q6 || []).join(', ')
+                    )
+                  }
+                </td>
+
+                <td>
+                  ${escapeHtml(row.q7)}
+                </td>
+
+                <td>
+                  ${escapeHtml(row.q8)}
+                </td>
+
+              </tr>
+            `;
+
+          }).join('');
+
+        document
+          .getElementById('login')
+          .classList
+          .add('hidden');
+
+        document
+          .getElementById('dash')
+          .classList
+          .remove('hidden');
+
+        document
+          .getElementById('exportBtn')
+          .classList
+          .remove('hidden');
+      }
+
+      document
+        .getElementById('go')
+        .addEventListener(
+          'click',
+          async function() {
+
+            password =
+              document
+                .getElementById('pwd')
+                .value;
+
+            const message =
+              document
+                .getElementById('msg');
+
+            message.textContent = '';
+
+            try {
+
+              await loadResults();
+
+            } catch (error) {
+
+              message.className = 'err';
+
+              message.textContent =
+                'Password errata oppure errore di connessione.';
+
+            }
+
+          }
+        );
+
+      document
+        .getElementById('pwd')
+        .addEventListener(
+          'keydown',
+          function(event) {
+
+            if (event.key === 'Enter') {
+
+              document
+                .getElementById('go')
+                .click();
+
+            }
+
+          }
+        );
+
+      document
+        .getElementById('exportBtn')
+        .addEventListener(
+          'click',
+          async function() {
+
+            const response = await fetch(
+              '/api/questionario-export',
+              {
+                method: 'POST',
+
+                headers: {
+                  'Content-Type':
+                    'application/json'
+                },
+
+                body: JSON.stringify({
+                  password
+                })
+              }
+            );
+
+            if (!response.ok) {
+
+              alert(
+                'Errore durante esportazione.'
+              );
+
+              return;
+
+            }
+
+            const blob =
+              await response.blob();
+
+            const url =
+              URL.createObjectURL(blob);
+
+            const link =
+              document.createElement('a');
+
+            link.href = url;
+
+            link.download =
+              'risposte-vocalflash.csv';
+
+            link.click();
+
+            URL.revokeObjectURL(url);
+
+          }
+        );
+    </script>
+
+  </main>
+</body>
+</html>
