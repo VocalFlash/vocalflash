@@ -15,8 +15,16 @@ export default async function handler(req, res) {
       });
     }
 
-    // Controllo campi obbligatori
-    for (const key of ["q1", "q2", "q3", "q4", "q7"]) {
+    // Campi obbligatori a risposta singola
+    for (const key of [
+      "q1",
+      "q2",
+      "q3",
+      "q4",
+      "q5",
+      "q7",
+      "q8"
+    ]) {
       if (!body[key]) {
         return res.status(400).json({
           error: "Campi mancanti"
@@ -24,10 +32,8 @@ export default async function handler(req, res) {
       }
     }
 
-    // Controllo risposte multiple
+    // Q6 è l'unica domanda a risposta multipla
     if (
-      !Array.isArray(body.q5) ||
-      body.q5.length === 0 ||
       !Array.isArray(body.q6) ||
       body.q6.length === 0
     ) {
@@ -57,26 +63,24 @@ export default async function handler(req, res) {
 
       q2: String(body.q2).slice(0, 80),
 
-      q3: String(body.q3).slice(0, 80),
+      q3: String(body.q3).slice(0, 120),
 
-      q4: String(body.q4).slice(0, 80),
+      q4: String(body.q4).slice(0, 120),
 
-      q5: body.q5
-        .slice(0, 12)
-        .map(value =>
-          String(value).slice(0, 120)
-        ),
+      q5: String(body.q5).slice(0, 120),
 
       q6: body.q6
         .slice(0, 12)
         .map(value =>
-          String(value).slice(0, 120)
+          String(value).slice(0, 180)
         ),
 
-      q7: String(body.q7).slice(0, 120),
+      q7: String(body.q7).slice(0, 180),
 
-      q8: String(
-        body.q8 || ""
+      q8: String(body.q8).slice(0, 120),
+
+      q9: String(
+        body.q9 || ""
       ).slice(0, 1200)
     };
 
