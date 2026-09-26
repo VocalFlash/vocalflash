@@ -1,10 +1,11 @@
 <!doctype html>
 <html lang="it">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <title>Risultati Questionario VocalFlash</title>
+  <title>Risultati questionario</title>
 
   <style>
     body {
@@ -15,7 +16,7 @@
     }
 
     main {
-      max-width: 1050px;
+      max-width: 1200px;
       margin: auto;
       padding: 20px;
     }
@@ -72,10 +73,40 @@
       font-weight: 800;
     }
 
+    .distribution {
+      margin-bottom: 26px;
+    }
+
+    .distribution:last-child {
+      margin-bottom: 0;
+    }
+
+    .distribution h3 {
+      margin: 0 0 10px;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 7px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .result-row:last-child {
+      border-bottom: 0;
+    }
+
+    .result-value {
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
+      min-width: 1450px;
     }
 
     th,
@@ -90,11 +121,12 @@
       position: sticky;
       top: 0;
       background: #fff;
+      z-index: 1;
     }
 
     .scroll {
       overflow: auto;
-      max-height: 520px;
+      max-height: 560px;
     }
 
     .muted {
@@ -117,160 +149,604 @@
 </head>
 
 <body>
-  <main>
 
-    <div class="top">
-      <div>
-        <h1>Risultati questionario</h1>
-        <div class="muted">VocalFlash</div>
+<main>
+
+  <div class="top">
+
+    <div>
+      <h1>Risultati questionario</h1>
+
+      <div class="muted">
+        Utilizzo di WhatsApp nel lavoro
       </div>
-
-      <button id="exportBtn" class="hidden">
-        Scarica CSV
-      </button>
     </div>
 
-    <div class="box login" id="login">
-      <strong>Accesso riservato</strong>
+    <button id="exportBtn" class="hidden">
+      Scarica CSV
+    </button>
 
-      <p class="muted">
-        Inserisci la password amministratore.
-      </p>
+  </div>
 
-      <input
-        id="pwd"
-        type="password"
-        placeholder="Password"
-      >
 
-      <button id="go">
-        Apri risultati
-      </button>
+  <!-- ACCESSO RISERVATO -->
 
-      <div id="msg"></div>
-    </div>
+  <div class="box login" id="login">
 
-    <div id="dash" class="hidden">
+    <strong>
+      Accesso riservato
+    </strong>
 
-      <div class="grid">
+    <p class="muted">
+      Inserisci la password amministratore.
+    </p>
 
-        <div class="card">
-          <div class="muted">
-            Risposte totali
-          </div>
+    <input
+      id="pwd"
+      type="password"
+      placeholder="Password"
+    >
 
-          <div class="num" id="total">
-            0
-          </div>
-        </div>
+    <button id="go">
+      Apri risultati
+    </button>
 
-        <div class="card">
-          <div class="muted">
-            Ultima risposta
-          </div>
+    <div id="msg"></div>
 
-          <div id="last">
-            —
-          </div>
-        </div>
+  </div>
 
-      </div>
+
+  <!-- DASHBOARD -->
+
+  <div id="dash" class="hidden">
+
+    <div class="grid">
 
       <div class="card">
-        <h2>Distribuzioni</h2>
 
-        <div id="summary"></div>
+        <div class="muted">
+          Risposte totali
+        </div>
+
+        <div class="num" id="total">
+          0
+        </div>
+
       </div>
 
+
       <div class="card">
-        <h2>Risposte complete</h2>
 
-        <div class="scroll">
-
-          <table>
-
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Uso WhatsApp</th>
-                <th>Vocali</th>
-                <th>Riascolto</th>
-                <th>Dimenticanze</th>
-                <th>Funzioni</th>
-                <th>Sistema</th>
-                <th>Prezzo</th>
-                <th>Risposta aperta</th>
-              </tr>
-            </thead>
-
-            <tbody id="rows"></tbody>
-
-          </table>
-
+        <div class="muted">
+          Ultima risposta
         </div>
+
+        <div id="last">
+          —
+        </div>
+
       </div>
 
     </div>
 
-    <script>
-      let password = '';
 
-      const labels = {
-        q1: 'Uso WhatsApp',
-        q2: 'Vocali al giorno',
-        q3: 'Riascolto',
-        q4: 'Dimenticanze',
-        q7: 'Disponibilità a pagare'
-      };
+    <!-- DISTRIBUZIONI -->
 
-      function escapeHtml(value) {
-        return String(value ?? '').replace(
-          /[&<>"']/g,
-          function(character) {
-            return {
-              '&': '&amp;',
-              '<': '&lt;',
-              '>': '&gt;',
-              '"': '&quot;',
-              "'": '&#039;'
-            }[character];
-          }
-        );
+    <div class="card">
+
+      <h2>
+        Distribuzioni
+      </h2>
+
+      <div id="summary"></div>
+
+    </div>
+
+
+    <!-- RISPOSTE COMPLETE -->
+
+    <div class="card">
+
+      <h2>
+        Risposte complete
+      </h2>
+
+      <div class="scroll">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>Data</th>
+
+              <th>Uso WhatsApp</th>
+
+              <th>Vocali al giorno</th>
+
+              <th>Recupero informazioni</th>
+
+              <th>Informazioni distribuite</th>
+
+              <th>Dimenticanze / sospesi</th>
+
+              <th>Funzioni desiderate</th>
+
+              <th>Autonomia assistente</th>
+
+              <th>Disponibilità a pagare</th>
+
+              <th>Problema principale</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="rows"></tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+
+<script>
+
+let password = "";
+
+
+/*
+ * Significato delle nuove domande.
+ *
+ * q9 non compare nelle distribuzioni
+ * perché è una risposta aperta.
+ */
+
+const labels = {
+  q1: "Uso di WhatsApp per lavoro",
+
+  q2: "Messaggi vocali al giorno",
+
+  q3: "Necessità di recuperare informazioni da vocali o chat",
+
+  q4: "Informazioni dello stesso cliente o lavoro distribuite nel tempo",
+
+  q5: "Richieste o attività dimenticate / rimaste in sospeso",
+
+  q6: "Funzioni considerate più utili",
+
+  q7: "Livello di autonomia desiderato",
+
+  q8: "Disponibilità a pagare"
+};
+
+
+/*
+ * Protezione del contenuto inserito nell'HTML.
+ */
+
+function esc(value) {
+
+  return String(value ?? "")
+    .replace(
+      /[&<>"']/g,
+      char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[char]
+    );
+
+}
+
+
+/*
+ * Conta le risposte di ciascuna domanda.
+ *
+ * q1-q5 e q7-q8 sono valori singoli.
+ * q6 è un array perché consente più risposte.
+ */
+
+function counts(data, key) {
+
+  const result = {};
+
+  data.forEach(row => {
+
+    const value = row[key];
+
+    if (Array.isArray(value)) {
+
+      value.forEach(item => {
+
+        if (!item) {
+          return;
+        }
+
+        result[item] =
+          (result[item] || 0) + 1;
+
+      });
+
+    } else if (value) {
+
+      result[value] =
+        (result[value] || 0) + 1;
+
+    }
+
+  });
+
+  return result;
+
+}
+
+
+/*
+ * Costruisce una distribuzione.
+ */
+
+function renderDistribution(data, key) {
+
+  const values = counts(data, key);
+
+  const entries =
+    Object.entries(values)
+      .sort((a, b) => b[1] - a[1]);
+
+  if (!entries.length) {
+
+    return `
+      <div class="distribution">
+
+        <h3>
+          ${esc(labels[key])}
+        </h3>
+
+        <div class="muted">
+          Nessuna risposta
+        </div>
+
+      </div>
+    `;
+
+  }
+
+  return `
+    <div class="distribution">
+
+      <h3>
+        ${esc(labels[key])}
+      </h3>
+
+      ${
+        entries
+          .map(([value, number]) => `
+
+            <div class="result-row">
+
+              <div>
+                ${esc(value)}
+              </div>
+
+              <div class="result-value">
+                ${number}
+              </div>
+
+            </div>
+
+          `)
+          .join("")
       }
 
-      function counts(data, key) {
-        const result = {};
+    </div>
+  `;
 
-        data.forEach(row => {
+}
 
-          const value = row[key];
 
-          if (Array.isArray(value)) {
+/*
+ * Carica i risultati dalla nostra API.
+ */
 
-            value.forEach(item => {
-              result[item] = (result[item] || 0) + 1;
-            });
+async function load() {
 
-          } else if (value) {
+  const response =
+    await fetch(
+      "/api/questionario-results",
+      {
+        method: "POST",
 
-            result[value] = (result[value] || 0) + 1;
+        headers: {
+          "Content-Type": "application/json"
+        },
 
-          }
+        body: JSON.stringify({
+          password
+        })
+      }
+    );
 
-        });
+  const json =
+    await response.json();
 
-        return result;
+  if (!response.ok) {
+
+    throw new Error(
+      json.error ||
+      "Accesso negato"
+    );
+
+  }
+
+
+  /*
+   * questionario-results.js restituisce:
+   *
+   * {
+   *   responses: [...]
+   * }
+   */
+
+  const data =
+    Array.isArray(json.responses)
+      ? json.responses
+      : [];
+
+
+  /*
+   * Totale risposte.
+   */
+
+  document
+    .getElementById("total")
+    .textContent =
+      data.length;
+
+
+  /*
+   * Ultima risposta.
+   *
+   * L'API ordina già:
+   * created_at.desc
+   *
+   * quindi data[0] è la più recente.
+   */
+
+  document
+    .getElementById("last")
+    .textContent =
+      data[0]?.created_at
+        ? new Date(
+            data[0].created_at
+          ).toLocaleString("it-IT")
+        : "—";
+
+
+  /*
+   * Distribuzioni q1-q8.
+   *
+   * q9 resta esclusa perché
+   * contiene testo libero.
+   */
+
+  const keys = [
+    "q1",
+    "q2",
+    "q3",
+    "q4",
+    "q5",
+    "q6",
+    "q7",
+    "q8"
+  ];
+
+  document
+    .getElementById("summary")
+    .innerHTML =
+      keys
+        .map(
+          key =>
+            renderDistribution(
+              data,
+              key
+            )
+        )
+        .join("");
+
+
+  /*
+   * Tabella delle risposte complete.
+   */
+
+  document
+    .getElementById("rows")
+    .innerHTML =
+      data
+        .map(row => {
+
+          const date =
+            row.created_at
+              ? new Date(
+                  row.created_at
+                ).toLocaleString("it-IT")
+              : "";
+
+
+          /*
+           * Soltanto q6 è multipla.
+           */
+
+          const functions =
+            Array.isArray(row.q6)
+              ? row.q6.join(", ")
+              : "";
+
+
+          return `
+
+            <tr>
+
+              <td>
+                ${esc(date)}
+              </td>
+
+              <td>
+                ${esc(row.q1)}
+              </td>
+
+              <td>
+                ${esc(row.q2)}
+              </td>
+
+              <td>
+                ${esc(row.q3)}
+              </td>
+
+              <td>
+                ${esc(row.q4)}
+              </td>
+
+              <td>
+                ${esc(row.q5)}
+              </td>
+
+              <td>
+                ${esc(functions)}
+              </td>
+
+              <td>
+                ${esc(row.q7)}
+              </td>
+
+              <td>
+                ${esc(row.q8)}
+              </td>
+
+              <td>
+                ${esc(row.q9)}
+              </td>
+
+            </tr>
+
+          `;
+
+        })
+        .join("");
+
+
+  /*
+   * Mostra dashboard
+   * e pulsante CSV.
+   */
+
+  document
+    .getElementById("login")
+    .classList
+    .add("hidden");
+
+  document
+    .getElementById("dash")
+    .classList
+    .remove("hidden");
+
+  document
+    .getElementById("exportBtn")
+    .classList
+    .remove("hidden");
+
+}
+
+
+/*
+ * ACCESSO
+ */
+
+document
+  .getElementById("go")
+  .onclick =
+    async () => {
+
+      password =
+        document
+          .getElementById("pwd")
+          .value;
+
+      const message =
+        document
+          .getElementById("msg");
+
+      message.textContent = "";
+
+      try {
+
+        await load();
+
+      } catch (error) {
+
+        message.className =
+          "err";
+
+        message.textContent =
+          "Password errata o errore di connessione.";
+
       }
 
-      async function loadResults() {
+    };
 
-        const response = await fetch(
-          '/api/questionario-results',
+
+/*
+ * Permette di premere INVIO
+ * nel campo password.
+ */
+
+document
+  .getElementById("pwd")
+  .addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key === "Enter") {
+
+        document
+          .getElementById("go")
+          .click();
+
+      }
+
+    }
+  );
+
+
+/*
+ * ESPORTAZIONE CSV
+ *
+ * Manteniamo la stessa API già prevista:
+ * /api/questionario-export
+ */
+
+document
+  .getElementById("exportBtn")
+  .onclick =
+    async () => {
+
+      const response =
+        await fetch(
+          "/api/questionario-export",
           {
-            method: 'POST',
+            method: "POST",
 
             headers: {
-              'Content-Type': 'application/json'
+              "Content-Type":
+                "application/json"
             },
 
             body: JSON.stringify({
@@ -279,254 +755,43 @@
           }
         );
 
-        const data = await response.json();
+      if (!response.ok) {
 
-        if (!response.ok) {
-          throw new Error(
-            data.error || 'Accesso negato'
-          );
-        }
+        alert(
+          "Errore durante l'esportazione."
+        );
 
-        const responses = data.responses || [];
+        return;
 
-        document.getElementById('total').textContent =
-          responses.length;
-
-        document.getElementById('last').textContent =
-          responses[0]
-            ? new Date(
-                responses[0].created_at
-              ).toLocaleString('it-IT')
-            : '—';
-
-        const keys = [
-          'q1',
-          'q2',
-          'q3',
-          'q4',
-          'q5',
-          'q6',
-          'q7'
-        ];
-
-        document.getElementById('summary').innerHTML =
-          keys.map(key => {
-
-            const distribution =
-              counts(responses, key);
-
-            const title =
-              labels[key] ||
-              (
-                key === 'q5'
-                  ? 'Funzioni desiderate'
-                  : 'Cosa dovrebbe fare il sistema'
-              );
-
-            return `
-              <h3>${escapeHtml(title)}</h3>
-
-              ${
-                Object.entries(distribution)
-                  .sort(
-                    (a, b) => b[1] - a[1]
-                  )
-                  .map(
-                    ([value, number]) =>
-                      `
-                      <div>
-                        ${escapeHtml(value)}:
-                        <strong>${number}</strong>
-                      </div>
-                      `
-                  )
-                  .join('')
-              }
-            `;
-
-          }).join('');
-
-        document.getElementById('rows').innerHTML =
-          responses.map(row => {
-
-            return `
-              <tr>
-
-                <td>
-                  ${
-                    escapeHtml(
-                      new Date(
-                        row.created_at
-                      ).toLocaleString('it-IT')
-                    )
-                  }
-                </td>
-
-                <td>
-                  ${escapeHtml(row.q1)}
-                </td>
-
-                <td>
-                  ${escapeHtml(row.q2)}
-                </td>
-
-                <td>
-                  ${escapeHtml(row.q3)}
-                </td>
-
-                <td>
-                  ${escapeHtml(row.q4)}
-                </td>
-
-                <td>
-                  ${
-                    escapeHtml(
-                      (row.q5 || []).join(', ')
-                    )
-                  }
-                </td>
-
-                <td>
-                  ${
-                    escapeHtml(
-                      (row.q6 || []).join(', ')
-                    )
-                  }
-                </td>
-
-                <td>
-                  ${escapeHtml(row.q7)}
-                </td>
-
-                <td>
-                  ${escapeHtml(row.q8)}
-                </td>
-
-              </tr>
-            `;
-
-          }).join('');
-
-        document
-          .getElementById('login')
-          .classList
-          .add('hidden');
-
-        document
-          .getElementById('dash')
-          .classList
-          .remove('hidden');
-
-        document
-          .getElementById('exportBtn')
-          .classList
-          .remove('hidden');
       }
 
-      document
-        .getElementById('go')
-        .addEventListener(
-          'click',
-          async function() {
+      const blob =
+        await response.blob();
 
-            password =
-              document
-                .getElementById('pwd')
-                .value;
+      const url =
+        URL.createObjectURL(blob);
 
-            const message =
-              document
-                .getElementById('msg');
+      const link =
+        document.createElement("a");
 
-            message.textContent = '';
+      link.href = url;
 
-            try {
-
-              await loadResults();
-
-            } catch (error) {
-
-              message.className = 'err';
-
-              message.textContent =
-                'Password errata oppure errore di connessione.';
-
-            }
-
-          }
-        );
+      link.download =
+        "risposte-questionario-whatsapp.csv";
 
       document
-        .getElementById('pwd')
-        .addEventListener(
-          'keydown',
-          function(event) {
+        .body
+        .appendChild(link);
 
-            if (event.key === 'Enter') {
+      link.click();
 
-              document
-                .getElementById('go')
-                .click();
+      link.remove();
 
-            }
+      URL.revokeObjectURL(url);
 
-          }
-        );
+    };
 
-      document
-        .getElementById('exportBtn')
-        .addEventListener(
-          'click',
-          async function() {
+</script>
 
-            const response = await fetch(
-              '/api/questionario-export',
-              {
-                method: 'POST',
-
-                headers: {
-                  'Content-Type':
-                    'application/json'
-                },
-
-                body: JSON.stringify({
-                  password
-                })
-              }
-            );
-
-            if (!response.ok) {
-
-              alert(
-                'Errore durante esportazione.'
-              );
-
-              return;
-
-            }
-
-            const blob =
-              await response.blob();
-
-            const url =
-              URL.createObjectURL(blob);
-
-            const link =
-              document.createElement('a');
-
-            link.href = url;
-
-            link.download =
-              'risposte-vocalflash.csv';
-
-            link.click();
-
-            URL.revokeObjectURL(url);
-
-          }
-        );
-    </script>
-
-  </main>
 </body>
 </html>
