@@ -64,6 +64,50 @@ function captureResponse() {
   return {res,capture};
 }
 
+async function runOne(tc, apiKey) {
+  const internalReq={
+    method:"POST",
+    headers:{"x-api-key":apiKey},
+    body:{business_id:B[tc.sector],new_event:{normalized_text:tc.text}}
+  };
+  const {res:innerRes,capture}=captureResponse();
+  await classifierHandler(internalReq,innerRes);
+  const actual=capture.body?.result || null;
+  let pass=null;
+  if(!tc.diagnostic){
+    pass=capture.statusCode===200 &&
+      (tc.expect ? actual?.decision==="CLASSIFIED" && actual?.workflow_key===tc.expect
+                 : actual?.decision===tc.expectDecision);
+  }
+  return {
+    id:tc.id,sector:tc.sector,pass,diagnostic:tc.diagnostic||null,
+    expected:tc.expect||tc.expectDecision||null,
+    status:capture.statusCode,
+    actual:actual ? {
+      decision:actual.decision,
+      workflow_key:actual.workflow_key,
+      work_type:actual.work_type,
+      confidence:actual.confidence,
+      needs_clarification:actual.needs_clarification,
+      clarification_question:actual.clarification_question
+    } : capture.body
+  };
+}
+
+async function mapLimit(items, limit, fn) {
+  const results=new Array(items.length);
+  let next=0;
+  async function worker(){
+    while(true){
+      const i=next++;
+      if(i>=items.length) return;
+      results[i]=await fn(items[i]);
+    }
+  }
+  await Promise.all(Array.from({length:Math.min(limit,items.length)},()=>worker()));
+  return results;
+}
+
 export default async function handler(req,res) {
   res.setHeader("Cache-Control","no-store");
   if(req.method!=="GET") return res.status(405).json({error:"GET only"});
@@ -71,47 +115,13 @@ export default async function handler(req,res) {
     return res.status(403).json({error:"Preview branch only"});
   }
 
-  const batch=Number(req.query?.batch || 1);
-  if(!Number.isInteger(batch) || batch<1 || batch>5) return res.status(400).json({error:"batch 1..5"});
-  const selected=CASES.slice((batch-1)*6,batch*6);
-
   const apiKey=(process.env.VOCALFLASH_API_KEYS||"").split(",").map(v=>v.trim()).filter(Boolean)[0];
   if(!apiKey) return res.status(500).json({error:"Preview API key unavailable"});
 
-  const results=[];
-  for(const tc of selected){
-    const internalReq={
-      method:"POST",
-      headers:{"x-api-key":apiKey},
-      body:{business_id:B[tc.sector],new_event:{normalized_text:tc.text}}
-    };
-    const {res:innerRes,capture}=captureResponse();
-    await classifierHandler(internalReq,innerRes);
-    const actual=capture.body?.result || null;
-    let pass=null;
-    if(!tc.diagnostic){
-      pass=capture.statusCode===200 &&
-        (tc.expect ? actual?.decision==="CLASSIFIED" && actual?.workflow_key===tc.expect
-                   : actual?.decision===tc.expectDecision);
-    }
-    results.push({
-      id:tc.id,sector:tc.sector,pass,diagnostic:tc.diagnostic||null,
-      expected:tc.expect||tc.expectDecision||null,
-      status:capture.statusCode,
-      actual:actual ? {
-        decision:actual.decision,
-        workflow_key:actual.workflow_key,
-        work_type:actual.work_type,
-        confidence:actual.confidence,
-        needs_clarification:actual.needs_clarification,
-        clarification_question:actual.clarification_question
-      } : capture.body
-    });
-  }
-
+  const results=await mapLimit(CASES,4,(tc)=>runOne(tc,apiKey));
   const scored=results.filter(r=>r.pass!==null);
   return res.status(200).json({
-    ok:true,batch,
+    ok:true,
     scored_passed:scored.filter(r=>r.pass).length,
     scored_total:scored.length,
     diagnostic_count:results.filter(r=>r.diagnostic).length,
