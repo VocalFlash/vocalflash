@@ -1,4 +1,4 @@
-// TEMPORARY Preview-only probe for Request Classifier V1.
+// TEMPORARY Preview-only batch probe for Request Classifier V1.
 // Fixed cases only. Never returns or logs VOCALFLASH_API_KEYS.
 // Delete after validation.
 
@@ -15,6 +15,17 @@ const CASES = {
   unsupported: "Vorrei installare una tenda da sole motorizzata sul terrazzo."
 };
 
+function makeCaptureResponse() {
+  const capture = { statusCode: 200, body: null, headers: {} };
+  const res = {
+    setHeader(name, value) { capture.headers[name] = value; return res; },
+    status(code) { capture.statusCode = code; return res; },
+    json(body) { capture.body = body; return capture; },
+    end() { return capture; }
+  };
+  return { res, capture };
+}
+
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
@@ -24,24 +35,24 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: "Probe allowed only on isolated Preview branch" });
   }
 
-  const testCase = typeof req.query?.case === "string" ? req.query.case : "";
-  const message = CASES[testCase];
-  if (!message) {
-    return res.status(400).json({ error: "Invalid fixed test case" });
-  }
-
   const apiKey = (process.env.VOCALFLASH_API_KEYS || "")
     .split(",").map((v) => v.trim()).filter(Boolean)[0];
   if (!apiKey) return res.status(500).json({ error: "Preview API key unavailable" });
 
-  const internalReq = {
-    method: "POST",
-    headers: { "x-api-key": apiKey },
-    body: {
-      business_id: BUSINESS_ID,
-      new_event: { normalized_text: message }
-    }
-  };
+  const results = {};
+  for (const [name, message] of Object.entries(CASES)) {
+    const internalReq = {
+      method: "POST",
+      headers: { "x-api-key": apiKey },
+      body: {
+        business_id: BUSINESS_ID,
+        new_event: { normalized_text: message }
+      }
+    };
+    const { res: captureRes, capture } = makeCaptureResponse();
+    await classifierHandler(internalReq, captureRes);
+    results[name] = { status: capture.statusCode, body: capture.body };
+  }
 
-  return classifierHandler(internalReq, res);
+  return res.status(200).json({ ok: true, fixed_cases: results });
 }
