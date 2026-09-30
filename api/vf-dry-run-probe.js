@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       new_event: {
         actor_type: "customer",
         content_type: "text",
-        normalized_text: "Il lavandino perde acqua da stamattina."
+        normalized_text: "Ecco la foto che mi avevi chiesto: si vede che perde dal sifone."
       }
     }
   };
