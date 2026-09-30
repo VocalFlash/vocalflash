@@ -1,9 +1,10 @@
 import decomposer from "./message-decomposer-dry-run-v2.js";
 import resolver from "./work-resolver-dry-run.js";
 import classifier from "./request-classifier-dry-run-v2.js";
+import intakeGate from "./intake-gate-dry-run.js";
 
 // VocalFlash Routing Orchestrator Dry-Run V1
-// Decomposer -> Resolver per unit -> Classifier V2 only for NEW.
+// Decomposer -> Resolver per unit -> Intake Gate only for NEW -> Classifier V2 only for NEW_WORK_CANDIDATE.
 // No writes.
 
 function capture(){
@@ -49,14 +50,24 @@ export default async function handler(req,res){
    return res.status(500).json({error:"Resolver dry-run failed",unit_id:unit.unit_id,detail:r.body});
   }
 
+  let g=null;
   let c=null;
   if(r.body.result.decision==="NEW"){
-   c=await invoke(classifier,{
+   g=await invoke(intakeGate,{
     method:"POST",headers:{"x-api-key":key},
     body:{business_id:businessId,normalized_text:unit.routing_text}
    });
-   if(c.statusCode!==200||!c.body?.result){
-    return res.status(500).json({error:"Classifier V2 dry-run failed",unit_id:unit.unit_id,detail:c.body});
+   if(g.statusCode!==200||!g.body?.result){
+    return res.status(500).json({error:"Intake Gate dry-run failed",unit_id:unit.unit_id,detail:g.body});
+   }
+   if(g.body.result.decision==="NEW_WORK_CANDIDATE"){
+    c=await invoke(classifier,{
+     method:"POST",headers:{"x-api-key":key},
+     body:{business_id:businessId,normalized_text:unit.routing_text}
+    });
+    if(c.statusCode!==200||!c.body?.result){
+     return res.status(500).json({error:"Classifier V2 dry-run failed",unit_id:unit.unit_id,detail:c.body});
+    }
    }
   }
 
@@ -70,6 +81,12 @@ export default async function handler(req,res){
     needs_clarification:r.body.result.needs_clarification,
     clarification_question:r.body.result.clarification_question
    },
+   intake_gate:g?{
+    decision:g.body.result.decision,
+    confidence:g.body.result.confidence,
+    needs_clarification:g.body.result.needs_clarification,
+    clarification_question:g.body.result.clarification_question
+   }:null,
    classifier:c?{
     decision:c.body.result.decision,
     routes:c.body.result.routes,
@@ -84,7 +101,7 @@ export default async function handler(req,res){
  console.log(`[VF ROUTING ORCHESTRATOR] decomposition=${d.body.result.mode} units=${routed.length} decisions=${routed.map(x=>x.resolver.decision).join(",")}`);
 
  return res.status(200).json({
-  ok:true,mode:"routing_orchestrator_dry_run",writes_performed:false,
+  ok:true,mode:"routing_orchestrator_v2_dry_run",writes_performed:false,
   decomposition:{mode:d.body.result.mode,confidence:d.body.result.confidence},
   units:routed,duration_ms:Date.now()-started
  });
