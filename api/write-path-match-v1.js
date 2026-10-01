@@ -73,13 +73,12 @@ export default async function handler(req,res){
   const normalizedText=clean(event.normalized_text);
   if(!normalizedText)return res.status(422).json({error:"Evento senza normalized_text"});
 
-  // Exactly-once fast path: if this event was already committed by this pipeline,
-  // do not rerun Decomposer/Resolver. This prevents retry drift and avoids AI cost.
+  // Exactly-once fast path: automatic routing is once per event across all software versions.
+  // A deployment/version change must never reroute an old Meta event or spend AI again.
   const existingDecisions=await dbGet("event_routing_decisions",{
-   select:"id,decision_payload,created_at",
+   select:"id,pipeline_version,decision_payload,created_at",
    business_id:`eq.${businessId}`,
    event_id:`eq.${eventId}`,
-   pipeline_version:`eq.${PIPELINE_VERSION}`,
    limit:1
   });
   if(existingDecisions[0]){
@@ -94,7 +93,8 @@ export default async function handler(req,res){
    console.log(`[VF WRITE MATCH V2] event=${eventId} replay=true links=${replayLinks.length}`);
    return res.status(200).json({
     ok:true,mode:"write_path_match_v2",scope:"MATCH_LINKS_ONLY_ROUTING_AUDIT_ALWAYS",
-    pipeline_version:PIPELINE_VERSION,replayed:true,
+    pipeline_version:replay?.pipeline_version||existingDecisions[0].pipeline_version,
+    current_pipeline_version:PIPELINE_VERSION,replayed:true,
     safety:{min_auto_match_confidence:MIN_AUTO_MATCH_CONFIDENCE,new_work_links_enabled:false,ambiguous_work_links_enabled:false},
     routing_decision_id:replay?.decision_id||existingDecisions[0].id,
     routing_decision_created:false,
