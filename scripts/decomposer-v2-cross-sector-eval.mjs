@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 
 const MODEL="gpt-6-luna";
-const BATCH=0;
+const BATCH=0;\nconst START=0,COUNT=4;
 const CASES=[
 {id:"ED1",sector:"edilizia",e:"SINGLE",t:"Per la ristrutturazione del bagno di Via Etnea 22 ho inviato la planimetria; il sopralluogo va bene martedì alle 11 e il budget resta 15000 euro."},
 {id:"ED2",sector:"edilizia",e:"MULTI_INDEPENDENT",t:"Per il bagno di casa mia confermo il sopralluogo. Inoltre nel negozio in via Roma si è staccata una parte del controsoffitto e vorrei un intervento separato."},
@@ -70,7 +70,7 @@ const prompt=[
 ].join("\n");
 
 const client=new OpenAI({apiKey:process.env.OPENAI_API_KEY});
-const selected=CASES.slice(BATCH*8,BATCH*8+8);
+const selected=CASES.slice(START,START+COUNT);
 let fail=0,totalTokens=0,totalMs=0;
 for(const tc of selected){
  const s=Date.now();
