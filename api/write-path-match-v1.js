@@ -4,7 +4,7 @@ import resolver from "./work-resolver-dry-run.js";
 // VocalFlash Write Path V2 - MATCH links + immutable routing audit.
 // Work-item links are allowed ONLY for resolver MATCH decisions.
 // NEW / AMBIGUOUS never create work-item links, but their routing outcome is audit-committed.
-// One immutable routing decision is committed exactly once per event + pipeline version.
+// One immutable automatic routing decision is committed exactly once per event, across software versions.
 // Resolver history is read from active reversible work_event_links.
 
 const MIN_AUTO_MATCH_CONFIDENCE = 0.90;
@@ -68,7 +68,7 @@ export default async function handler(req,res){
   const event=events[0];
   if(!event)return res.status(404).json({error:"Evento non trovato nel business"});
   if(event.direction!=="inbound"||event.actor_type!=="customer"||!event.contact_id){
-   return res.status(422).json({error:"Write Path V1 accetta solo eventi inbound customer con contact_id"});
+   return res.status(422).json({error:"Write Path V2 accetta solo eventi inbound customer con contact_id"});
   }
   const normalizedText=clean(event.normalized_text);
   if(!normalizedText)return res.status(422).json({error:"Evento senza normalized_text"});
