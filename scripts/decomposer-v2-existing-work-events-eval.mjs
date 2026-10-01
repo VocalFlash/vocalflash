@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import { DECOMPOSER_V2_PROMPT, decomposerV2Schema, validateDecomposerV2 } from "../api/message-decomposer-dry-run-v2.js";
 
 const MODEL="gpt-6-luna";
+const START=0,COUNT=6;
 const CASES=[
  {id:"EV1",sector:"artigiano",t:"Ho pagato il saldo del preventivo 42, grazie.",must:[/pagat|pagament|saldo/i,/42/]},
  {id:"EV2",sector:"fisioterapia",t:"Domani non riesco a venire all'appuntamento delle 18, devo annullare.",must:[/appuntament|sedut/i,/annull|non.*ven/i]},
@@ -18,8 +19,9 @@ const CASES=[
 ];
 
 const client=new OpenAI({apiKey:process.env.OPENAI_API_KEY});
+const selected=CASES.slice(START,START+COUNT);
 let fail=0,totalTokens=0,totalMs=0;
-for(const tc of CASES){
+for(const tc of selected){
  const s=Date.now();
  try{
   const c=await client.chat.completions.create({
@@ -36,5 +38,5 @@ for(const tc of CASES){
   if(!ok)fail++;
  }catch(e){console.error("VF_EXISTING_EVENT_ERROR",tc.id,e.message);fail++;}
 }
-console.log("VF_EXISTING_EVENT_BATCH",JSON.stringify({cases:CASES.length,fail,totalTokens,totalMs}));
+console.log("VF_EXISTING_EVENT_BATCH",JSON.stringify({start:START,cases:selected.length,fail,totalTokens,totalMs}));
 if(fail)process.exit(1);
