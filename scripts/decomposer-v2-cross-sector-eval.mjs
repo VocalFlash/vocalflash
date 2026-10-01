@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 const MODEL="gpt-6-luna";
 const BATCH=0;
-const START=19,COUNT=1;
+const START=0,COUNT=5;\nconst TARGET_IDS=["ED3","IM3","LG3","PH3","ES3","RS3","AF3","MF3","AR3","GN3"];
 const CASES=[
 {id:"ED1",sector:"edilizia",e:"SINGLE",t:"Per la ristrutturazione del bagno di Via Etnea 22 ho inviato la planimetria; il sopralluogo va bene martedì alle 11 e il budget resta 15000 euro."},
 {id:"ED2",sector:"edilizia",e:"MULTI_INDEPENDENT",t:"Per il bagno di casa mia confermo il sopralluogo. Inoltre nel negozio in via Roma si è staccata una parte del controsoffitto e vorrei un intervento separato."},
@@ -58,9 +58,12 @@ const CASES=[
 function schema(){return {name:"vf_decomposer_eval",strict:true,schema:{type:"object",additionalProperties:false,properties:{mode:{type:"string",enum:["SINGLE","MULTI_INDEPENDENT"]},units:{type:"array",minItems:1,maxItems:5,items:{type:"object",additionalProperties:false,properties:{unit_id:{type:"string"},routing_text:{type:"string"},reason:{type:"string"}},required:["unit_id","routing_text","reason"]}},shared_context:{type:"array",items:{type:"string"},maxItems:5},reason:{type:"string"},confidence:{type:"number",minimum:0,maximum:1}},required:["mode","units","shared_context","reason","confidence"]}}}
 const prompt=[
 "Sei il Message Decomposer V2 di VocalFlash, prima del Work Resolver.",
-"Devi decidere se un singolo messaggio contiene UNA pratica/lavoro potenziale oppure PIU pratiche/lavori indipendenti.",
-"SINGLE: tutto può ragionevolmente appartenere allo stesso work item/pratica, anche se contiene più fatti, problemi collegati, documenti, foto, appuntamenti, disponibilità, preventivi, pagamenti, azioni o passaggi.",
-"MULTI_INDEPENDENT: ci sono due o più obiettivi che potrebbero proseguire come work item/pratiche distinti senza dipendere l'uno dall'altro.",
+"Devi separare THREAD OPERATIVI INDIPENDENTI, non semplici argomenti o parole professionali.",
+"Un thread operativo è una nuova esigenza/richiesta del mittente OPPURE un evento/aggiornamento che potrebbe appartenere a un lavoro o pratica esistente: foto, documento, pagamento, appuntamento, cancellazione, problema risolto, disponibilità, avanzamento o altra informazione pertinente.",
+"SINGLE: esiste al massimo un thread operativo indipendente. Mantieni SINGLE anche quando il messaggio contiene racconti su terzi, esempi, citazioni, ipotesi, problemi storici, confronti o termini professionali che non costituiscono una richiesta/evento separato del mittente.",
+"Se non emerge alcun thread operativo, restituisci comunque SINGLE con una sola unità fedele al messaggio: non inventare un lavoro. Il Resolver e i passaggi successivi decideranno se collegarlo o fermarlo.",
+"MULTI_INDEPENDENT: usa questo stato SOLO quando esistono almeno due thread operativi distinti che potrebbero essere instradati verso work item/pratiche differenti.",
+"Un racconto incidentale su un'altra persona o un problema non richiesto NON è un secondo thread solo perché appartiene allo stesso settore professionale.",
 "Non separare due fatture dello stesso recupero crediti solo perché sono due documenti.",
 "Non separare invio documenti, prenotazione/spostamento appuntamento o altre azioni se fanno parte della stessa pratica.",
 "Non separare più aspetti dello stesso episodio, anche se in seguito potrebbero richiedere più instradamenti o azioni.",
@@ -71,7 +74,7 @@ const prompt=[
 ].join("\n");
 
 const client=new OpenAI({apiKey:process.env.OPENAI_API_KEY});
-const selected=CASES.slice(START,START+COUNT);
+const selected=TARGET_IDS.slice(START,START+COUNT).map(id=>CASES.find(x=>x.id===id));
 let fail=0,totalTokens=0,totalMs=0;
 for(const tc of selected){
  const s=Date.now();
@@ -79,8 +82,7 @@ for(const tc of selected){
   const c=await client.chat.completions.create({model:MODEL,reasoning_effort:"low",messages:[{role:"system",content:prompt},{role:"user",content:JSON.stringify({message:tc.t})}],response_format:{type:"json_schema",json_schema:schema()}});
   totalMs+=Date.now()-s; totalTokens+=c.usage?.total_tokens||0;
   const o=JSON.parse(c.choices[0].message.content);
-  const diagnosticExpected=tc.e;
-  const ok=o.mode===diagnosticExpected && (diagnosticExpected==="SINGLE"?o.units.length===1:o.units.length>=2);
+  const diagnosticExpected=tc.e;\n  const ok=o.mode===diagnosticExpected && (diagnosticExpected==="SINGLE"?o.units.length===1:o.units.length>=2);
   console.log("VF_DECOMP_EVAL",JSON.stringify({id:tc.id,sector:tc.sector,expected:tc.e,actual:o.mode,units:o.units.length,ok}));
   if(!ok)fail++;
  }catch(e){console.error("VF_DECOMP_EVAL_ERROR",tc.id,e.message);fail++;}
