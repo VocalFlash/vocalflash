@@ -2,8 +2,5 @@
   "dependencies": {
     "openai": "^4.0.0",
     "formidable": "^3.5.0"
-  },
-  "scripts": {
-    "vercel-build": "node scripts/decomposer-v3-cross-sector-eval.mjs"
   }
 }
