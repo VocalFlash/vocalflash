@@ -85,3 +85,5 @@ export default async function handler(req,res){
   return res.status(500).json({error:"Errore interno decomposer V2"});
  }
 }
+
+// Regression trigger: strict API-linked V2 baseline recheck.
