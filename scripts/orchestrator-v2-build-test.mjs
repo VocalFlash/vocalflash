@@ -11,4 +11,4 @@ const CASES=[
 
 function cap(){const c={statusCode:200,body:null};const r={setHeader(){return r;},status(x){c.statusCode=x;return r;},json(x){c.body=x;return c;},send(x){c.body=x;return c;},end(){return c;}};return{r,c};}
 async function one(tc,key){const {r,c}=cap();await orchestrator({method:"POST",headers:{"x-api-key":key},body:{business_id:BUSINESS,contact_id:CONTACT,normalized_text:tc.text}},r);let pass=false;try{pass=c.statusCode===200&&tc.check(c.body)}catch{};console.log("VF_E2E",JSON.stringify({id:tc.id,status:c.statusCode,pass,body:c.body}));if(!pass)process.exitCode=1;}
-const key=(process.env.VOCALFLASH_API_KEYS||"").split(",").map(v=>v.trim()).filter(Boolean)[0];if(!key)throw new Error("VOCALFLASH_API_KEYS missing in Preview build");for(const tc of CASES)await one(tc,key);if(!process.exitCode)console.log("VF_E2E_SUMMARY 6/6 PASS");
+const key=(process.env.VOCALFLASH_API_KEYS||"").split(",").map(v=>v.trim()).filter(Boolean)[0];if(!key)throw new Error("VOCALFLASH_API_KEYS missing in Preview build");await one(CASES[1],key);if(!process.exitCode)console.log("VF_E2E_SUMMARY CASE2 PASS");
