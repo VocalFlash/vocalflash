@@ -53,4 +53,5 @@ assert(eligible.length===1&&eligible[0].resolver?.work_item_id==="0d97b103-b90b-
 assert(mixed.work_links_created_count===1,"MIXED_WRITE_COUNT_WRONG");
 results.push(["MIXED_MATCH_NEW",md,mixed.work_links_created_count]);
 
-console.log("VF_MATCH_WRITE_V2_E2E_PASS",JSON.stringify(results));\nprocess.exit(0);
+console.log("VF_MATCH_WRITE_V2_E2E_PASS",JSON.stringify(results));
+process.exit(0);
