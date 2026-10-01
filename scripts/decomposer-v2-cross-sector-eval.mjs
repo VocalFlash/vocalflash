@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 const MODEL="gpt-6-luna";
 const BATCH=0;
-const START=25,COUNT=5;
+const START=0,COUNT=5;
 const CASES=[
 {id:"ED1",sector:"edilizia",e:"SINGLE",t:"Per la ristrutturazione del bagno di Via Etnea 22 ho inviato la planimetria; il sopralluogo va bene martedì alle 11 e il budget resta 15000 euro."},
 {id:"ED2",sector:"edilizia",e:"MULTI_INDEPENDENT",t:"Per il bagno di casa mia confermo il sopralluogo. Inoltre nel negozio in via Roma si è staccata una parte del controsoffitto e vorrei un intervento separato."},
@@ -85,7 +85,7 @@ for(const tc of selected){
   totalMs+=Date.now()-s; totalTokens+=c.usage?.total_tokens||0;
   const o=JSON.parse(c.choices[0].message.content);
   const diagnosticExpected=tc.e;
-  const ok=o.mode===diagnosticExpected;
+  const ok=o.mode===diagnosticExpected && (diagnosticExpected==="SINGLE" ? o.units.length===1 : o.units.length>=2);
   console.log("VF_DECOMP_EVAL",JSON.stringify({id:tc.id,sector:tc.sector,expected:tc.e,actual:o.mode,units:o.units.length,ok}));
   if(!ok)fail++;
  }catch(e){console.error("VF_DECOMP_EVAL_ERROR",tc.id,e.message);fail++;}
