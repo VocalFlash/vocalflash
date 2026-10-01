@@ -1,5 +1,5 @@
 import orchestrator from "../api/routing-orchestrator-dry-run.js";
-const BUSINESS="195a7b0a-4c3a-47ca-a4c1-a72548c40e06",CONTACT="859d3852-744d-43d2-b8df-6cae4a76bafb";
+const BUSINESS="195a7b0a-4c3a-47ca-a4c1-a72548c40e06",CONTACT="fa87f68e-39a4-4d9d-a5e7-4ef9e4e4df31";
 const CASES=[
 {id:"MATCH",text:"Ecco la foto del lavandino che mi avevi chiesto.",check:o=>o.units?.length===1&&o.units[0].resolver?.decision==="MATCH"&&o.units[0].intake_gate===null&&o.units[0].classifier===null},
 {id:"NO_NEW",text:"Mio cognato ha avuto un guasto alla caldaia e una perdita tremenda. Io invece non ho problemi, ti scrivevo solo per ringraziarti.",check:o=>o.units?.length===1&&o.units[0].resolver?.decision==="NEW"&&o.units[0].intake_gate?.decision==="NO_NEW_WORK"&&o.units[0].classifier===null},
@@ -11,4 +11,4 @@ const CASES=[
 
 function cap(){const c={statusCode:200,body:null};const r={setHeader(){return r;},status(x){c.statusCode=x;return r;},json(x){c.body=x;return c;},send(x){c.body=x;return c;},end(){return c;}};return{r,c};}
 async function one(tc,key){const {r,c}=cap();await orchestrator({method:"POST",headers:{"x-api-key":key},body:{business_id:BUSINESS,contact_id:CONTACT,normalized_text:tc.text}},r);let pass=false;try{pass=c.statusCode===200&&tc.check(c.body)}catch{};console.log("VF_E2E",JSON.stringify({id:tc.id,status:c.statusCode,pass,body:c.body}));if(!pass)process.exitCode=1;}
-const key=(process.env.VOCALFLASH_API_KEYS||"").split(",").map(v=>v.trim()).filter(Boolean)[0];if(!key)throw new Error("VOCALFLASH_API_KEYS missing in Preview build");await one(CASES[5],key);if(!process.exitCode)console.log("VF_E2E_SUMMARY CASE6 PASS");
+const key=(process.env.VOCALFLASH_API_KEYS||"").split(",").map(v=>v.trim()).filter(Boolean)[0];if(!key)throw new Error("VOCALFLASH_API_KEYS missing in Preview build");await one(CASES[1],key);if(!process.exitCode)console.log("VF_E2E_SUMMARY CASE2_CLEAN PASS");
