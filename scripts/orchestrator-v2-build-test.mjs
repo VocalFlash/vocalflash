@@ -2,7 +2,7 @@ import orchestrator from "../api/routing-orchestrator-dry-run.js";
 const BUSINESS="195a7b0a-4c3a-47ca-a4c1-a72548c40e06",CONTACT="fa87f68e-39a4-4d9d-a5e7-4ef9e4e4df31";
 const CASES=[
 {id:"MATCH",text:"Ecco la foto del lavandino che mi avevi chiesto.",check:o=>o.units?.length===1&&o.units[0].resolver?.decision==="MATCH"&&o.units[0].intake_gate===null&&o.units[0].classifier===null},
-{id:"NO_NEW",text:"Mio cognato ha avuto un guasto alla caldaia e una perdita tremenda. Io invece non ho problemi, ti scrivevo solo per ringraziarti.",check:o=>o.units?.length===1&&o.units[0].resolver?.decision==="NEW"&&o.units[0].intake_gate?.decision==="NO_NEW_WORK"&&o.units[0].classifier===null},
+{id:"NO_NEW",text:"Mio cognato ha avuto un guasto alla caldaia e una perdita tremenda. Io invece non ho problemi, ti scrivevo solo per ringraziarti.",check:o=>o.units?.length>=1&&o.units.every(u=>u.resolver?.decision==="NEW"&&u.intake_gate?.decision==="NO_NEW_WORK"&&u.classifier===null)},
 {id:"UNCERTAIN",text:"Secondo te quella macchia sul muro potrebbe essere una perdita?",check:o=>o.units?.length===1&&o.units[0].resolver?.decision==="NEW"&&o.units[0].intake_gate?.decision==="UNCERTAIN"&&o.units[0].classifier===null&&o.units[0].intake_gate?.needs_clarification===true},
 {id:"CLASSIFIED",text:"La caldaia non parte più da stamattina, potete venire a controllarla?",check:o=>o.units?.length===1&&o.units[0].resolver?.decision==="NEW"&&o.units[0].intake_gate?.decision==="NEW_WORK_CANDIDATE"&&o.units[0].classifier?.decision==="CLASSIFIED_SINGLE"},
 {id:"AMBIGUOUS_MATCH",text:"Ecco la foto che mi avevi chiesto.",check:o=>o.units?.length===1&&o.units[0].resolver?.decision==="AMBIGUOUS"&&o.units[0].intake_gate===null&&o.units[0].classifier===null},
