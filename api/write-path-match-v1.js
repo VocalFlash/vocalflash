@@ -4,7 +4,7 @@ import resolver from "./work-resolver-dry-run.js";
 // VocalFlash Write Path V1 - MATCH ONLY
 // Real write allowed ONLY for resolver MATCH decisions.
 // NEW / AMBIGUOUS remain read-only.
-// All MATCH links for one event are committed atomically by Postgres RPC.
+// All MATCH links for one event are committed atomically by Postgres RPC.\n// Resolver history is read from active reversible work_event_links.
 
 const MIN_AUTO_MATCH_CONFIDENCE = 0.90;
 const UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
