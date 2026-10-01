@@ -3,6 +3,7 @@ import { DECOMPOSER_V3_PROMPT, decomposerV3Schema, validateDecomposerV3 } from "
 
 const MODEL="gpt-6-luna";
 const START=0,COUNT=5;
+const TARGET_IDS=["IM3","LG3","LG4","PH3","PH4","ES3","ES4","RS3","AF3","MF3","MF4","AR3","GN3","GN4"];
 const CASES=[
 {id:"ED1",sector:"edilizia",e:"SINGLE",t:"Per la ristrutturazione del bagno di Via Etnea 22 ho inviato la planimetria; il sopralluogo va bene martedì alle 11 e il budget resta 15000 euro."},
 {id:"ED2",sector:"edilizia",e:"MULTI_INDEPENDENT",t:"Per il bagno di casa mia confermo il sopralluogo. Inoltre nel negozio in via Roma si è staccata una parte del controsoffitto e vorrei un intervento separato."},
@@ -56,7 +57,7 @@ const CASES=[
 ];
 
 const client=new OpenAI({apiKey:process.env.OPENAI_API_KEY});
-const selected=CASES.slice(START,START+COUNT);
+const selected=TARGET_IDS.slice(START,START+COUNT).map(id=>CASES.find(x=>x.id===id));
 let fail=0,totalTokens=0,totalMs=0;
 for(const tc of selected){
  const s=Date.now();
