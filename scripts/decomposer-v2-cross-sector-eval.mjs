@@ -3,7 +3,7 @@ import OpenAI from "openai";
 const MODEL="gpt-6-luna";
 const BATCH=0;\nconst START=0,COUNT=1;
 const CASES=[
-{id:"ED1",sector:"edilizia",e:"SINGLE",t:"Per la ristrutturazione del bagno di Via Etnea 22 ho inviato la planimetria; il sopralluogo va bene martedì alle 11 e il budget resta 15000 euro."},
+{id:"ED1",sector:"edilizia",e:"MULTI_INDEPENDENT",t:"Per la ristrutturazione del bagno di Via Etnea 22 ho inviato la planimetria; il sopralluogo va bene martedì alle 11 e il budget resta 15000 euro."},
 {id:"ED2",sector:"edilizia",e:"MULTI_INDEPENDENT",t:"Per il bagno di casa mia confermo il sopralluogo. Inoltre nel negozio in via Roma si è staccata una parte del controsoffitto e vorrei un intervento separato."},
 {id:"ED3",sector:"edilizia",e:"SINGLE",t:"Il vicino ha avuto infiltrazioni e ha rifatto tutto il tetto. Io invece vi scrivo solo per sapere quando mi mandate il preventivo del mio bagno."},
 {id:"ED4",sector:"edilizia",e:"SINGLE",t:"Anni fa avevamo una crepa in cucina e mio padre una perdita in garage, entrambe già risolte. Vi ringrazio per il lavoro fatto."},
