@@ -4,6 +4,7 @@
     "formidable": "^3.5.0"
   },
   "scripts": {
-    "vercel-build": "node scripts/decomposer-v3-existing-work-events-eval.mjs"
+    "vercel-build": "node scripts/decomposer-v3-existing-work-events-eval.mjs",
+    "vf-eval-marker": "EV1"
   }
 }
