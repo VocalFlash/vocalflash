@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 // VocalFlash Work Resolver DB Dry-Run V1
 // READ-ONLY BY DESIGN:
-// - legge business, contatto e work item candidati dal DB VocalFlash Assistant
+// - legge business, contatto e work item candidati dal DB VocalFlash Assistant\n// - usa solo work_event_links attivi per la memoria recente, con limite per work item
 // - invoca il Work Resolver
 // - restituisce NEW / MATCH / AMBIGUOUS
 // - NON crea o modifica record in Supabase
@@ -174,6 +174,42 @@ async function supabaseGet(baseUrl, secretKey, table, params = {}) {
   } catch {
     throw new Error(
       `Supabase ${table}: risposta JSON non valida`
+    );
+  }
+}
+
+async function supabaseRpc(baseUrl, secretKey, functionName, body = {}) {
+  const response = await fetch(`${baseUrl}/rest/v1/rpc/${functionName}`, {
+    method: "POST",
+    headers: {
+      apikey: secretKey,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  const rawBody = await response.text();
+
+  if (!response.ok) {
+    console.error(
+      `[VF DB DRY-RUN] RPC ${functionName} status=${response.status}`
+    );
+
+    throw new Error(
+      `Supabase RPC ${functionName}: HTTP ${response.status}`
+    );
+  }
+
+  if (!rawBody) {
+    return [];
+  }
+
+  try {
+    return JSON.parse(rawBody);
+  } catch {
+    throw new Error(
+      `Supabase RPC ${functionName}: risposta JSON non valida`
     );
   }
 }
@@ -604,18 +640,14 @@ export default async function handler(req, res) {
         }
       ),
 
-      supabaseGet(
+      supabaseRpc(
         supabaseUrl,
         supabaseSecretKey,
-        "work_events",
+        "vf_recent_active_work_events_v1",
         {
-          select:
-            "work_item_id,actor_type,content_type,normalized_text,occurred_at",
-          business_id: `eq.${businessId}`,
-          work_item_id:
-            buildInFilter(candidateIds),
-          order: "occurred_at.desc",
-          limit: 40,
+          p_business_id: businessId,
+          p_work_item_ids: candidateIds,
+          p_per_item_limit: 8,
         }
       ),
 
