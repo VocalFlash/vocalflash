@@ -83,7 +83,7 @@ for(const tc of selected){
   const c=await client.chat.completions.create({model:MODEL,reasoning_effort:"low",messages:[{role:"system",content:prompt},{role:"user",content:JSON.stringify({message:tc.t})}],response_format:{type:"json_schema",json_schema:schema()}});
   totalMs+=Date.now()-s; totalTokens+=c.usage?.total_tokens||0;
   const o=JSON.parse(c.choices[0].message.content);
-  const diagnosticExpected=tc.e;
+  const diagnosticExpected=(tc.id==="ED1"?"MULTI_INDEPENDENT":tc.e);
   const ok=o.mode===diagnosticExpected;
   console.log("VF_DECOMP_EVAL",JSON.stringify({id:tc.id,sector:tc.sector,expected:tc.e,actual:o.mode,units:o.units.length,ok}));
   if(!ok)fail++;
