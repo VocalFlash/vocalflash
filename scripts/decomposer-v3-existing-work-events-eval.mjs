@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import { DECOMPOSER_V3_PROMPT, decomposerV3Schema, validateDecomposerV3 } from "../api/message-decomposer-dry-run-v3.js";
 
 const MODEL="gpt-6-luna";
-const START=4,COUNT=1;
+const START=5,COUNT=1;
 const CASES=[
  {id:"EV1",sector:"artigiano",t:"Ho pagato il saldo del preventivo 42, grazie.",must:[/pagat|pagament|saldo/i,/42/]},
  {id:"EV2",sector:"fisioterapia",t:"Domani non riesco a venire all'appuntamento delle 18, devo annullare.",must:[/appuntament|sedut/i,/annull|non.*ven/i]},
