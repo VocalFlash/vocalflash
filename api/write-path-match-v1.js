@@ -158,6 +158,27 @@ export default async function handler(req,res){
   const writeResult=Array.isArray(commitResult?.links)?commitResult.links:[];
   const createdCount=writeResult.filter(x=>x.created===true).length;
   const routingDecisionCreated=commitResult?.created===true;
+
+  // If another worker committed after our initial replay check, never return
+  // this worker's losing local AI result. Return only the immutable DB decision.
+  if(!routingDecisionCreated){
+   console.log(`[VF WRITE MATCH V2] event=${eventId} concurrent_replay=true active_links=${writeResult.length}`);
+   return res.status(200).json({
+    ok:true,mode:"write_path_match_v2",scope:"MATCH_LINKS_ONLY_ROUTING_AUDIT_ALWAYS",
+    stored_pipeline_version:commitResult?.pipeline_version||null,
+    current_pipeline_version:PIPELINE_VERSION,
+    replayed:true,replay_reason:"CONCURRENT_COMMIT_WON",
+    safety:{min_auto_match_confidence:MIN_AUTO_MATCH_CONFIDENCE,new_work_links_enabled:false,ambiguous_work_links_enabled:false},
+    routing_decision_id:commitResult?.decision_id||null,
+    routing_decision_created:false,
+    decision_payload:commitResult?.decision_payload||null,
+    write_result:writeResult,
+    writes_performed:false,
+    work_links_created_count:0,
+    duration_ms:Date.now()-started
+   });
+  }
+
   console.log(`[VF WRITE MATCH V2] event=${eventId} units=${units.length} eligible=${matches.length} decision_created=${routingDecisionCreated} links_created=${createdCount}`);
 
   return res.status(200).json({
