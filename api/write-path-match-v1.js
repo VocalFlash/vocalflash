@@ -6,7 +6,7 @@ import resolver from "./work-resolver-dry-run.js";
 // NEW / AMBIGUOUS remain read-only.
 // All MATCH links for one event are committed atomically by Postgres RPC.\n// Resolver history is read from active reversible work_event_links.
 
-const MIN_AUTO_MATCH_CONFIDENCE = 0.90;
+const MIN_AUTO_MATCH_CONFIDENCE = 0.90;\nconst PIPELINE_VERSION = \"routing-v1-decomposer-v2-resolver-active-links-v1-writer-v2\";
 const UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function keys(){return (process.env.VOCALFLASH_API_KEYS||"").split(",").map(v=>v.trim()).filter(Boolean);}
@@ -71,6 +71,39 @@ export default async function handler(req,res){
   const normalizedText=clean(event.normalized_text);
   if(!normalizedText)return res.status(422).json({error:"Evento senza normalized_text"});
 
+  // Exactly-once fast path: if this event was already committed by this pipeline,
+  // do not rerun Decomposer/Resolver. This prevents retry drift and avoids AI cost.
+  const existingDecisions=await dbGet("event_routing_decisions",{
+   select:"id,decision_payload,created_at",
+   business_id:`eq.${businessId}`,
+   event_id:`eq.${eventId}`,
+   pipeline_version:`eq.${PIPELINE_VERSION}`,
+   limit:1
+  });
+  if(existingDecisions[0]){
+   const replay=await rpc("vf_commit_routing_decision_v1",{
+    p_business_id:businessId,
+    p_event_id:eventId,
+    p_pipeline_version:PIPELINE_VERSION,
+    p_decision_payload:existingDecisions[0].decision_payload,
+    p_matches:[]
+   });
+   const replayLinks=Array.isArray(replay?.links)?replay.links:[];
+   console.log(`[VF WRITE MATCH V2] event=${eventId} replay=true links=${replayLinks.length}`);
+   return res.status(200).json({
+    ok:true,mode:"write_path_match_v2",scope:"MATCH_LINKS_ONLY_ROUTING_AUDIT_ALWAYS",
+    pipeline_version:PIPELINE_VERSION,replayed:true,
+    safety:{min_auto_match_confidence:MIN_AUTO_MATCH_CONFIDENCE,new_work_links_enabled:false,ambiguous_work_links_enabled:false},
+    routing_decision_id:replay?.decision_id||existingDecisions[0].id,
+    routing_decision_created:false,
+    decision_payload:replay?.decision_payload||existingDecisions[0].decision_payload,
+    write_result:replayLinks,
+    writes_performed:false,
+    work_links_created_count:0,
+    duration_ms:Date.now()-started
+   });
+  }
+
   const d=await invoke(decomposer,{method:"POST",headers:{"x-api-key":key},body:{normalized_text:normalizedText}});
   if(d.statusCode!==200||!d.body?.result)throw new Error("Decomposer failed");
 
@@ -101,25 +134,45 @@ export default async function handler(req,res){
    }
   }
 
-  let writeResult=[];
-  if(matches.length>0){
-   writeResult=await rpc("vf_write_match_links_v1",{
-    p_business_id:businessId,p_event_id:eventId,p_matches:matches
-   });
-  }
+  const decisionPayload={
+   decomposition:{
+    mode:d.body.result.mode,
+    confidence:d.body.result.confidence,
+    reason:d.body.result.reason,
+    shared_context:d.body.result.shared_context||[]
+   },
+   units
+  };
 
-  const createdCount=Array.isArray(writeResult)?writeResult.filter(x=>x.created===true).length:0;
-  console.log(`[VF WRITE MATCH V1] event=${eventId} units=${units.length} eligible=${matches.length} created=${createdCount}`);
+  // Commit routing outcome even when there are zero MATCH links.
+  // The DB RPC makes event + pipeline_version exactly-once and commits links atomically.
+  const commitResult=await rpc("vf_commit_routing_decision_v1",{
+   p_business_id:businessId,
+   p_event_id:eventId,
+   p_pipeline_version:PIPELINE_VERSION,
+   p_decision_payload:decisionPayload,
+   p_matches:matches
+  });
+  const writeResult=Array.isArray(commitResult?.links)?commitResult.links:[];
+  const createdCount=writeResult.filter(x=>x.created===true).length;
+  const routingDecisionCreated=commitResult?.created===true;
+  console.log(`[VF WRITE MATCH V2] event=${eventId} units=${units.length} eligible=${matches.length} decision_created=${routingDecisionCreated} links_created=${createdCount}`);
 
   return res.status(200).json({
-   ok:true,mode:"write_path_match_v1",scope:"MATCH_ONLY",
-   safety:{min_auto_match_confidence:MIN_AUTO_MATCH_CONFIDENCE,new_writes_enabled:false,ambiguous_writes_enabled:false},
+   ok:true,mode:"write_path_match_v2",scope:"MATCH_LINKS_ONLY_ROUTING_AUDIT_ALWAYS",
+   pipeline_version:PIPELINE_VERSION,replayed:false,
+   safety:{min_auto_match_confidence:MIN_AUTO_MATCH_CONFIDENCE,new_work_links_enabled:false,ambiguous_work_links_enabled:false},
    decomposition:{mode:d.body.result.mode,confidence:d.body.result.confidence},
-   units,write_result:writeResult,writes_performed:createdCount>0,created_count:createdCount,
+   units,
+   routing_decision_id:commitResult?.decision_id||null,
+   routing_decision_created:routingDecisionCreated,
+   write_result:writeResult,
+   writes_performed:routingDecisionCreated||createdCount>0,
+   work_links_created_count:createdCount,
    duration_ms:Date.now()-started
   });
  }catch(e){
-  console.error("[VF WRITE MATCH V1] error:",e?.message||"unknown");
-  return res.status(500).json({ok:false,mode:"write_path_match_v1",error:"Write Path MATCH V1 failed"});
+  console.error("[VF WRITE MATCH V2] error:",e?.message||"unknown");
+  return res.status(500).json({ok:false,mode:"write_path_match_v2",error:"Write Path MATCH V2 failed"});
  }
 }
