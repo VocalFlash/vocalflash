@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 const MODEL="gpt-6-luna";
 const BATCH=0;
-const START=0,COUNT=5;\nconst TARGET_IDS=["ED3","IM3","LG3","PH3","ES3","RS3","AF3","MF3","AR3","GN3"];
+const START=0,COUNT=4;\nconst TARGET_IDS=["ES3","RS3","MF3","AR3"];
 const CASES=[
 {id:"ED1",sector:"edilizia",e:"SINGLE",t:"Per la ristrutturazione del bagno di Via Etnea 22 ho inviato la planimetria; il sopralluogo va bene martedì alle 11 e il budget resta 15000 euro."},
 {id:"ED2",sector:"edilizia",e:"MULTI_INDEPENDENT",t:"Per il bagno di casa mia confermo il sopralluogo. Inoltre nel negozio in via Roma si è staccata una parte del controsoffitto e vorrei un intervento separato."},
@@ -64,7 +64,7 @@ const prompt=[
 "Se non emerge alcun thread operativo, restituisci comunque SINGLE con una sola unità fedele al messaggio: non inventare un lavoro. Il Resolver e i passaggi successivi decideranno se collegarlo o fermarlo.",
 "MULTI_INDEPENDENT: usa questo stato SOLO quando esistono almeno due thread operativi distinti che potrebbero essere instradati verso work item/pratiche differenti.",
 "Un racconto incidentale su un'altra persona o un problema non richiesto NON è un secondo thread solo perché appartiene allo stesso settore professionale.",
-"Non separare due fatture dello stesso recupero crediti solo perché sono due documenti.",
+"Non creare una unit per un fatto che riguarda un amico, parente, collega o altro terzo presso un altro professionista/fornitore, salvo che il mittente chieda esplicitamente di gestire anche quel fatto.",\n"Parole come guasto, irritazione, prestito, ordine, causa o problema non rendono operativo il racconto: conta chi chiede cosa a questa attività adesso.",\n"Non separare due fatture dello stesso recupero crediti solo perché sono due documenti.",
 "Non separare invio documenti, prenotazione/spostamento appuntamento o altre azioni se fanno parte della stessa pratica.",
 "Non separare più aspetti dello stesso episodio, anche se in seguito potrebbero richiedere più instradamenti o azioni.",
 "Se nello stesso messaggio c'è un follow-up a un lavoro precedente e un nuovo problema distinto, usa MULTI_INDEPENDENT.",
