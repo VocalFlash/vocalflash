@@ -243,6 +243,27 @@ export default async function handler(req,res){
   const links=Array.isArray(committed?.links)?committed.links:[];
   const createdLinks=links.filter(x=>x.created===true).length;
 
+  // Concurrency race: another worker may have committed this event after our initial
+  // replay check but before this RPC. Never expose our losing local AI result.
+  if(committed?.created!==true){
+   console.log(`[VF EVENT ROUTING V1] event=${eventId} concurrent_replay=true active_links=${links.length}`);
+   return res.status(200).json({
+    ok:true,
+    mode:"event_routing_processor_v1",
+    replayed:true,
+    replay_reason:"CONCURRENT_COMMIT_WON",
+    stored_pipeline_version:committed?.pipeline_version||null,
+    current_pipeline_version:PIPELINE_VERSION,
+    routing_decision_id:committed?.decision_id||null,
+    routing_decision_created:false,
+    decision_payload:committed?.decision_payload||null,
+    active_links:links,
+    work_links_created_count:0,
+    new_work_items_created_count:0,
+    duration_ms:Date.now()-started
+   });
+  }
+
   console.log(`[VF EVENT ROUTING V1] event=${eventId} mode=${d.body.result.mode} units=${units.length} links_created=${createdLinks} actions=${units.map(x=>x.next_action).join(",")}`);
 
   return res.status(200).json({
