@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import { DECOMPOSER_V3_PROMPT, decomposerV3Schema, validateDecomposerV3 } from "../api/message-decomposer-dry-run-v3.js";
 
 const MODEL="gpt-6-luna";
-const START=5,COUNT=5;
+const START=10,COUNT=4;
 const TARGET_IDS=["IM3","LG3","LG4","PH3","PH4","ES3","ES4","RS3","AF3","MF3","MF4","AR3","GN3","GN4"];
 const CASES=[
 {id:"ED1",sector:"edilizia",e:"SINGLE",t:"Per la ristrutturazione del bagno di Via Etnea 22 ho inviato la planimetria; il sopralluogo va bene martedì alle 11 e il budget resta 15000 euro."},
