@@ -1,4 +1,4 @@
-import handler from "../api/owner-command-context-dry-run.js";
+import handler from "../lib/owner-command-context-handler-v1.js";
 
 const apiKey=(process.env.VOCALFLASH_API_KEYS||"").split(",").map(x=>x.trim()).filter(Boolean)[0];
 if(!apiKey||!process.env.VF_ASSISTANT_SUPABASE_URL||!process.env.VF_ASSISTANT_SUPABASE_SECRET_KEY){
