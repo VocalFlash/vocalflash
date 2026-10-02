@@ -38,8 +38,6 @@ export default async function handler(req, res) {
       db_status: dbStatus
     });
   }
-
-export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
       error: "Metodo non consentito"
@@ -170,6 +168,4 @@ export default async function handler(req, res) {
       error: "Errore interno"
     });
   }
-}
-
 }
