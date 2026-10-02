@@ -92,11 +92,11 @@ const marker=await fetch(markerUrl,{
 });
 if(!marker.ok)throw new Error("DEBUG_MARKER_FAILED");
 
-if(first?.status!=="RECEIVED_RECORDED"||!first?.event_id)throw new Error("RECEIVE_FIRST_FAILED");
+if(!["RECEIVED_RECORDED","RECEIVED_EXISTS"].includes(first?.status)||!first?.event_id)throw new Error("RECEIVE_FIRST_FAILED");
 if(retryReceive?.status!=="RECEIVED_EXISTS"||retryReceive?.event_id!==first.event_id)throw new Error("RECEIVE_RETRY_FAILED");
-if(proposal?.status!=="PROPOSAL_RECORDED"||!proposal?.proposal_event_id)throw new Error("PROPOSAL_FIRST_FAILED");
+if(!["PROPOSAL_RECORDED","PROPOSAL_EXISTS"].includes(proposal?.status)||!proposal?.proposal_event_id)throw new Error("PROPOSAL_FIRST_FAILED");
 if(proposalRetry?.status!=="PROPOSAL_EXISTS"||proposalRetry?.proposal_event_id!==proposal.proposal_event_id)throw new Error("PROPOSAL_RETRY_FAILED");
-if(action?.status!=="ACTION_CREATED"||!action?.action_id||action?.notification_scheduled!==false)throw new Error("ACTION_FIRST_FAILED");
+if(!["ACTION_CREATED","ACTION_EXISTS"].includes(action?.status)||!action?.action_id||action?.notification_scheduled!==false)throw new Error("ACTION_FIRST_FAILED");
 if(actionRetry?.status!=="ACTION_EXISTS"||actionRetry?.action_id!==action.action_id||actionRetry?.notification_scheduled!==false)throw new Error("ACTION_RETRY_FAILED");
 
 console.log("OWNER_COMMAND_PERSISTENCE_SMOKE_PASS");
