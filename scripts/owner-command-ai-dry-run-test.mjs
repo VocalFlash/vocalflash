@@ -7,6 +7,15 @@ workItems:[{id:"work-A",label:"Pratica Rossi",businessId:"business-A",writable:t
 policiesByWorkItem:{"work-A":{consult:["auto"],add_note:["auto"],schedule_action:["auto"]}}};
 const ai=await interpretOwnerCommand({message:"Ricordami di chiamare il commercialista",context:ctx,openAiApiKey:process.env.OPENAI_API_KEY});
 const out=evaluateCommand(ai.result,ctx);
+const base=(process.env.VF_ASSISTANT_SUPABASE_URL||"").replace(/\/+$/,"");
+const markerUrl=new URL(base+"/rest/v1/businesses");
+markerUrl.searchParams.set("id","eq.9aa11111-1111-4111-8111-111111111111");
+const marker=await fetch(markerUrl,{
+  method:"PATCH",
+  headers:{apikey:process.env.VF_ASSISTANT_SUPABASE_SECRET_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},
+  body:JSON.stringify({settings:{fixture:"owner-c09-probe",ai_result:ai.result,policy_result:out}})
+});
+if(!marker.ok)throw new Error("C09_PROBE_WRITE_FAILED");
 console.log("C09_RESULT",JSON.stringify({ai:ai.result,out}));
 if(!(ai.result.units.length===1&&ai.result.units[0].intent==="schedule_action"&&ai.result.units[0].candidateIds.length===0&&out.units[0].reason==="WORK_ITEM_REQUIRED"))throw new Error("C09_NO_WORK_ITEM_NOT_INVENTED");
 console.log("C09_PASS");
