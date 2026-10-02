@@ -60,5 +60,16 @@ assert(eligible.length===1&&eligible[0].resolver?.work_item_id==="c4400000-0000-
 assert(mixed.work_links_created_count===1,"MIXED_WRITE_COUNT_WRONG");
 results.push(["MIXED_MATCH_NEW",md,mixed.work_links_created_count]);
 
+const markerUrl=new URL(process.env.VF_ASSISTANT_SUPABASE_URL.replace(/\/+$/,"")+"/rest/v1/businesses");
+markerUrl.searchParams.set("id","eq.a1100000-0000-4000-8000-000000000001");
+const marker=await fetch(markerUrl,{
+  method:"PATCH",
+  headers:{
+    apikey:process.env.VF_ASSISTANT_SUPABASE_SECRET_KEY,
+    "Content-Type":"application/json",
+    Prefer:"return=minimal"
+  },
+  body:JSON.stringify({settings:{fixture:"writer-v2-synthetic-20261002-v2",e2e_status:"PASS"}})
+});
+if(!marker.ok) throw new Error("PASS_MARKER_WRITE_FAILED");
 console.log("VF_MATCH_WRITE_V2_E2E_PASS_DB_REVIEW_REQUIRED",JSON.stringify(results));
-process.exit(0);
