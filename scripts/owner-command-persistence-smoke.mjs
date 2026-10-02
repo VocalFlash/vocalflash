@@ -13,21 +13,23 @@ const common={
 
 const first=await store.recordReceived({
   ...common,
-  externalMessageId:"owner-persistence-smoke-msg-1",
+  externalMessageId:"owner-persistence-smoke-msg-2",
   normalizedText:"Ricordami domani alle 10 di chiamare Rossi",
   occurredAt:"2026-10-02T08:00:00+02:00",
   payload:{fixture:"owner-persistence-smoke"}
 });
-if(first?.status!=="RECEIVED_RECORDED"||!first?.event_id)throw new Error("RECEIVE_FIRST_FAILED");
+const debug={first};
+
 
 const retryReceive=await store.recordReceived({
   ...common,
-  externalMessageId:"owner-persistence-smoke-msg-1",
+  externalMessageId:"owner-persistence-smoke-msg-2",
   normalizedText:"Ricordami domani alle 10 di chiamare Rossi",
   occurredAt:"2026-10-03T08:00:00+02:00",
   payload:{fixture:"owner-persistence-smoke",retry:true}
 });
-if(retryReceive?.status!=="RECEIVED_EXISTS"||retryReceive?.event_id!==first.event_id)throw new Error("RECEIVE_RETRY_FAILED");
+debug.retryReceive=retryReceive;
+
 
 const proposal=await store.recordProposal({
   businessId:common.businessId,
@@ -41,7 +43,8 @@ const proposal=await store.recordProposal({
     policy:"auto"
   }
 });
-if(proposal?.status!=="PROPOSAL_RECORDED"||!proposal?.proposal_event_id)throw new Error("PROPOSAL_FIRST_FAILED");
+debug.proposal=proposal;
+
 
 const proposalRetry=await store.recordProposal({
   businessId:common.businessId,
@@ -55,7 +58,8 @@ const proposalRetry=await store.recordProposal({
     policy:"auto"
   }
 });
-if(proposalRetry?.status!=="PROPOSAL_EXISTS"||proposalRetry?.proposal_event_id!==proposal.proposal_event_id)throw new Error("PROPOSAL_RETRY_FAILED");
+debug.proposalRetry=proposalRetry;
+
 
 const action=await store.commitScheduleAction({
   businessId:common.businessId,
@@ -66,7 +70,8 @@ const action=await store.commitScheduleAction({
   dueAt:"2026-10-03T10:00:00+02:00",
   confirmed:false
 });
-if(action?.status!=="ACTION_CREATED"||!action?.action_id||action?.notification_scheduled!==false)throw new Error("ACTION_FIRST_FAILED");
+debug.action=action;
+
 
 const actionRetry=await store.commitScheduleAction({
   businessId:common.businessId,
@@ -77,6 +82,21 @@ const actionRetry=await store.commitScheduleAction({
   dueAt:"2026-10-04T10:00:00+02:00",
   confirmed:false
 });
+debug.actionRetry=actionRetry;
+const markerUrl=new URL(baseUrl.replace(/\/+$/,"")+"/rest/v1/businesses");
+markerUrl.searchParams.set("id","eq.71111111-1111-4111-8111-111111111111");
+const marker=await fetch(markerUrl,{
+  method:"PATCH",
+  headers:{apikey:secret,Authorization:"Bearer "+secret,"Content-Type":"application/json",Prefer:"return=minimal"},
+  body:JSON.stringify({settings:{fixture:"owner-persistence-smoke",debug}})
+});
+if(!marker.ok)throw new Error("DEBUG_MARKER_FAILED");
+
+if(first?.status!=="RECEIVED_RECORDED"||!first?.event_id)throw new Error("RECEIVE_FIRST_FAILED");
+if(retryReceive?.status!=="RECEIVED_EXISTS"||retryReceive?.event_id!==first.event_id)throw new Error("RECEIVE_RETRY_FAILED");
+if(proposal?.status!=="PROPOSAL_RECORDED"||!proposal?.proposal_event_id)throw new Error("PROPOSAL_FIRST_FAILED");
+if(proposalRetry?.status!=="PROPOSAL_EXISTS"||proposalRetry?.proposal_event_id!==proposal.proposal_event_id)throw new Error("PROPOSAL_RETRY_FAILED");
+if(action?.status!=="ACTION_CREATED"||!action?.action_id||action?.notification_scheduled!==false)throw new Error("ACTION_FIRST_FAILED");
 if(actionRetry?.status!=="ACTION_EXISTS"||actionRetry?.action_id!==action.action_id||actionRetry?.notification_scheduled!==false)throw new Error("ACTION_RETRY_FAILED");
 
 console.log("OWNER_COMMAND_PERSISTENCE_SMOKE_PASS");
