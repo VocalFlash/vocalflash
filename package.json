@@ -3,8 +3,5 @@
   "dependencies": {
     "openai": "^4.0.0",
     "formidable": "^3.5.0"
-  },
-  "scripts": {
-    "vercel-build": "node scripts/event-routing-v2-integration-e2e.mjs"
   }
 }
