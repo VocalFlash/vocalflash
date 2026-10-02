@@ -1,43 +1,4 @@
 export default async function handler(req, res) {
-  if (req.method === "GET") {
-    const supabaseUrl = process.env.SUPABASE_URL || "";
-    const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY || "";
-    const surveyAdminPassword = process.env.SURVEY_ADMIN_PASSWORD || "";
-
-    let dbReachable = false;
-    let dbStatus = null;
-    let projectRef = null;
-
-    try {
-      if (supabaseUrl) {
-        const u = new URL(supabaseUrl);
-        projectRef = u.hostname.split(".")[0] || null;
-      }
-    } catch {}
-
-    if (supabaseUrl && supabaseSecretKey) {
-      try {
-        const response = await fetch(
-          `${supabaseUrl.replace(/\/+$/, "")}/rest/v1/questionario_vocalflash?select=id&limit=1`,
-          { headers: { apikey: supabaseSecretKey } }
-        );
-        dbStatus = response.status;
-        dbReachable = response.ok;
-      } catch {
-        dbStatus = "network_error";
-      }
-    }
-
-    return res.status(200).json({
-      diagnostic: true,
-      supabase_url_present: Boolean(supabaseUrl),
-      supabase_secret_present: Boolean(supabaseSecretKey),
-      survey_admin_password_present: Boolean(surveyAdminPassword),
-      project_ref: projectRef,
-      db_reachable: dbReachable,
-      db_status: dbStatus
-    });
-  }
   if (req.method !== "POST") {
     return res.status(405).json({
       error: "Metodo non consentito"
