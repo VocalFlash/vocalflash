@@ -2,5 +2,8 @@
   "dependencies": {
     "openai": "^4.0.0",
     "formidable": "^3.5.0"
+  },
+  "scripts": {
+    "vercel-build": "node scripts/owner-command-identity-smoke.mjs"
   }
 }
