@@ -1,4 +1,4 @@
-import processor from "../api/event-routing-processor-v1.js";
+import processor from "../lib/event-routing-processor-v2.js";
 
 const apiKey=(process.env.VOCALFLASH_API_KEYS||"").split(",").map(x=>x.trim()).filter(Boolean)[0];
 if(!apiKey||!process.env.VF_ASSISTANT_SUPABASE_URL||!process.env.VF_ASSISTANT_SUPABASE_SECRET_KEY){
