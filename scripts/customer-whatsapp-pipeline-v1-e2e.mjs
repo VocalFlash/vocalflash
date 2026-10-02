@@ -32,3 +32,4 @@ if(retry.routing?.routing_decision_created!==false)throw new Error("PIPELINE_RET
 if(retry.routing?.work_links_created_count!==0)throw new Error("PIPELINE_RETRY_LINK");
 
 console.log("CUSTOMER_WHATSAPP_PIPELINE_V1_PASS");
+// retrigger: same assertions, no functional change
