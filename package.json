@@ -4,6 +4,6 @@
     "formidable": "^3.5.0"
   },
   "scripts": {
-    "vercel-build": "node scripts/owner-command-authz-v1-test.mjs"
+    "vercel-build": "node scripts/owner-command-context-e2e.mjs"
   }
 }
