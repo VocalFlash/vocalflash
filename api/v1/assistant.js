@@ -1,7 +1,7 @@
 import {processCustomerWhatsappMessage} from "../../lib/customer-whatsapp-pipeline-v1.js";
 
-function keys(){
-  return (process.env.VOCALFLASH_API_KEYS||"")
+function assistantKeys(){
+  return (process.env.VOCALFLASH_ASSISTANT_API_KEYS||"")
     .split(",")
     .map(v=>v.trim())
     .filter(Boolean);
@@ -15,16 +15,16 @@ function clean(v,max=12000){
 export default async function handler(req,res){
   res.setHeader("Cache-Control","no-store");
   res.setHeader("Access-Control-Allow-Origin","*");
-  res.setHeader("Access-Control-Allow-Headers","X-API-Key, Content-Type");
+  res.setHeader("Access-Control-Allow-Headers","X-VocalFlash-Assistant-Key, Content-Type");
   res.setHeader("Access-Control-Allow-Methods","POST, OPTIONS");
 
   if(req.method==="OPTIONS")return res.status(204).end();
   if(req.method!=="POST")return res.status(405).json({error:"Usa POST"});
 
-  const key=req.headers["x-api-key"];
-  const valid=keys();
+  const key=req.headers["x-vocalflash-assistant-key"];
+  const valid=assistantKeys();
   if(!key||typeof key!=="string"||valid.length===0||!valid.includes(key)){
-    return res.status(401).json({error:"API Key non valida"});
+    return res.status(401).json({error:"Assistant API Key non valida"});
   }
 
   const externalAccountId=clean(req.body?.external_account_id,256);
