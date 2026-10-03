@@ -18,7 +18,7 @@ const cases=[
     id:"legal_missing_deadline",
     workflow:{id:"33333333-3333-4333-8333-333333333333",workflow_key:"legal_case",name:"Pratica legale",required_data:[{key:"counterparty",label:"Controparte"},{key:"deadline",label:"Scadenza"}]},
     text:"La controparte è la società Alfa Srl. Non ricordo quando scade il termine, devo controllare.",
-    expect:{PROVIDED:["counterparty"],MISSING:[],UNCERTAIN:["deadline"]}
+    expect:{PROVIDED:["counterparty"],MISSING:["deadline"],UNCERTAIN:[]}
   },
   {
     id:"beauty_uncertain_availability",
