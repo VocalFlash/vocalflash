@@ -3,8 +3,5 @@
   "dependencies": {
     "openai": "^4.0.0",
     "formidable": "^3.5.0"
-  },
-  "scripts": {
-    "vercel-build": "node scripts/new-work-required-data-extractor-v1-ai-eval.mjs"
   }
 }
