@@ -1,7 +1,5 @@
+import {mkdir,writeFile} from "node:fs/promises";
 import {extractNewWorkRequiredData} from "../lib/new-work-required-data-extractor-v1.js";
-
-if(!process.env.OPENAI_API_KEY)throw new Error("OPENAI_API_KEY_MISSING");
-function assert(x,msg){if(!x)throw new Error(msg);}
 
 const cases=[
   {
@@ -36,21 +34,33 @@ const cases=[
   }
 ];
 
-let passed=0;
-for(const tc of cases){
-  const r=await extractNewWorkRequiredData({normalizedText:tc.text,workflow:tc.workflow,openAiApiKey:process.env.OPENAI_API_KEY});
-  assert(r.ok===true,tc.id+" not ok");
-  assert(r.writes_performed===false,tc.id+" wrote data");
-  const actual={
-    PROVIDED:r.extraction.provided.map(x=>x.key).sort(),
-    MISSING:r.extraction.missing.map(x=>x.key).sort(),
-    UNCERTAIN:r.extraction.uncertain.map(x=>x.key).sort()
-  };
-  for(const status of ["PROVIDED","MISSING","UNCERTAIN"]){
-    const exp=[...tc.expect[status]].sort();
-    assert(JSON.stringify(actual[status])===JSON.stringify(exp),tc.id+" "+status+" expected="+JSON.stringify(exp)+" actual="+JSON.stringify(actual[status]));
+const report={ok:false,model_configured:Boolean(process.env.OPENAI_API_KEY),passed:0,total:cases.length,cases:[],fatal_error:null};
+try{
+  if(!process.env.OPENAI_API_KEY)throw new Error("OPENAI_API_KEY_MISSING");
+  for(const tc of cases){
+    try{
+      const r=await extractNewWorkRequiredData({normalizedText:tc.text,workflow:tc.workflow,openAiApiKey:process.env.OPENAI_API_KEY});
+      const actual=r?.extraction?{
+        PROVIDED:r.extraction.provided.map(x=>x.key).sort(),
+        MISSING:r.extraction.missing.map(x=>x.key).sort(),
+        UNCERTAIN:r.extraction.uncertain.map(x=>x.key).sort()
+      }:null;
+      const expected={
+        PROVIDED:[...tc.expect.PROVIDED].sort(),
+        MISSING:[...tc.expect.MISSING].sort(),
+        UNCERTAIN:[...tc.expect.UNCERTAIN].sort()
+      };
+      const semanticPass=Boolean(r?.ok)&&r?.writes_performed===false&&actual&&["PROVIDED","MISSING","UNCERTAIN"].every(k=>JSON.stringify(actual[k])===JSON.stringify(expected[k]));
+      if(semanticPass)report.passed++;
+      report.cases.push({id:tc.id,pass:semanticPass,status:r?.status||null,actual,expected,extraction:r?.extraction||null,error:null});
+    }catch(e){
+      report.cases.push({id:tc.id,pass:false,actual:null,expected:tc.expect,error:e?.message||String(e)});
+    }
   }
-  passed++;
-  console.log("NEW_DATA_AI_CASE_PASS",tc.id,JSON.stringify(actual));
+  report.ok=report.passed===report.total;
+}catch(e){
+  report.fatal_error=e?.message||String(e);
 }
-console.log(`NEW_WORK_REQUIRED_DATA_EXTRACTOR_V1_AI_PASS ${passed}/${cases.length}`);
+await mkdir("public",{recursive:true});
+await writeFile("public/new-work-required-data-ai-eval.json",JSON.stringify(report,null,2));
+console.log("NEW_WORK_REQUIRED_DATA_AI_EVAL_WRITTEN",JSON.stringify({ok:report.ok,passed:report.passed,total:report.total,fatal_error:report.fatal_error}));
