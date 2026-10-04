@@ -27,6 +27,11 @@ export default async function handler(req,res){
     return res.status(401).json({error:"Assistant API Key non valida"});
   }
 
+  const action=clean(req.body?.action,64);
+  if(action==="health"){
+    return res.status(200).json({ok:true,action,auth:true});
+  }
+
   const externalAccountId=clean(req.body?.external_account_id,256);
   const senderWaId=clean(req.body?.sender_wa_id,64);
   const externalMessageId=clean(req.body?.external_message_id,256);
