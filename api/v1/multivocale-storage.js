@@ -67,6 +67,17 @@ export default async function handler(req,res){
   const store=supabase.storage.from(bucket);
 
   try{
+    if(action==="health"){
+      const {data,error}=await supabase.storage.getBucket(bucket);
+      if(error)throw error;
+      return res.status(200).json({
+        ok:true,
+        action,
+        storage:true,
+        bucket_private:data?.public===false,
+      });
+    }
+
     if(action==="prepare_upload"){
       const batchId=clean(req.body?.batch_id,64);
       const messageId=clean(req.body?.message_id,256);
