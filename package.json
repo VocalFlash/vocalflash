@@ -6,6 +6,6 @@
     "formidable": "^3.5.0"
   },
   "scripts": {
-    "vercel-build": "node scripts/owner-command-authz-v1-test.mjs && node scripts/message-origin-router-v1-test.mjs && node scripts/owner-command-secret-header-v1-test.mjs && node scripts/owner-command-c01-consult-test.mjs && node scripts/owner-command-c11-test.mjs && node scripts/owner-command-confirmation-contract-v1-test.mjs && node scripts/owner-command-orchestrator-safety-v1-test.mjs"
+    "vercel-build": "node scripts/owner-command-authz-v1-test.mjs && node scripts/message-origin-router-v1-test.mjs && node scripts/owner-command-secret-header-v1-test.mjs && node scripts/owner-command-c01-consult-test.mjs && node scripts/owner-command-c11-test.mjs && node scripts/owner-command-confirmation-contract-v1-test.mjs && node scripts/owner-command-orchestrator-safety-v1-test.mjs && node scripts/supabase-secret-header-compat-v1-test.mjs && node scripts/assistant-whatsapp-dispatch-v1-test.mjs && node scripts/assistant-whatsapp-origin-resolver-v1-test.mjs && node scripts/owner-command-replay-conflict-v1-test.mjs && node scripts/owner-command-replay-verified-v1-test.mjs"
   }
 }
