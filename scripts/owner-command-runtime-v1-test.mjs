@@ -8,10 +8,10 @@ const context={businessId:"b",originVerified:true,receivedAt:baseInput.occurredA
   workItems:[{id:"w",businessId:"b",label:"Rossi",writable:true}],
   policiesByWorkItem:{w:{consult:["auto"],add_note:["confirm"]}}};
 
-let proposals=0,writes=0;
+let proposals=0,writes=0,receivedCalls=0;
 const deps={
   persistence:{
-    recordReceived:async()=>({ok:true,status:"RECEIVED_RECORDED",event_id:"source",replayed:false}),
+    recordReceived:async()=>{receivedCalls++;return {ok:true,status:"RECEIVED_RECORDED",event_id:"source",replayed:false};},
     recordProposal:async()=>{proposals++;return {ok:true,status:"PROPOSAL_RECORDED",proposal_event_id:"proposal",replayed:false};},
     commitNote:async()=>{writes++;return {ok:true,status:"NOTE_ADDED"};}
   },
@@ -43,4 +43,11 @@ assert.equal(read.status,"READ_ONLY_READY");
 assert.equal(read.reads.length,1);
 assert.equal(read.writes_performed,false);
 
-console.log("OWNER_COMMAND_RUNTIME_V1_PASS 13/13");
+const beforeConfirmationCalls=receivedCalls;
+const blockedConfirmation=await processOwnerCommandMessage({...baseInput,normalizedText:"Sì, confermo"},deps);
+assert.equal(blockedConfirmation.ok,false);
+assert.equal(blockedConfirmation.status,"ATOMIC_CONFIRMATION_NOT_ENABLED");
+assert.equal(blockedConfirmation.writes_performed,false);
+assert.equal(receivedCalls,beforeConfirmationCalls);
+
+console.log("OWNER_COMMAND_RUNTIME_V1_PASS 17/17");
