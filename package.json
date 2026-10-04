@@ -4,8 +4,5 @@
     "@supabase/supabase-js": "^2.0.0",
     "openai": "^4.0.0",
     "formidable": "^3.5.0"
-  },
-  "scripts": {
-    "vercel-build": "node scripts/owner-command-runtime-v1-test.mjs && node scripts/owner-command-orchestrator-safety-v1-test.mjs && node scripts/owner-command-replay-conflict-v1-test.mjs && node scripts/owner-command-replay-verified-v1-test.mjs && node scripts/assistant-whatsapp-dispatch-v1-test.mjs && node scripts/assistant-whatsapp-origin-resolver-v1-test.mjs && node scripts/owner-command-ai-dry-run-test.mjs"
   }
 }
