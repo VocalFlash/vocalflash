@@ -68,13 +68,14 @@ export default async function handler(req,res){
 
   try{
     if(action==="health"){
-      const {data,error}=await supabase.storage.getBucket(bucket);
+      const healthKey=`health/${crypto.randomUUID()}.ogg`;
+      const {data,error}=await store.createSignedUploadUrl(healthKey,{upsert:false});
       if(error)throw error;
+      if(!data?.signedUrl)throw new Error("Signed upload health incompleto");
       return res.status(200).json({
         ok:true,
         action,
         storage:true,
-        bucket_private:data?.public===false,
       });
     }
 
