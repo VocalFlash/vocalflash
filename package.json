@@ -4,5 +4,8 @@
     "@supabase/supabase-js": "^2.0.0",
     "openai": "^4.0.0",
     "formidable": "^3.5.0"
+  },
+  "scripts": {
+    "vercel-build": "node scripts/owner-command-authz-v1-test.mjs && node scripts/message-origin-router-v1-test.mjs && node scripts/owner-command-secret-header-v1-test.mjs && node scripts/owner-command-c01-consult-test.mjs && node scripts/owner-command-c11-test.mjs && node scripts/owner-command-confirmation-contract-v1-test.mjs && node scripts/owner-command-orchestrator-safety-v1-test.mjs"
   }
 }
