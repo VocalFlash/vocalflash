@@ -12,7 +12,7 @@
 - The live RPCs `vf_commit_owner_note_v1` and `vf_commit_owner_schedule_action_v1` accept `p_confirmed boolean` and `p_proposal_event_id`, but the inspected function definitions do **not** query or validate a corresponding `owner_command_confirmation` event.
 - The inspected commit RPCs do not contain expiry or one-time-consumption logic for a confirmation event. They do use transaction-scoped advisory locks and idempotency/conflict handling for their existing write paths.
 - The inspected owner-command RPCs are executable by `service_role` and `postgres`; no `anon` or `authenticated` EXECUTE grant appeared in the inspected privilege results.
-- GitHub Actions run #87 for the current JS branch head completed successfully, including the focused assistant test job. This does not validate the live SQL write path or a WhatsApp end-to-end flow.
+- GitHub Actions run [#39824601956](https://github.com/VocalFlash/vocalflash/actions/runs/39824601956) passed for code head `85293847131493cbad6ad6997d4d788aa239e460`; later documentation-only branch commits also passed focused assistant CI, including run [#39825666950](https://github.com/VocalFlash/vocalflash/actions/runs/39825666950) for commit `650af73bcb5cdc2a53f333b8b1b9e68b48ec38f7`. These runs do not validate the live SQL write path or a WhatsApp end-to-end flow.
 
 ## Release-blocking gap
 
