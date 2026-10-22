@@ -5,10 +5,10 @@ Status: read-only audit. No database writes, schema changes, merges, or producti
 ## Verified code and CI
 
 - JavaScript assistant PR: `assistant-conversation-photo-v1` → `assistant-auth-v1`, PR #3, still Draft/open/not merged.
-- Current head: `43add6c755c81112db2b67f42d2023e1c4345b6d`.
-- GitHub Actions run #39769310989: 41 tests passed, 0 failed, 0 skipped; dependency audit reported 0 vulnerabilities.
+- Current head after the read-only owner-confirmation audit update: `dcc816e28797066a3696ec53a7349b6cb56caa24`.
+- GitHub Actions run [#39825267824](https://github.com/VocalFlash/vocalflash/actions/runs/39825267824) passed on code head `85293847131493cbad6ad6997d4d788aa239e460`; the focused assistant test job completed successfully. The later documentation-only commit `dcc816e28797066a3696ec53a7349b6cb56caa24` also has GitHub Actions run [#39825267824](https://github.com/VocalFlash/vocalflash/actions/runs/39825267824) verified successful at the time of this audit; Vercel Preview status for that documentation commit is success. Do not interpret these as full end-to-end verification.
 - Vercel Preview for the current head: READY. This is not a production deployment and not an end-to-end WhatsApp test.
-- Python bot PR #2 remains Draft/open/not merged; its last verified CI run passed 10/10 tests.
+- Python bot PR #2 remains Draft/open/not merged. GitHub Actions run [#39822398223](https://github.com/VocalFlash/vocalflash-bot/actions/runs/39822398223) passed for current head `d110184080471c4129392330ac6bd1d502a14932`.
 - The JS and Python changes depend on each other for customer-facing assistant replies and must be released together after staging verification.
 
 ## Read-only Supabase snapshot
@@ -67,3 +67,15 @@ Do not remove unused indexes mechanically: the project is small/test-configured,
 - Configure and test the first pilot business with synthetic/staging data.
 - Verify RLS, grants, function privileges, advisors, logs, and data retention after the development migration.
 - Run the JS and Python changes together in staging, including real WhatsApp inbound/outbound delivery, before any production release.
+
+
+## Owner confirmation audit — verified 2026-10-22
+
+The separate [owner confirmation atomicity audit](owner-confirmation-atomicity-audit-v1.md) inspected the live definitions of the owner-command RPCs without changing database state.
+
+- `vf_record_owner_command_confirmation_v1` records a confirmation event tied to a proposal and source event.
+- `vf_commit_owner_note_v1` and `vf_commit_owner_schedule_action_v1` accept `p_confirmed` and a proposal ID, but the inspected definitions do not validate a matching confirmation event or enforce its expiry/one-time consumption.
+- The inspected RPC privileges showed `EXECUTE` for `service_role` and `postgres`, not `anon` or `authenticated`. This is not evidence of public direct RPC access, but it does leave the service-side contract incomplete.
+- Runtime remains fail-closed with `ATOMIC_CONFIRMATION_NOT_ENABLED`. Do not enable confirmation writes until proposal binding, expiry, one-time consumption, and the requested write are validated atomically and tested under concurrency and replay.
+
+The Meta POST signature verification code and tests are present only in the Python development PR. `META_APP_SECRET` has not been verified as configured in Render staging or production; no deployment was performed.
