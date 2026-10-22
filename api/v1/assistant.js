@@ -56,7 +56,13 @@ export default async function handler(req,res){
       const status=result?.stage==="origin"?422:500;
       return res.status(status).json({ok:false,mode:"assistant_whatsapp_dispatch_v1",stage:result?.stage||"unknown",result});
     }
-    return res.status(200).json({ok:true,mode:"assistant_whatsapp_dispatch_v1",origin:result.route?.origin,result});
+    return res.status(200).json({
+      ok:true,
+      mode:"assistant_whatsapp_dispatch_v1",
+      origin:result.route?.origin,
+      assistant_message:result.route?.origin==="customer"?result.customer?.assistant_message||null:null,
+      result
+    });
   }catch(error){
     console.error("[VF ASSISTANT DISPATCH V1] error",error?.message||"unknown");
     return res.status(500).json({ok:false,mode:"assistant_whatsapp_dispatch_v1",error:"Assistant dispatch failed"});
