@@ -6,7 +6,7 @@ Status: read-only audit. No database writes, schema changes, merges, or producti
 
 - JavaScript assistant PR: `assistant-conversation-photo-v1` → `assistant-auth-v1`, PR #3, still Draft/open/not merged.
 - Source-code head reviewed for the implementation audit: `85293847131493cbad6ad6997d4d788aa239e460`. Subsequent commits on this branch updated audit documentation only; the latest checked documentation commit at this revision was `650af73bcb5cdc2a53f333b8b1b9e68b48ec38f7`.
-- GitHub Actions run [#39824601956](https://github.com/VocalFlash/vocalflash/actions/runs/39824601956) passed on code head `85293847131493cbad6ad6997d4d788aa239e460`; the focused assistant test job completed successfully. The subsequent documentation-only commits also passed focused assistant CI; the latest checked documentation commit `650af73bcb5cdc2a53f333b8b1b9e68b48ec38f7` passed run [#39825666950](https://github.com/VocalFlash/vocalflash/actions/runs/39825666950). Vercel Preview status for that documentation commit is success. Do not interpret these as full end-to-end verification.
+- GitHub Actions run [#39824601956](https://github.com/VocalFlash/vocalflash/actions/runs/39824601956) passed on code head `85293847131493cbad6ad6997d4d788aa239e460`. After the required-data schema alignment and new regression tests, latest run [#39827480693](https://github.com/VocalFlash/vocalflash/actions/runs/39827480693) passed. The latest checked Preview head `ea495964723f09c3ce77df217daa125304e48639` has Vercel status `success`. These are focused CI/Preview checks, not full end-to-end verification.
 - Vercel Preview for the current head: READY. This is not a production deployment and not an end-to-end WhatsApp test.
 - Python bot PR #2 remains Draft/open/not merged. GitHub Actions run [#39822398223](https://github.com/VocalFlash/vocalflash-bot/actions/runs/39822398223) passed for current head `d110184080471c4129392330ac6bd1d502a14932`.
 - The JS and Python changes depend on each other for customer-facing assistant replies and must be released together after staging verification.
@@ -49,6 +49,7 @@ Do not remove unused indexes mechanically: the project is small/test-configured,
 - Multi-workflow intake is explicitly review-only; it cannot auto-split or create a work item.
 - Customer replies now distinguish multi-workflow review and unclassified requests without claiming that a practice was opened.
 - Regression tests cover the above guardrails.
+- The NEW Work Intake Plan now uses the same strict `normalizeRequiredFields` contract as the extractor. Unsupported `required_data` objects and malformed field definitions return `CONFIG_REQUIRED`; the plan exposes normalized field definitions only and keeps creation disabled. The new tests are included in the focused CI workflow.
 
 ## Blocked pending explicit approval or business decisions
 
@@ -79,3 +80,9 @@ The separate [owner confirmation atomicity audit](owner-confirmation-atomicity-a
 - Runtime remains fail-closed with `ATOMIC_CONFIRMATION_NOT_ENABLED`. Do not enable confirmation writes until proposal binding, expiry, one-time consumption, and the requested write are validated atomically and tested under concurrency and replay.
 
 The Meta POST signature verification code and tests are present only in the Python development PR. `META_APP_SECRET` has not been verified as configured in Render staging or production; no deployment was performed.
+
+
+## Additional audits — verified 2026-10-22
+
+- [Supabase migration provenance audit](supabase-migration-provenance-audit-v1.md) records the 15 migrations in the live registry. The authoritative source sequence has not yet been reconciled end to end; this is a release gate, not proof that migration files are absent from every branch/repository.
+- The latest required-data guardrail change and its tests passed focused GitHub Actions run [#39827480693](https://github.com/VocalFlash/vocalflash/actions/runs/39827480693). No database or production change was made.
