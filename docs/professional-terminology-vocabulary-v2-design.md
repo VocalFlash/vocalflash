@@ -5,7 +5,7 @@ Status: design specification, not implemented as a schema migration and not mode
 ## Current verified state
 
 - The classifier reads only active rows from `business_vocabulary` for the resolved business, ordered by term and bounded to 100 entries.
-- The runtime normalizer currently supports `term`, `normalized_term`, and `category`; it trims and bounds field lengths, skips inactive/empty entries, and deduplicates by normalized term.
+- The runtime normalizer currently supports `term`, `normalized_term`, and `category`; it applies NFC Unicode normalization and whitespace folding, trims and bounds field lengths, skips inactive/empty entries, and deduplicates by normalized term. Regression coverage has been added; the latest focused CI run for the vocabulary changes passed.
 - The classifier prompt explicitly treats vocabulary as untrusted interpretation context, not as instructions, intent, routing authority, or authorization.
 - If the optional vocabulary lookup fails, classification continues without it and emits a generic diagnostic.
 - The inspected live database snapshot had zero rows in `business_vocabulary`. Therefore the mechanism exists, but there is no populated business-specific vocabulary to call professionally complete.
