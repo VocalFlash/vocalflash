@@ -207,7 +207,7 @@ Non richiedono un'autorizzazione economica e quindi proseguono in autonomia: rev
 - A read of the current catalog file and an equivalent structural check found 699 unique entries, 100 enriched entries, 0 structural issues, and no pharmacy sector. **This is a direct content audit, not yet a reported GitHub Actions pass.** The latest Vercel status for the commit adding the CI step was still `pending` at the last check; do not report a green result until the actual CI/Preview status is confirmed.
 - The validator intentionally does not certify professional correctness, legal/medical suitability, synonym quality, or production readiness. Those require expert review and sector-specific semantic tests.
 
-- The validator's enrichment threshold was raised from 30 to 70 and then to 100 after the additional sector batches were added. The current file was re-audited in read-only mode: 699 entries, 699 unique sector-scoped terms, 70 enriched entries with all required draft metadata, no structural issues. GitHub Actions/Preview still needs its own status confirmation.
+- The validator's enrichment threshold was raised from 30 to 70 and then to 100 after the additional sector batches were added. The current file was re-audited in read-only mode: 699 entries, 699 unique sector-scoped terms, 100 enriched entries with all required draft metadata, no structural issues. GitHub Actions/Preview still needs its own status confirmation.
 
 ## 13. Supabase cost refresh — 23 October 2026
 
