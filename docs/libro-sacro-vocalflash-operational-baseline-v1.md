@@ -30,8 +30,8 @@ La sintesi vocale deve privilegiare informazioni rilevanti e azioni, senza ripor
 
 ### Assistant API — PR #3
 - PR Draft, aperta, non integrata: https://github.com/VocalFlash/vocalflash/pull/3
-- Ultimo head verificato dopo seed, test e documentazione: `1b4b4cc34fb09fa90de7978a099a431708a33b1b`. La seed è stata aggiunta con commit `3561c8c3f47208e711c0cdbaf49467ad72b41e60`; i test di policy sono stati aggiunti in `50588712dc6b85b981c61116669d5a55730fc4e5`.
-- CI run `39998680330` sul commit `1b4b4cc34fb09fa90de7978a099a431708a33b1b`: **success**; il test step, inclusi i nuovi test della policy, è completato con esito positivo. Preview Vercel sullo stesso commit: **READY**. È una Preview, non produzione, e non costituisce prova end-to-end.
+- Ultimo head del codice applicativo verificato: `9bbb304e9ddd15bd80e2fe7cbf803286e7637cf0`. CI run `39999067164`: **success**; Vercel Preview associata a questo head: **READY**. È una Preview, non produzione, e non costituisce prova end-to-end.
+- Successivamente sono stati aggiunti commit documentali sulla stessa branch per il registro delle decisioni e il catalogo terminologico draft. Tali commit non modificano il codice applicativo; non considerarli una nuova prova di test runtime. La Preview verde verificata riguarda l'head applicativo indicato sopra.
 - La pipeline di sviluppo contiene ingest/routing persistenti, classificazione validata, estrazione dei campi obbligatori con evidenza letterale, raccolta dei dati mancanti, risposte cliente deterministiche, policy gate e contesto lessicale circoscritto all'azienda.
 - Il piano di raccolta dati e la policy evaluator non creano da soli pratiche; la persistenza è un gate separato.
 - Aggiunti test unitari per verificare che `confirm` non autorizzi la creazione automatica, policy assente/modalità sconosciuta falliscano chiuse, `forbidden` prevalga su `auto` e dati mancanti/ incerti impediscano l'autorizzazione. La CI run `39998581789` ha superato il test step.
@@ -188,3 +188,12 @@ Questa sezione separa le decisioni che richiedono autorizzazione o dati del tito
 
 Non richiedono un'autorizzazione economica e quindi proseguono in autonomia: revisione del codice e dei test, definizione del catalogo terminologico draft da almeno 300 voci, progettazione della persistenza e dell'outbox, test fail-closed, documentazione, revisione delle migrazioni in sola lettura e verifiche CI/Preview. Nessuna di queste attività autorizza modifiche allo schema live, merge o deploy in produzione.
 
+
+
+## 11. Ultimo aggiornamento documentale — 23 ottobre 2026
+
+- Registro delle decisioni del titolare aggiunto: Supabase development branch, SMS Bird, metodi di pagamento, identità Auth reale, approvazione del pilota e revisione del dizionario.
+- Creato il [catalogo professionale draft v1](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/professional-terminology-catalog-v1-draft.json): 699 voci candidate, tutte in stato draft, distribuite per settore. Il numero è un inventario iniziale, non certifica che le voci abbiano già sinonimi, definizioni, disambiguazioni ed esempi completi. Nessuna importazione massiva nel database è autorizzata.
+- Aggiornata la roadmap master con i gate di qualità del catalogo e il registro delle decisioni.
+- Verifica GitHub sul codice applicativo `9bbb304e9ddd15bd80e2fe7cbf803286e7637cf0`: status Vercel **success**. I successivi commit sono documentali; non è stato eseguito un nuovo test end-to-end.
+- Non è stata creata una Supabase development branch, non è stato configurato Bird o Stripe, non è stato creato un utente/membro fittizio e non è stata modificata la produzione.
