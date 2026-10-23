@@ -202,15 +202,16 @@ Non richiedono un'autorizzazione economica e quindi proseguono in autonomia: rev
 ## 12. Catalog quality and validation — 23 October 2026
 
 - The catalog remains an inventory of **699 draft entries** across the seven intended scopes, with no pharmaceutical sector and no duplicate `(sector, normalized_term)` pairs found in the current file.
-- A total of **70 entries across the initial sectors** now have preliminary synonyms, definitions, disambiguation notes, examples and confusable terms, including the first 40 plumbing/maintenance entries. They remain `draft` and explicitly require domain-owner review; this is editorial enrichment, not expert approval.
+- A total of **100 entries across the initial sectors** now have preliminary synonyms, definitions, disambiguation notes, examples and confusable terms, including 39 plumbing/maintenance entries and draft enrichment in all six other scopes. They remain `draft` and explicitly require domain-owner review; this is editorial enrichment, not expert approval.
 - Added `scripts/validate-professional-terminology-catalog.mjs` and wired it into `.github/workflows/customer-assistant-tests.yml`. The validator checks the minimum count, required sectors, exclusion of pharmacy, uniqueness, draft-only status and completeness of the enriched batch.
-- A read of the current catalog file and an equivalent structural check found 699 unique entries, 70 enriched entries, 0 structural issues, and no pharmacy sector. **This is a direct content audit, not yet a reported GitHub Actions pass.** The latest Vercel status for the commit adding the CI step was still `pending` at the last check; do not report a green result until the actual CI/Preview status is confirmed.
+- A read of the current catalog file and an equivalent structural check found 699 unique entries, 100 enriched entries, 0 structural issues, and no pharmacy sector. **This is a direct content audit, not yet a reported GitHub Actions pass.** The latest Vercel status for the commit adding the CI step was still `pending` at the last check; do not report a green result until the actual CI/Preview status is confirmed.
 - The validator intentionally does not certify professional correctness, legal/medical suitability, synonym quality, or production readiness. Those require expert review and sector-specific semantic tests.
 
-- The validator's enrichment threshold was raised from 30 to 70 after the additional sector batches were added. The current file was re-audited in read-only mode: 699 entries, 699 unique sector-scoped terms, 70 enriched entries with all required draft metadata, no structural issues. GitHub Actions/Preview still needs its own status confirmation.
+- The validator's enrichment threshold was raised from 30 to 70 and then to 100 after the additional sector batches were added. The current file was re-audited in read-only mode: 699 entries, 699 unique sector-scoped terms, 70 enriched entries with all required draft metadata, no structural issues. GitHub Actions/Preview still needs its own status confirmation.
 
 ## 13. Supabase cost refresh — 23 October 2026
 
 A read-only cost quote was retrieved again using the organization associated with the existing VocalFlash Assistant project. The returned branch quote remains **$0.01344/hour**.
 Correct conversions: 720 hours (30 days) = $9.6768 (~$9.68); 730 hours = $9.8112 (~$9.81). This is a quote for hourly branch compute, not a guarantee of the total bill.
 No branch was created and this check incurred no branch charge. Explicit owner approval is still required; recalculate immediately before creation.
+- Updated the validator minimum to 100 enriched entries after the second cross-sector enrichment batch. A new read-only content audit found 699 unique entries, 100 enriched entries with complete draft metadata, no duplicates, no non-draft statuses, and no pharmaceutical sector. CI status remains unconfirmed until the workflow result is available.
