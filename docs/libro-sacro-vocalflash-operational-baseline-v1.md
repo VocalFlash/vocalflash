@@ -208,3 +208,9 @@ Non richiedono un'autorizzazione economica e quindi proseguono in autonomia: rev
 - The validator intentionally does not certify professional correctness, legal/medical suitability, synonym quality, or production readiness. Those require expert review and sector-specific semantic tests.
 
 - The validator's enrichment threshold was raised from 30 to 70 after the additional sector batches were added. The current file was re-audited in read-only mode: 699 entries, 699 unique sector-scoped terms, 70 enriched entries with all required draft metadata, no structural issues. GitHub Actions/Preview still needs its own status confirmation.
+
+## 13. Supabase cost refresh — 23 October 2026
+
+A read-only cost quote was retrieved again using the organization associated with the existing VocalFlash Assistant project. The returned branch quote remains **$0.01344/hour**.
+Correct conversions: 720 hours (30 days) = $9.6768 (~$9.68); 730 hours = $9.8112 (~$9.81). This is a quote for hourly branch compute, not a guarantee of the total bill.
+No branch was created and this check incurred no branch charge. Explicit owner approval is still required; recalculate immediately before creation.
