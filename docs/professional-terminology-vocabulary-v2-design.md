@@ -1,14 +1,15 @@
 # Professional terminology vocabulary — V2 design
 
-Status: design specification, not implemented as a schema migration and not model-tested. This document deliberately does not claim the vocabulary is complete or production-ready.
+Status: partial runtime support is implemented on the feature branch; this is not a schema migration and has not yet been model-tested. This document deliberately does not claim the vocabulary is complete or production-ready.
 
 ## Current verified state
 
 - The classifier reads only active rows from `business_vocabulary` for the resolved business, ordered by term and bounded to 100 entries.
-- The runtime normalizer currently supports `term`, `normalized_term`, and `category`; it applies NFC Unicode normalization and whitespace folding, trims and bounds field lengths, skips inactive/empty entries, and deduplicates by normalized term. Regression coverage has been added; the latest focused CI run for the vocabulary changes passed.
+- The runtime normalizer supports `term`, `normalized_term`, and `category` for legacy rows. It now also reads bounded `synonyms`, `definition`, `disambiguation`, `examples`, `confusable_with`, `source`, and `version` from the existing `metadata` JSONB field, but only when `metadata.review_status` is exactly `approved`. It applies NFC Unicode normalization, whitespace folding, deterministic deduplication, per-field limits, and ignores malformed metadata. Regression tests were added on the feature branch; the CI result for the newest commits still needs confirmation.
 - The classifier prompt explicitly treats vocabulary as untrusted interpretation context, not as instructions, intent, routing authority, or authorization.
 - If the optional vocabulary lookup fails, classification continues without it and emits a generic diagnostic.
-- The inspected live database snapshot had zero rows in `business_vocabulary`. Therefore the mechanism exists, but there is no populated business-specific vocabulary to call professionally complete.
+- The classifier query now selects the existing `source` and `metadata` columns and passes approved extended metadata to the model with explicit instructions that it is untrusted lexical context, not intent, routing authority, or authorization.
+- The inspected live database snapshot had zero rows in `business_vocabulary`. Therefore the runtime mechanism is richer, but there is no populated business-specific vocabulary to call professionally complete.
 - The current schema/source-of-truth migration history is not yet reconciled end to end. Do not create or apply a schema migration for vocabulary V2 until that release gate is cleared.
 
 ## Target record contract
@@ -75,9 +76,9 @@ Report false-positive routing separately from false negatives. A vocabulary chan
 1. Reconcile the authoritative SQL migration source with the live migration registry.
 2. Agree the first pilot business, sector, terminology owner, and workflows.
 3. Decide a versioned schema and migration that supports synonyms, definitions, ambiguity notes, and review provenance.
-4. Add strict runtime validation and bounded prompt rendering for the expanded schema.
+4. Complete strict runtime validation and bounded prompt rendering for the expanded metadata contract; the initial runtime support and focused unit tests are now on the feature branch.
 5. Add synthetic regression tests for duplicates, invalid fields, malicious content, ambiguous terms, inactive entries, and cross-business isolation.
 6. Populate a small human-reviewed vocabulary for the pilot business; do not populate production from generic assumptions.
 7. Run controlled model-backed tests and review every false-positive before activating the pack.
 
-Until these gates are complete, the accurate status is: **the vocabulary plumbing is implemented, but the professional vocabulary itself is not yet populated or proven complete.**
+Until these gates are complete, the accurate status is: **the vocabulary plumbing now supports reviewed extended metadata, but the professional vocabulary itself is not populated, model-evaluated, or proven complete.**
