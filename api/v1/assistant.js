@@ -27,7 +27,9 @@ export default async function handler(req,res){
   if(action==="health"){
     const readiness=await checkAssistantReadiness({
       baseUrl:process.env.VF_ASSISTANT_SUPABASE_URL,
-      secret:process.env.VF_ASSISTANT_SUPABASE_SECRET_KEY
+      secret:process.env.VF_ASSISTANT_SUPABASE_SECRET_KEY,
+      openAiApiKey:process.env.OPENAI_API_KEY,
+      routingApiKey:(process.env.VOCALFLASH_API_KEYS||"").split(",").map(v=>v.trim()).filter(Boolean)[0]
     });
     return res.status(readiness.ready?200:503).json({
       ok:readiness.ready,
