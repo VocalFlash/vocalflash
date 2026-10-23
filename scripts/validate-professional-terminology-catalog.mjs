@@ -47,7 +47,7 @@ for (const [index, entry] of catalog.entries.entries()) {
   }
 }
 assert.equal(seen.size, catalog.entries.length, "all sector-scoped canonical terms must be unique");
-assert.ok(enriched >= 70, "at least 70 entries should have structured editorial enrichment across the initial sectors");
+assert.ok(enriched >= 100, "at least 100 entries should have structured editorial enrichment across the initial sectors");
 
 console.log(JSON.stringify({
   status: catalog.status,
