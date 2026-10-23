@@ -1,0 +1,118 @@
+# Cross-repository Assistant release verification matrix v1
+
+Status: test plan only. No live end-to-end run is claimed by this document.
+
+Scope: site/API PR #3 and bot PR #2, treated as one release unit. The purpose is to turn the existing runbook and newly identified release blockers into reproducible evidence. Do not use production data, production writes, production secrets in local test logs, or a production deployment to complete this matrix.
+
+## Evidence labels
+
+- **PASS**: command/test was executed against the exact candidate commit and the result is retained.
+- **FAIL**: a reproducible failure exists; include sanitized request shape, expected/actual result, and candidate SHA.
+- **BLOCKED**: cannot safely test until the prerequisite is met.
+- **NOT RUN**: no evidence yet. Never convert NOT RUN or BLOCKED into PASS based on code review alone.
+
+Every result must record repository, full commit SHA, test environment, timestamp, result, and evidence URL. Redact tokens, phone numbers, customer messages, media URLs, and personal data.
+
+## Gate 0 — candidate identity and change control
+
+- [ ] Record exact site/API candidate SHA and bot candidate SHA.
+- [ ] Confirm both PRs remain Draft until all gates are reviewed.
+- [ ] Confirm no unexpected changes to production environment, database schema/data, secrets, or deployments.
+- [ ] Re-run CI for the exact candidate SHAs after any code or test change.
+- [ ] Verify Preview is not mistaken for a production deployment.
+
+## Gate 1 — API authentication, readiness, and credentials
+
+- [ ] Missing/invalid X-VocalFlash-Assistant-Key is rejected.
+- [ ] Authenticated liveness is distinguished from dependency readiness.
+- [ ] Missing Supabase URL or secret cannot produce a ready status.
+- [ ] A bounded, read-only dependency probe failure or timeout cannot produce a ready status.
+- [ ] Modern sb_secret_ credential headers are tested for REST and RPC requests.
+- [ ] Legacy service-role JWT handling, if supported, is documented and tested separately.
+- [ ] Origin lookup, customer event ingest, workflow/policy reads, and owner persistence use the same documented credential policy.
+- [ ] Health responses reveal no secrets, database URLs, customer data, or internal stack traces.
+
+Related blockers: site issues #6 and #7. Keep this gate BLOCKED until code and automated tests demonstrate the required behavior; a static review is not a passing test.
+
+## Gate 2 — Meta webhook trust boundary
+
+- [ ] Correct HMAC-SHA256 signature and unchanged request body are accepted.
+- [ ] Missing, malformed, incorrect, and body-tampered signatures are rejected.
+- [ ] Missing META_APP_SECRET fails closed.
+- [ ] Signature validation happens before parsing or processing event content.
+- [ ] Staging uses the secret belonging to the correct Meta app; only presence/status is recorded in evidence.
+- [ ] Genuine Meta staging delivery is processed and the response path is confirmed.
+- [ ] No live webhook test is performed against production without explicit release authorization.
+
+The automated signature suite is not proof that the matching secret is configured in Render.
+
+## Gate 3 — inbound idempotency, durable outbound, and failure ambiguity
+
+- [ ] Duplicate inbound webhook before processing completes.
+- [ ] Duplicate inbound webhook after the inbound dedup TTL.
+- [ ] Assistant API commits its result but its HTTP response is lost.
+- [ ] Meta accepts a send but the client times out before receiving the response.
+- [ ] Definitive provider rejection versus ambiguous timeout are handled differently.
+- [ ] Concurrent workers attempt the same outbound intent.
+- [ ] Process restart occurs while an outbound message is pending.
+- [ ] Provider status callbacks are reconciled with the stored outbound intent.
+- [ ] Retry policy never turns an unknown send outcome into an unbounded duplicate-send risk.
+- [ ] The outbound intent has a durable unique key based on source event, business/channel, and reply version.
+
+Related blocker: bot issue #3. The current 24-hour Redis marker is at-most-once protection, not durable exactly-once delivery. This gate is BLOCKED until an outbox/reconciliation design is implemented and tested.
+
+## Gate 4 — business routing and safe writes
+
+- [ ] Active WhatsApp channel resolves to exactly one business.
+- [ ] Inactive, absent, or ambiguous channel fails closed.
+- [ ] Customer and owner senders route to separate processing paths.
+- [ ] An unverified or inactive member cannot execute owner commands.
+- [ ] Cross-business member, workflow, policy, or event IDs are denied.
+- [ ] Required or uncertain customer data returns a clarification request without a business write.
+- [ ] A single authorized action writes only when policy allows it.
+- [ ] Duplicate source event replays return the existing result and do not create another work item.
+- [ ] Owner confirmation replay is idempotent and proposal-bound.
+- [ ] Multi-action batches remain review-only until batch atomicity is supported.
+- [ ] No side-effecting test runs against production.
+
+## Gate 5 — legacy audio and MultiVocale regression
+
+- [ ] One audio message follows the established transcription/summarization path.
+- [ ] The response emphasizes salient points and actions, not the full transcript by default.
+- [ ] First voice is retained when later voices are added.
+- [ ] Automatic batching and manual “summarize now” do not create duplicate summaries.
+- [ ] Simultaneous arrivals, provider retries, worker failure, and process restart are tested.
+- [ ] Text-only messages do not get swallowed by the MultiVocale handler.
+- [ ] Media errors produce safe, actionable responses and do not leak credentials or media URLs.
+
+## Gate 6 — Italian ASR and multi-sector quality
+
+- [ ] Run a lawful synthetic or explicitly consented corpus with frozen expected transcripts and expected action extraction.
+- [ ] Include terms and phrases such as “sopralluogo”, “Via Etnea”, and “controllare le misure del locale”.
+- [ ] Score transcription fidelity separately from summary quality and action-item recall.
+- [ ] Test plumbing/maintenance, construction, real estate, financial mediation, legal, medical, generic, ambiguous, multi-workflow, vocabulary-only, and adversarial inputs.
+- [ ] Compare model/provider options on the same corpus, recording latency, token use, cost estimate, and errors.
+- [ ] No production model/provider switch until acceptance thresholds and rollback criteria are approved.
+
+The existing classifier test plan and resolver results must not be treated as evidence that this full Assistant/ASR corpus has passed.
+
+## Gate 7 — release decision
+
+Release is **NO-GO** if any of these remain unresolved:
+- health/readiness can give a false positive;
+- Supabase key format and REST/RPC header behavior are unverified;
+- durable outbound intent and ambiguous-outcome reconciliation are absent;
+- persistent conversation state and confirmation atomicity remain incomplete for the enabled flows;
+- Meta signature configuration is not verified in staging;
+- any staging end-to-end gate has no evidence.
+
+A GO decision requires review of exact candidate SHAs, all gate evidence, rollback procedure, monitoring/owner, and explicit release approval. Passing CI alone is insufficient.
+
+## Current status at document creation
+
+- CI for the previously reviewed site/API candidate: PASS (run 39919606346).
+- Vercel Preview status for that candidate: PASS, Preview only.
+- CI for the previously reviewed bot candidate: PASS (run 39822398223).
+- Full current-candidate staging end-to-end: NOT RUN.
+- Gates 1 and 3: BLOCKED by the issues cited above.
+- Supabase isolated development environment: BLOCKED pending current cost check and explicit approval.
