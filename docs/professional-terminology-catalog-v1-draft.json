@@ -26,14 +26,24 @@
       "category": "components",
       "canonical_term": "sifone",
       "normalized_term": "sifone",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "sifone del lavandino",
+        "sifone lavabo"
+      ],
+      "definition": "Componente del sistema di scarico che mantiene una chiusura idraulica contro il ritorno degli odori.",
+      "disambiguation": "La sua menzione non prova che sia guasto o responsabile del problema.",
+      "examples": [
+        "Sento odore vicino al sifone.",
+        "Il sifone sotto il lavello gocciola."
+      ],
+      "confusable_with": [
+        "colonna di scarico",
+        "piletta"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.2",
@@ -41,14 +51,24 @@
       "category": "components",
       "canonical_term": "raccordo",
       "normalized_term": "raccordo",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "raccordo del tubo",
+        "giunto di collegamento"
+      ],
+      "definition": "Elemento che collega tra loro tubi o componenti dell’impianto.",
+      "disambiguation": "Non confonderlo con la tubazione collegata; non dedurre materiale o misura non dichiarati.",
+      "examples": [
+        "Il raccordo perde acqua.",
+        "Serve controllare il raccordo sotto il lavello."
+      ],
+      "confusable_with": [
+        "manicotto",
+        "giunto"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.3",
@@ -56,14 +76,24 @@
       "category": "components",
       "canonical_term": "valvola",
       "normalized_term": "valvola",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "valvola di chiusura",
+        "valvola d’arresto"
+      ],
+      "definition": "Dispositivo che regola, consente o interrompe il passaggio dell’acqua o di un altro fluido.",
+      "disambiguation": "La menzione non equivale a una diagnosi né dimostra che la valvola debba essere sostituita.",
+      "examples": [
+        "Non riesco a chiudere la valvola.",
+        "La valvola sembra bloccata."
+      ],
+      "confusable_with": [
+        "rubinetto",
+        "valvola di ritegno"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.4",
@@ -71,14 +101,24 @@
       "category": "components",
       "canonical_term": "rubinetto",
       "normalized_term": "rubinetto",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "miscelatore",
+        "rubinetto lavabo"
+      ],
+      "definition": "Dispositivo terminale che consente di erogare e, se previsto, miscelare acqua calda e fredda.",
+      "disambiguation": "Specificare il tipo o la posizione solo se dichiarati; un gocciolamento è un sintomo.",
+      "examples": [
+        "Il rubinetto gocciola.",
+        "Vorrei sostituire il rubinetto della cucina."
+      ],
+      "confusable_with": [
+        "valvola",
+        "miscelatore termostatico"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.5",
@@ -101,14 +141,24 @@
       "category": "components",
       "canonical_term": "guarnizione",
       "normalized_term": "guarnizione",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "guarnizione di tenuta",
+        "anello di tenuta"
+      ],
+      "definition": "Elemento interposto tra superfici o componenti per limitare il passaggio di acqua o altri fluidi.",
+      "disambiguation": "Non inferire che sia consumata o da sostituire senza una valutazione.",
+      "examples": [
+        "La guarnizione sembra rovinata.",
+        "Perde acqua dal raccordo con la guarnizione."
+      ],
+      "confusable_with": [
+        "O-ring",
+        "sigillante"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.7",
@@ -116,14 +166,24 @@
       "category": "components",
       "canonical_term": "tubo flessibile",
       "normalized_term": "tubo flessibile",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "flessibile",
+        "tubo di collegamento flessibile"
+      ],
+      "definition": "Condotto flessibile usato per collegare un punto dell’impianto a un apparecchio o rubinetto.",
+      "disambiguation": "Non confonderlo con una tubazione fissa; registrare il punto esatto solo se specificato.",
+      "examples": [
+        "Il tubo flessibile sotto il lavello perde.",
+        "Il flessibile del rubinetto è da controllare."
+      ],
+      "confusable_with": [
+        "tubazione",
+        "raccordo"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.8",
@@ -131,14 +191,23 @@
       "category": "components",
       "canonical_term": "tubazione",
       "normalized_term": "tubazione",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "tubo fisso",
+        "condotta"
+      ],
+      "definition": "Condotto fisso che trasporta acqua o altro fluido nell’impianto.",
+      "disambiguation": "Distinguere, se dichiarato, tra adduzione, scarico, tratto visibile e tratto incassato.",
+      "examples": [
+        "C’è una perdita nella tubazione a muro."
+      ],
+      "confusable_with": [
+        "tubo flessibile",
+        "colonna di scarico"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.9",
@@ -146,14 +215,24 @@
       "category": "components",
       "canonical_term": "colonna di scarico",
       "normalized_term": "colonna di scarico",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "colonna condominiale di scarico",
+        "montante di scarico"
+      ],
+      "definition": "Condotta generalmente verticale che raccoglie gli scarichi di più apparecchi o unità dell’edificio.",
+      "disambiguation": "Non attribuire automaticamente causa o responsabilità al condominio; richiede verifica tecnica.",
+      "examples": [
+        "L’acqua risale dalla colonna di scarico.",
+        "Si sente rumore nella colonna quando scarica il piano superiore."
+      ],
+      "confusable_with": [
+        "colonna montante idrica",
+        "tubo di adduzione"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.10",
@@ -176,14 +255,23 @@
       "category": "components",
       "canonical_term": "pozzetto",
       "normalized_term": "pozzetto",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "pozzetto di ispezione",
+        "pozzetto di raccolta"
+      ],
+      "definition": "Vano di accesso o raccolta che può far parte di una rete di scarico o drenaggio.",
+      "disambiguation": "Chiarire il contesto perché esistono pozzetti con funzioni differenti.",
+      "examples": [
+        "Il pozzetto esterno si riempie d’acqua."
+      ],
+      "confusable_with": [
+        "caditoia",
+        "vasca di raccolta"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.12",
@@ -206,14 +294,22 @@
       "category": "components",
       "canonical_term": "riduttore di pressione",
       "normalized_term": "riduttore di pressione",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "regolatore di pressione"
+      ],
+      "definition": "Dispositivo che riduce e regola la pressione a valle rispetto a quella in ingresso.",
+      "disambiguation": "Non equivale a una pompa o a un pressostato; non dedurre la necessità di regolazione o sostituzione.",
+      "examples": [
+        "Il tecnico deve controllare il riduttore di pressione."
+      ],
+      "confusable_with": [
+        "pressostato",
+        "manometro"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.14",
@@ -236,14 +332,23 @@
       "category": "components",
       "canonical_term": "autoclave",
       "normalized_term": "autoclave",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "gruppo di pressurizzazione",
+        "impianto autoclave"
+      ],
+      "definition": "Sistema di pompaggio e controllo usato per mantenere la pressione di distribuzione dell’acqua.",
+      "disambiguation": "Nel linguaggio comune può indicare l’intero gruppo; chiarire il sintomo prima di classificare il guasto.",
+      "examples": [
+        "Ai piani alti manca pressione e l’autoclave fa rumore."
+      ],
+      "confusable_with": [
+        "pompa di sollevamento",
+        "vaso di espansione"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.16",
@@ -251,14 +356,24 @@
       "category": "components",
       "canonical_term": "pompa di sollevamento",
       "normalized_term": "pompa di sollevamento",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "pompa di rilancio",
+        "pompa di sollevamento acque"
+      ],
+      "definition": "Pompa che trasferisce un liquido verso una quota superiore o un punto di raccolta.",
+      "disambiguation": "Non assumere il tipo di liquido o l’applicazione se non dichiarati.",
+      "examples": [
+        "La pompa di sollevamento non parte.",
+        "Il pozzetto si riempie e la pompa non scarica."
+      ],
+      "confusable_with": [
+        "autoclave",
+        "pompa di circolazione"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.17",
@@ -266,14 +381,22 @@
       "category": "components",
       "canonical_term": "vaso di espansione",
       "normalized_term": "vaso di espansione",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "vaso espansione"
+      ],
+      "definition": "Componente che assorbe variazioni di volume del fluido in un circuito chiuso.",
+      "disambiguation": "Specificare il circuito solo se noto; non attribuire a questo componente ogni variazione di pressione.",
+      "examples": [
+        "La pressione dell’impianto sale molto e il tecnico deve controllare il vaso di espansione."
+      ],
+      "confusable_with": [
+        "valvola di sicurezza",
+        "serbatoio di accumulo"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.18",
@@ -281,14 +404,23 @@
       "category": "components",
       "canonical_term": "manometro",
       "normalized_term": "manometro",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "indicatore di pressione"
+      ],
+      "definition": "Strumento che misura e visualizza la pressione di un fluido.",
+      "disambiguation": "Un valore letto deve essere riportato con unità e contesto, senza dedurre la causa del problema.",
+      "examples": [
+        "Il manometro segna meno di un bar.",
+        "La lancetta del manometro oscilla."
+      ],
+      "confusable_with": [
+        "pressostato",
+        "termometro"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.19",
@@ -296,14 +428,22 @@
       "category": "components",
       "canonical_term": "pressostato",
       "normalized_term": "pressostato",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "interruttore di pressione"
+      ],
+      "definition": "Dispositivo che commuta uno stato elettrico in funzione di una soglia di pressione.",
+      "disambiguation": "Non confonderlo con lo strumento che visualizza la pressione; la menzione non conferma un guasto.",
+      "examples": [
+        "La pompa non parte e il cliente cita il pressostato."
+      ],
+      "confusable_with": [
+        "manometro",
+        "sensore di portata"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.20",
@@ -311,14 +451,23 @@
       "category": "components",
       "canonical_term": "galleggiante",
       "normalized_term": "galleggiante",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "galleggiante della cassetta",
+        "valvola a galleggiante"
+      ],
+      "definition": "Elemento mobile che segue il livello di un liquido e può comandare un meccanismo di riempimento o arresto.",
+      "disambiguation": "Precisare il contesto (cassetta WC, serbatoio o altro) se dichiarato; non assumere la posizione.",
+      "examples": [
+        "L’acqua continua a entrare nella cassetta WC e il cliente sospetta il galleggiante."
+      ],
+      "confusable_with": [
+        "valvola di riempimento",
+        "sensore di livello"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.21",
@@ -326,14 +475,25 @@
       "category": "components",
       "canonical_term": "cassetta di risciacquo",
       "normalized_term": "cassetta di risciacquo",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "cassetta WC",
+        "cassone di scarico",
+        "sciacquone"
+      ],
+      "definition": "Serbatoio e meccanismo che rilasciano acqua per il risciacquo del vaso sanitario.",
+      "disambiguation": "Il termine colloquiale può indicare l’intero gruppo; non dedurre quale componente sia difettoso.",
+      "examples": [
+        "La cassetta WC continua a caricare acqua.",
+        "Lo sciacquone non scarica."
+      ],
+      "confusable_with": [
+        "vaso sanitario",
+        "galleggiante"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.22",
@@ -356,14 +516,24 @@
       "category": "components",
       "canonical_term": "piletta",
       "normalized_term": "piletta",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "piletta di scarico",
+        "bocchetta di scarico"
+      ],
+      "definition": "Elemento di scarico installato sul fondo di un lavabo, lavello, piatto doccia o altro sanitario.",
+      "disambiguation": "Non confonderla con il sifone sottostante o con la griglia separata.",
+      "examples": [
+        "La piletta del lavabo perde.",
+        "La piletta della doccia è ostruita."
+      ],
+      "confusable_with": [
+        "sifone",
+        "griglia di scarico"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.24",
@@ -401,14 +571,23 @@
       "category": "components",
       "canonical_term": "giunto",
       "normalized_term": "giunto",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "giunto di collegamento",
+        "giunzione"
+      ],
+      "definition": "Punto o componente di collegamento tra due elementi di un impianto.",
+      "disambiguation": "Termine generico: chiedere dove si trova se serve a identificare la richiesta.",
+      "examples": [
+        "Il giunto del tubo perde acqua."
+      ],
+      "confusable_with": [
+        "raccordo",
+        "manicotto"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.27",
@@ -431,14 +610,22 @@
       "category": "components",
       "canonical_term": "manicotto",
       "normalized_term": "manicotto",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "manicotto di giunzione"
+      ],
+      "definition": "Raccordo, spesso cilindrico, utilizzato per unire due tratti di tubo o componenti.",
+      "disambiguation": "Non dedurre materiale, diametro o metodo di giunzione se non esplicitati.",
+      "examples": [
+        "Il manicotto tra i due tubi perde."
+      ],
+      "confusable_with": [
+        "raccordo",
+        "riduzione"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.29",
@@ -446,14 +633,24 @@
       "category": "components",
       "canonical_term": "filtro",
       "normalized_term": "filtro",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "filtro acqua",
+        "filtro in linea"
+      ],
+      "definition": "Componente che trattiene particelle o impurità dal fluido in transito.",
+      "disambiguation": "La parola da sola non identifica il tipo, la posizione o l’intervallo di manutenzione.",
+      "examples": [
+        "Il filtro dell’acqua è sporco.",
+        "Il tecnico deve controllare il filtro in ingresso."
+      ],
+      "confusable_with": [
+        "addolcitore",
+        "riduttore di pressione"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.30",
@@ -461,14 +658,23 @@
       "category": "components",
       "canonical_term": "addolcitore",
       "normalized_term": "addolcitore",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "addolcitore acqua"
+      ],
+      "definition": "Apparecchiatura che riduce la durezza dell’acqua tramite un processo di trattamento.",
+      "disambiguation": "Non equivale a un filtro generico; non dedurre la qualità dell’acqua senza misurazioni.",
+      "examples": [
+        "L’addolcitore segnala un errore.",
+        "Il cliente chiede manutenzione all’addolcitore."
+      ],
+      "confusable_with": [
+        "filtro",
+        "dosatore di polifosfati"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.31",
@@ -476,14 +682,24 @@
       "category": "components",
       "canonical_term": "scaldabagno",
       "normalized_term": "scaldabagno",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "scaldacqua",
+        "boiler"
+      ],
+      "definition": "Apparecchio destinato alla produzione di acqua calda sanitaria.",
+      "disambiguation": "Non assumere che sia una caldaia per riscaldamento ambienti; chiedere il tipo solo se necessario.",
+      "examples": [
+        "Lo scaldabagno non scalda più l’acqua.",
+        "Lo scaldacqua perde dalla parte inferiore."
+      ],
+      "confusable_with": [
+        "caldaia",
+        "pompa di calore"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.32",
@@ -491,14 +707,24 @@
       "category": "components",
       "canonical_term": "caldaia",
       "normalized_term": "caldaia",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "caldaia domestica",
+        "generatore di calore"
+      ],
+      "definition": "Apparecchiatura che produce calore per il riscaldamento e/o per l’acqua calda sanitaria.",
+      "disambiguation": "Non formulare diagnosi; raccogliere il codice d’errore esatto se riferito dal cliente.",
+      "examples": [
+        "La caldaia mostra il codice errore E01.",
+        "La caldaia non produce acqua calda."
+      ],
+      "confusable_with": [
+        "scaldabagno",
+        "pompa di calore"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.33",
@@ -506,14 +732,23 @@
       "category": "components",
       "canonical_term": "termostato",
       "normalized_term": "termostato",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "termostato ambiente",
+        "regolatore di temperatura"
+      ],
+      "definition": "Dispositivo che rileva o regola la temperatura secondo un valore impostato.",
+      "disambiguation": "Distinguere il termostato ambiente dai controlli integrati in caldaia quando il contesto lo consente.",
+      "examples": [
+        "Il termostato non avvia il riscaldamento."
+      ],
+      "confusable_with": [
+        "valvola termostatica",
+        "sonda di temperatura"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.34",
@@ -521,14 +756,22 @@
       "category": "components",
       "canonical_term": "circolatore",
       "normalized_term": "circolatore",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "pompa di circolazione"
+      ],
+      "definition": "Pompa che mantiene la circolazione del fluido in un circuito di riscaldamento o altro impianto.",
+      "disambiguation": "Non confonderlo con una pompa di sollevamento; non dedurre il guasto dalla sola assenza di calore.",
+      "examples": [
+        "Il tecnico deve controllare il circolatore."
+      ],
+      "confusable_with": [
+        "pompa di sollevamento",
+        "autoclave"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.35",
@@ -536,14 +779,24 @@
       "category": "components",
       "canonical_term": "radiatore",
       "normalized_term": "radiatore",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "termosifone",
+        "elemento radiante"
+      ],
+      "definition": "Elemento terminale che cede calore all’ambiente in un impianto di riscaldamento.",
+      "disambiguation": "Un radiatore freddo non prova da solo la causa; distinguere freddo totale, parziale o perdita.",
+      "examples": [
+        "Il termosifone resta freddo.",
+        "Il radiatore perde vicino alla valvola."
+      ],
+      "confusable_with": [
+        "convettore",
+        "valvola termostatica"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.36",
@@ -551,14 +804,23 @@
       "category": "components",
       "canonical_term": "valvola termostatica",
       "normalized_term": "valvola termostatica",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "testa termostatica",
+        "valvola del termosifone"
+      ],
+      "definition": "Dispositivo che regola il flusso verso un radiatore in base alla temperatura impostata o rilevata.",
+      "disambiguation": "La testa termostatica e il corpo valvola sono parti correlate ma non identiche.",
+      "examples": [
+        "La valvola termostatica non regola il calore."
+      ],
+      "confusable_with": [
+        "detentore",
+        "termostato ambiente"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.37",
@@ -566,14 +828,22 @@
       "category": "components",
       "canonical_term": "detentore",
       "normalized_term": "detentore",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "valvola di ritorno del radiatore"
+      ],
+      "definition": "Valvola posta sul ritorno di un radiatore, usata per isolamento e bilanciamento del circuito.",
+      "disambiguation": "Non confonderlo con la valvola termostatica sul lato di mandata.",
+      "examples": [
+        "Il tecnico deve verificare il detentore del radiatore."
+      ],
+      "confusable_with": [
+        "valvola termostatica",
+        "valvola d’arresto"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.38",
@@ -581,14 +851,23 @@
       "category": "components",
       "canonical_term": "collettore di distribuzione",
       "normalized_term": "collettore di distribuzione",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "collettore idraulico",
+        "collettore impianto"
+      ],
+      "definition": "Elemento che distribuisce o raccoglie il fluido tra più circuiti o diramazioni.",
+      "disambiguation": "Indicare il tipo di impianto solo se noto; non confonderlo con una colonna verticale.",
+      "examples": [
+        "Il collettore di distribuzione ha una perdita."
+      ],
+      "confusable_with": [
+        "colonna montante",
+        "distributore"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.39",
@@ -611,14 +890,23 @@
       "category": "components",
       "canonical_term": "valvola di ritegno",
       "normalized_term": "valvola di ritegno",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "valvola di non ritorno",
+        "non ritorno"
+      ],
+      "definition": "Valvola progettata per consentire il flusso in una direzione e ostacolarlo nella direzione opposta.",
+      "disambiguation": "Non confonderla con una valvola di intercettazione; il suo stato va verificato tecnicamente.",
+      "examples": [
+        "Il cliente segnala un problema sulla valvola di non ritorno."
+      ],
+      "confusable_with": [
+        "valvola d’arresto",
+        "valvola di sicurezza"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.components.41",
@@ -626,14 +914,22 @@
       "category": "components",
       "canonical_term": "valvola di sicurezza",
       "normalized_term": "valvola di sicurezza",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "valvola limitatrice di pressione"
+      ],
+      "definition": "Dispositivo progettato per scaricare o limitare la pressione quando supera determinate condizioni.",
+      "disambiguation": "Non confonderla con una valvola di chiusura o di ritegno; non prescrivere regolazioni.",
+      "examples": [
+        "La valvola di sicurezza scarica acqua."
+      ],
+      "confusable_with": [
+        "valvola di ritegno",
+        "riduttore di pressione"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.symptoms.42",
@@ -641,14 +937,25 @@
       "category": "symptoms",
       "canonical_term": "perdita d’acqua",
       "normalized_term": "perdita d’acqua",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "perdita",
+        "perde acqua",
+        "fuoriuscita d’acqua"
+      ],
+      "definition": "Fuoriuscita d’acqua segnalata dal cliente da un impianto, raccordo o apparecchio.",
+      "disambiguation": "Descrive un sintomo; non identifica da sola il componente guasto né la causa.",
+      "examples": [
+        "C’è una perdita d’acqua sotto il lavandino.",
+        "Il tubo perde quando apro il rubinetto."
+      ],
+      "confusable_with": [
+        "infiltrazione",
+        "condensa"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.symptoms.43",
@@ -671,14 +978,25 @@
       "category": "symptoms",
       "canonical_term": "scarico ostruito",
       "normalized_term": "scarico ostruito",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "scarico tappato",
+        "scarico bloccato",
+        "l’acqua non defluisce"
+      ],
+      "definition": "Deflusso impedito o fortemente ridotto in uno scarico, secondo quanto riferito dal cliente.",
+      "disambiguation": "Non dedurre la posizione dell’ostruzione né la necessità di uno specifico intervento.",
+      "examples": [
+        "Lo scarico del bagno è ostruito.",
+        "L’acqua resta nel lavello e scende lentamente."
+      ],
+      "confusable_with": [
+        "scarico lento",
+        "rigurgito"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.symptoms.45",
@@ -686,14 +1004,23 @@
       "category": "symptoms",
       "canonical_term": "scarico lento",
       "normalized_term": "scarico lento",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "deflusso lento",
+        "l’acqua scende lentamente"
+      ],
+      "definition": "Deflusso più lento del normale segnalato in un lavello, lavabo, doccia o altro scarico.",
+      "disambiguation": "Non equivale necessariamente a un’ostruzione completa.",
+      "examples": [
+        "L’acqua nella doccia scende molto lentamente."
+      ],
+      "confusable_with": [
+        "scarico ostruito",
+        "rigurgito"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.symptoms.46",
@@ -701,14 +1028,23 @@
       "category": "symptoms",
       "canonical_term": "rigurgito",
       "normalized_term": "rigurgito",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "ritorno d’acqua dallo scarico",
+        "risalita d’acqua"
+      ],
+      "definition": "Ritorno o risalita di acqua o reflui da uno scarico verso un punto che normalmente dovrebbe defluire.",
+      "disambiguation": "È un sintomo potenzialmente serio; non dedurre il punto d’ostruzione né la responsabilità.",
+      "examples": [
+        "Quando uso la lavatrice l’acqua risale dal pozzetto."
+      ],
+      "confusable_with": [
+        "scarico ostruito",
+        "allagamento"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.symptoms.47",
@@ -821,14 +1157,22 @@
       "category": "symptoms",
       "canonical_term": "colpo d’ariete",
       "normalized_term": "colpo d’ariete",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "urto idraulico"
+      ],
+      "definition": "Variazione rapida di pressione nel circuito dovuta a un cambiamento brusco della velocità del fluido.",
+      "disambiguation": "Se il cliente usa il termine, preservarlo come descrizione; non assumere che la diagnosi sia confermata.",
+      "examples": [
+        "Quando chiudo il rubinetto sento un colpo nelle tubazioni."
+      ],
+      "confusable_with": [
+        "rumore nelle tubazioni",
+        "vibrazione"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.symptoms.55",
@@ -836,14 +1180,24 @@
       "category": "symptoms",
       "canonical_term": "infiltrazione",
       "normalized_term": "infiltrazione",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "infiltrazione d’acqua",
+        "macchia di umidità"
+      ],
+      "definition": "Presenza segnalata di acqua o umidità che penetra in una struttura o in un ambiente.",
+      "disambiguation": "La macchia non identifica da sola origine, percorso dell’acqua o responsabilità.",
+      "examples": [
+        "C’è una macchia di umidità sul soffitto.",
+        "Dopo la pioggia compare un’infiltrazione vicino alla finestra."
+      ],
+      "confusable_with": [
+        "condensa",
+        "perdita d’acqua"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.symptoms.56",
@@ -866,14 +1220,23 @@
       "category": "symptoms",
       "canonical_term": "condensa",
       "normalized_term": "condensa",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "formazione di condensa",
+        "goccioline da condensazione"
+      ],
+      "definition": "Acqua che si forma quando il vapore condensa su una superficie sufficientemente fredda.",
+      "disambiguation": "Non classificarla automaticamente come perdita o infiltrazione; l’origine può richiedere valutazione.",
+      "examples": [
+        "Si formano gocce sul tubo freddo."
+      ],
+      "confusable_with": [
+        "infiltrazione",
+        "perdita d’acqua"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.symptoms.58",
@@ -9716,14 +10079,25 @@
       "category": "scheduling",
       "canonical_term": "sopralluogo",
       "normalized_term": "sopralluogo",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "visita tecnica",
+        "controllo sul posto",
+        "ispezione in loco"
+      ],
+      "definition": "Visita presso il luogo indicato per osservare una situazione o valutare un lavoro richiesto.",
+      "disambiguation": "Una richiesta di sopralluogo non significa che data e orario siano già confermati.",
+      "examples": [
+        "Vorrei fissare un sopralluogo.",
+        "Il tecnico deve fare un sopralluogo prima del preventivo."
+      ],
+      "confusable_with": [
+        "appuntamento confermato",
+        "intervento eseguito"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "generic.scheduling.648",
@@ -10505,5 +10879,11 @@
       "source": "draft_catalog_seed",
       "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
     }
-  ]
+  ],
+  "enrichment_summary": {
+    "updated_on": "2026-10-23",
+    "enriched_entries": 40,
+    "status": "DRAFT_NEEDS_DOMAIN_REVIEW",
+    "note": "Entries enriched with preliminary definitions, synonyms, disambiguation, examples and confusable terms. This is editorial preparation, not expert approval; all entries remain draft and must not be used as approved runtime context."
+  }
 }
