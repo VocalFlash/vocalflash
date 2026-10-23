@@ -133,3 +133,57 @@ Un test unitario verde o una Preview `READY` da soli non soddisfano i criteri GO
 7. Solo dopo evidenza di tutti i gate, proporre una decisione separata di rilascio.
 
 Questo documento è il riferimento operativo principale. Se una nota più vecchia contraddice lo stato verificato qui, prevalgono il fatto più recente comprovato e i guardrail di sicurezza sopra elencati.
+
+## 10. Decisioni e interventi richiesti al titolare
+
+Questa sezione separa le decisioni che richiedono autorizzazione o dati del titolare dalle attività tecniche che possono proseguire senza costi o impatti esterni. Aggiornare questo elenco dopo ogni decisione e ogni verifica; non considerare un elemento approvato in assenza di una risposta esplicita.
+
+### D1 — Supabase development branch (approvazione di costo)
+- **Stato:** BLOCCATO in attesa di approvazione.
+- **Ultimo preventivo disponibile:** $0.01344/ora, circa $9.68 per 30 giorni di funzionamento continuo. Il totale effettivo può variare; ricalcolare prima della creazione.
+- **Cosa serve:** autorizzare la creazione della branch di sviluppo. Non verrà creata prima della conferma.
+- **Link:** [Supabase Dashboard — progetto VocalFlash Assistant](https://supabase.com/dashboard/project/tkfyfqgtumoeywlqzmdt).
+- **Risposta attesa:** “Supabase branch: sì” oppure “Supabase branch: no”.
+
+### D2 — SMS per verifica del titolare (approvazione di costo + accesso account)
+- **Stato:** BLOCCATO; nessun account, mittente, metodo di pagamento o hook SMS è stato configurato.
+- **Implementazione prevista:** Supabase Auth con Bird **Send SMS Hook**, non Bird Verify, come già deciso nel progetto. Prima si verifica il percorso di integrazione e il costo totale dell'account; poi si collega un vero utente Auth e soltanto allora si crea la membership.
+- **Tariffa pubblicata consultata il 23/10/2026:** Bird indica $0.065 per segmento SMS verso l'Italia per i tipi di mittente elencati. Segmenti aggiuntivi, carrier, registrazione/mittente, tasse o altre condizioni possono aumentare il totale; non è una stima mensile completa.
+- **Link:** [Prezzi SMS Bird Italia](https://bird.com/en-es/products/sms/pricing/it) · [Prezzi Bird Italia](https://bird.com/it-it/prezzi) · [Documentazione Supabase Auth Hooks](https://supabase.com/docs/guides/auth/auth-hooks).
+- **Cosa serve:** approvare l'uso del provider a consumo dopo aver verificato mittente, eventuali costi accessori e limiti. Non basta approvare il prezzo per messaggio per autorizzare spese fisse o servizi diversi.
+- **Risposta attesa:** “SMS Bird: sì, entro il solo consumo SMS pubblicato” oppure “SMS Bird: no”. Se il provider richiede un costo fisso o un impegno ulteriore, fermarsi e chiedere una nuova approvazione.
+
+### D3 — Metodi di pagamento e abbonamenti
+- **Stato:** DECISIONE DI PRODOTTO APERTA; nessun account Stripe, piano, prezzo o pagamento è stato configurato.
+- **Proposta tecnica da valutare:** Stripe Checkout + Stripe Billing; carte di credito/debito e wallet supportati (Apple Pay/Google Pay quando eleggibili). Valutare SEPA Direct Debit per gli abbonamenti solo se il titolare lo desidera; non attivare metodi aggiuntivi automaticamente.
+- **Costi pubblicati consultati il 23/10/2026:** Stripe indica per carte standard EEA 1,5% + €0,25 per transazione; Stripe Billing indica 0,7% del volume Billing, con condizioni e possibili eccezioni da verificare. I metodi locali hanno tariffe diverse.
+- **Link:** [Prezzi Stripe Italia](https://stripe.com/en-it/pricing) · [Metodi di pagamento in Italia](https://support.stripe.com/questions/stripe-in-italy?locale=it-IT) · [Stripe Billing](https://stripe.com/billing).
+- **Decisioni richieste prima dell'implementazione:** (a) carte + wallet soltanto oppure anche SEPA Direct Debit; (b) piani e prezzi; (c) prova gratuita sì/no e durata; (d) rinnovo mensile/annuale; (e) regole per mancato pagamento, sospensione, cancellazione e rimborso. Prima di eseguire operazioni live serviranno inoltre titolarità/account Stripe, dati fiscali e approvazione esplicita dei costi.
+- **Risposta attesa per ora:** confermare i metodi desiderati; non è ancora un'autorizzazione a creare/configurare l'account o attivare pagamenti live.
+
+### D4 — Membro aziendale reale
+- **Stato:** BLOCCATO da identità assente: ultimo controllo ha rilevato 0 utenti Auth e 0 membership.
+- **Cosa serve al titolare:** completare la verifica del proprio account attraverso il flusso Auth approvato; non inviare password, codici OTP o segreti in chat. Una volta presente l'identità verificata, la membership potrà essere associata al business corretto.
+- **Link:** [Supabase Auth — utenti e autenticazione](https://supabase.com/docs/guides/auth).
+- **Nota:** non creare identità placeholder né assegnare UUID manuali.
+
+### D5 — Revisione del dizionario professionale
+- **Stato:** DA COSTRUIRE E VALIDARE; al momento ci sono 14 termini sintetici attivi nel solo fixture staging, con metadati estesi in stato draft.
+- **Obiettivo minimo di prodotto:** catalogo iniziale di **almeno 300 voci professionali curate**, suddivise per settore e per azienda, non 300 sinonimi duplicati. La prima tranche deve coprire idraulica/manutenzione, edilizia/cantiere, immobiliare, mediazione finanziaria, legale, medico e linguaggio generico. Il settore farmaceutico resta escluso dal catalogo iniziale.
+- **Qualità minima per ogni voce, ove applicabile:** termine canonico, forma normalizzata, sinonimi/varianti regionali, settore e categoria, definizione breve, contesto d'uso, termini confondibili, esempi positivi e controesempi, fonte/nota di revisione e stato draft/reviewed/active.
+- **Regola di sicurezza:** le voci non possono creare intenti, compilare campi obbligatori senza evidenza, scegliere workflow, diagnosticare o autorizzare azioni. Le voci non revisionate restano draft e non vengono promosse a produzione.
+- **Cosa serve al titolare:** nessun intervento immediato per redigere la bozza; prima dell'attivazione per un pilota, un responsabile reale di dominio deve revisionare i termini del proprio settore. Il lavoro tecnico di redazione e test prosegue senza costi esterni.
+
+### D6 — Approvazione di un'attività pilota reale
+- **Stato:** BLOCCATO prima di qualsiasi uso operativo con clienti reali.
+- **Cosa serve:** identificare un'attività reale e un responsabile autorizzato che approvino settore, workflow, campi obbligatori, messaggi al cliente, policy e termini professionali. Il fixture “VocalFlash — STAGING TEST” resta sintetico e non equivale a un cliente pilota.
+- **Link di lavoro:** [PR Assistant API #3](https://github.com/VocalFlash/vocalflash/pull/3) · [PR Bot WhatsApp #2](https://github.com/VocalFlash/vocalflash-bot/pull/2) · [Libro sacro operativo](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/libro-sacro-vocalflash-operational-baseline-v1.md).
+
+### Registro sintetico delle decisioni in attesa
+1. **Supabase branch:** sì/no, dopo ricalcolo del preventivo.
+2. **Bird SMS:** sì/no, solo consumo pubblicato; fermarsi se emergono costi accessori non approvati.
+3. **Pagamenti:** carte + wallet oppure anche SEPA Direct Debit; piani/prezzi e cadenza da definire prima dell'implementazione.
+4. **Attività pilota:** da individuare e far approvare prima di usare dati o clienti reali.
+
+Non richiedono un'autorizzazione economica e quindi proseguono in autonomia: revisione del codice e dei test, definizione del catalogo terminologico draft da almeno 300 voci, progettazione della persistenza e dell'outbox, test fail-closed, documentazione, revisione delle migrazioni in sola lettura e verifiche CI/Preview. Nessuna di queste attività autorizza modifiche allo schema live, merge o deploy in produzione.
+
