@@ -30,10 +30,11 @@ La sintesi vocale deve privilegiare informazioni rilevanti e azioni, senza ripor
 
 ### Assistant API — PR #3
 - PR Draft, aperta, non integrata: https://github.com/VocalFlash/vocalflash/pull/3
-- Head verificato prima delle ultime aggiunte: `d3c321ac80ef4b59a127ec44cc1c923f0345ce2d`; il nuovo seed di staging è stato aggiunto con commit `3561c8c3f47208e711c0cdbaf49467ad72b41e60`.
-- CI sul precedente head era verde e la Preview era READY. Il commit del seed deve essere controllato nella CI aggiornata; non considerare la CI del commit precedente prova dei nuovi file.
+- Head funzionale di riferimento per i test policy: `50588712dc6b85b981c61116669d5a55730fc4e5`. La seed staging è stata aggiunta con commit `3561c8c3f47208e711c0cdbaf49467ad72b41e60`; la baseline e la roadmap sono state documentate in commit successivi.
+- CI run `39998581789` sul commit `50588712dc6b85b981c61116669d5a55730fc4e5`: **success**; include i nuovi test della policy di creazione. La Preview Vercel per quel commit era ancora `BUILDING` all'ultima lettura, quindi il suo stato va distinto da quello della CI e verificato sul candidato più recente.
 - La pipeline di sviluppo contiene ingest/routing persistenti, classificazione validata, estrazione dei campi obbligatori con evidenza letterale, raccolta dei dati mancanti, risposte cliente deterministiche, policy gate e contesto lessicale circoscritto all'azienda.
 - Il piano di raccolta dati e la policy evaluator non creano da soli pratiche; la persistenza è un gate separato.
+- Aggiunti test unitari per verificare che `confirm` non autorizzi la creazione automatica, policy assente/modalità sconosciuta falliscano chiuse, `forbidden` prevalga su `auto` e dati mancanti/ incerti impediscano l'autorizzazione. La CI run `39998581789` ha superato il test step.
 - La conversazione multi-turno persistente non è implementata.
 
 ### Bot WhatsApp — PR #2
@@ -66,7 +67,7 @@ Verifica successiva alla seed:
 - Policy `create_work_item`: attiva, scope workflow, modalità `confirm`.
 - La policy blocca la creazione automatica e richiede conferma. La configurazione esplicativa JSONB documenta le condizioni, ma il runtime attuale applica direttamente la modalità `autonomy_mode`; non trattare ogni campo descrittivo della configurazione come regola già eseguita dal codice.
 - Vocabolario: 14 termini canonici attivi nel solo business di staging. I metadati estesi (sinonimi, definizioni, disambiguazioni ed esempi) sono marcati `draft`; il runtime non deve trattarli come revisione di dominio approvata. Non riutilizzare questi seed generici in produzione.
-- I dati sono stati verificati con query di sola lettura dopo l'esecuzione della seed.
+- I dati sono stati verificati con query di sola lettura dopo l'esecuzione della seed. La seed è stata rieseguita una seconda volta: conteggi invariati (1 workflow attivo, 1 policy di creazione attiva, 14 termini, 0 membri), a conferma dell'idempotenza sul fixture corrente.
 
 ### Membro aziendale: bloccato per identità assente
 La verifica ha trovato **0 righe in `business_members` e 0 utenti in `auth.users`** nel progetto. Non è quindi possibile collegare in modo corretto il titolare a un'identità verificata. Non creare un membro fittizio, non inserire un UUID inventato e non aggirare Supabase Auth. L'onboarding deve usare l'identità verificata reale; l'eventuale configurazione di provider OTP/SMS a pagamento richiede conferma preventiva del costo.
