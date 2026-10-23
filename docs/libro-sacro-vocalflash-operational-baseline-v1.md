@@ -30,8 +30,8 @@ La sintesi vocale deve privilegiare informazioni rilevanti e azioni, senza ripor
 
 ### Assistant API — PR #3
 - PR Draft, aperta, non integrata: https://github.com/VocalFlash/vocalflash/pull/3
-- Head funzionale di riferimento per i test policy: `50588712dc6b85b981c61116669d5a55730fc4e5`. La seed staging è stata aggiunta con commit `3561c8c3f47208e711c0cdbaf49467ad72b41e60`; la baseline e la roadmap sono state documentate in commit successivi.
-- CI run `39998581789` sul commit `50588712dc6b85b981c61116669d5a55730fc4e5`: **success**; include i nuovi test della policy di creazione. La Preview Vercel per quel commit era ancora `BUILDING` all'ultima lettura, quindi il suo stato va distinto da quello della CI e verificato sul candidato più recente.
+- Ultimo head verificato dopo seed, test e documentazione: `1b4b4cc34fb09fa90de7978a099a431708a33b1b`. La seed è stata aggiunta con commit `3561c8c3f47208e711c0cdbaf49467ad72b41e60`; i test di policy sono stati aggiunti in `50588712dc6b85b981c61116669d5a55730fc4e5`.
+- CI run `39998680330` sul commit `1b4b4cc34fb09fa90de7978a099a431708a33b1b`: **success**; il test step, inclusi i nuovi test della policy, è completato con esito positivo. Preview Vercel sullo stesso commit: **READY**. È una Preview, non produzione, e non costituisce prova end-to-end.
 - La pipeline di sviluppo contiene ingest/routing persistenti, classificazione validata, estrazione dei campi obbligatori con evidenza letterale, raccolta dei dati mancanti, risposte cliente deterministiche, policy gate e contesto lessicale circoscritto all'azienda.
 - Il piano di raccolta dati e la policy evaluator non creano da soli pratiche; la persistenza è un gate separato.
 - Aggiunti test unitari per verificare che `confirm` non autorizzi la creazione automatica, policy assente/modalità sconosciuta falliscano chiuse, `forbidden` prevalga su `auto` e dati mancanti/ incerti impediscano l'autorizzazione. La CI run `39998581789` ha superato il test step.
@@ -47,10 +47,10 @@ La sintesi vocale deve privilegiare informazioni rilevanti e azioni, senza ripor
 
 ### Supabase
 - Progetto controllato in sola lettura: `VocalFlash Assistant`, stato `ACTIVE_HEALTHY`.
-- Il registro live contiene 15 migrazioni; la sequenza completa dei file SQL autorevoli non è ancora stata riconciliata.
+- Il registro live contiene 15 migrazioni; la sequenza completa dei file SQL autorevoli non è ancora stata riconciliata. È stata estesa la ricerca di sola lettura a 19 alberi di branch rilevanti nei due repository GitHub: non sono stati trovati file SQL di migrazione in quegli alberi. La ricerca non prova l'assenza in ogni branch, repository privato o pipeline esterna; la provenienza resta un release gate aperto.
 - Gli advisor hanno segnalato 15 tabelle con RLS abilitata ma senza policy e 18 foreign key senza indice di copertura; non dedurre automaticamente che le tabelle siano pubblicamente accessibili. La query di privilegi diretti a `anon` e `authenticated` non ha restituito concessioni dirette sulle tabelle pubbliche.
 - Non eliminare indici inutilizzati meccanicamente: il database è piccolo e in gran parte di test.
-- Non creare una development branch Supabase finché il costo aggiornato non è stato presentato e approvato.
+- Preventivo corrente restituito per una Supabase development branch nell'organizzazione del progetto: **$0.01344/ora**. La creazione è in attesa di conferma esplicita; nessuna branch è stata creata. Non creare la risorsa finché il costo non è approvato.
 
 ## 4. Configurazione staging effettuata
 
