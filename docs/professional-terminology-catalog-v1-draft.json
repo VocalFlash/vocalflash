@@ -1679,14 +1679,23 @@
       "category": "materials",
       "canonical_term": "calcestruzzo",
       "normalized_term": "calcestruzzo",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "conglomerato cementizio",
+        "cls"
+      ],
+      "definition": "Materiale da costruzione composto da legante, aggregati, acqua ed eventuali additivi.",
+      "disambiguation": "Non confonderlo con il cemento, che è uno dei leganti utilizzabili nella miscela.",
+      "examples": [
+        "Il getto di calcestruzzo è previsto per domani."
+      ],
+      "confusable_with": [
+        "cemento",
+        "malta"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.88",
@@ -1739,14 +1748,23 @@
       "category": "materials",
       "canonical_term": "massetto",
       "normalized_term": "massetto",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "sottofondo cementizio",
+        "massetto di posa"
+      ],
+      "definition": "Strato di supporto o regolarizzazione del pavimento, con composizione e funzione variabili.",
+      "disambiguation": "Non equivale alla pavimentazione finale né alla soletta strutturale.",
+      "examples": [
+        "Il massetto deve asciugare prima della posa del pavimento."
+      ],
+      "confusable_with": [
+        "solaio",
+        "pavimentazione"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.92",
@@ -1934,14 +1952,23 @@
       "category": "materials",
       "canonical_term": "cappotto termico",
       "normalized_term": "cappotto termico",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "isolamento a cappotto",
+        "sistema ETICS"
+      ],
+      "definition": "Sistema di isolamento termico applicato generalmente all’esterno o all’interno di una parete.",
+      "disambiguation": "Non dedurre prestazioni, spessori o conformità da una semplice menzione.",
+      "examples": [
+        "È richiesto un preventivo per il cappotto termico."
+      ],
+      "confusable_with": [
+        "isolante termico",
+        "facciata ventilata"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.105",
@@ -2159,14 +2186,23 @@
       "category": "materials",
       "canonical_term": "ponteggio",
       "normalized_term": "ponteggio",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "impalcatura",
+        "ponteggio da cantiere"
+      ],
+      "definition": "Struttura temporanea di accesso e lavoro in quota, soggetta a requisiti e controlli di sicurezza.",
+      "disambiguation": "La menzione non dimostra che la struttura sia montata o verificata a norma.",
+      "examples": [
+        "Il ponteggio deve essere controllato prima dell’uso."
+      ],
+      "confusable_with": [
+        "trabattello",
+        "piattaforma elevabile"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.120",
@@ -2774,14 +2810,23 @@
       "category": "activities",
       "canonical_term": "computo metrico",
       "normalized_term": "computo metrico",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "computo metrico estimativo",
+        "computo lavori"
+      ],
+      "definition": "Documento che elenca lavorazioni e quantità; nella versione estimativa associa prezzi e importi.",
+      "disambiguation": "Non equivale automaticamente a un preventivo accettato o a un contratto.",
+      "examples": [
+        "Il cliente chiede il computo metrico delle opere."
+      ],
+      "confusable_with": [
+        "capitolato",
+        "preventivo"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.activities.161",
@@ -2789,14 +2834,23 @@
       "category": "activities",
       "canonical_term": "stato avanzamento lavori",
       "normalized_term": "stato avanzamento lavori",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "SAL",
+        "avanzamento lavori"
+      ],
+      "definition": "Rilevazione documentata delle lavorazioni eseguite fino a una data, secondo il contratto e i criteri applicabili.",
+      "disambiguation": "Non equivale di per sé a collaudo, accettazione o pagamento autorizzato.",
+      "examples": [
+        "Serve aggiornare il SAL del cantiere."
+      ],
+      "confusable_with": [
+        "verbale di consegna",
+        "collaudo"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.activities.162",
@@ -3284,14 +3338,23 @@
       "category": "property",
       "canonical_term": "appartamento",
       "normalized_term": "appartamento",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "unità abitativa",
+        "alloggio"
+      ],
+      "definition": "Unità immobiliare destinata prevalentemente ad abitazione.",
+      "disambiguation": "Non inferire piano, metratura, pertinenze o stato di occupazione se non dichiarati.",
+      "examples": [
+        "Cerco un appartamento con due camere."
+      ],
+      "confusable_with": [
+        "unità immobiliare",
+        "villa"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "real_estate.property.195",
@@ -3554,14 +3617,23 @@
       "category": "property",
       "canonical_term": "superficie commerciale",
       "normalized_term": "superficie commerciale",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "metri commerciali",
+        "mq commerciali"
+      ],
+      "definition": "Superficie convenzionale utilizzata in ambito immobiliare secondo criteri di calcolo che possono includere quote di pertinenze.",
+      "disambiguation": "Non coincide necessariamente con la superficie calpestabile o catastale; specificare fonte e criterio quando disponibili.",
+      "examples": [
+        "L’annuncio riporta 95 metri quadrati commerciali."
+      ],
+      "confusable_with": [
+        "superficie calpestabile",
+        "superficie catastale"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "real_estate.property.213",
@@ -3629,14 +3701,23 @@
       "category": "property",
       "canonical_term": "attestato di prestazione energetica",
       "normalized_term": "attestato di prestazione energetica",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "APE",
+        "attestato energetico"
+      ],
+      "definition": "Documento che riporta la prestazione energetica di un edificio o unità immobiliare secondo la normativa applicabile.",
+      "disambiguation": "Non dedurre la classe energetica senza consultare il documento valido.",
+      "examples": [
+        "L’APE è tra i documenti da richiedere al proprietario."
+      ],
+      "confusable_with": [
+        "diagnosi energetica",
+        "certificazione impianto"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "real_estate.property.218",
@@ -3659,14 +3740,23 @@
       "category": "property",
       "canonical_term": "visura catastale",
       "normalized_term": "visura catastale",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "visura del catasto",
+        "visura catastale immobile"
+      ],
+      "definition": "Consultazione dei dati presenti negli archivi catastali relativi a immobili o intestatari secondo le regole di accesso.",
+      "disambiguation": "Non prova da sola la piena conformità urbanistica o la titolarità giuridica.",
+      "examples": [
+        "La visura catastale deve essere aggiornata."
+      ],
+      "confusable_with": [
+        "planimetria catastale",
+        "visura ipotecaria"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "real_estate.property.220",
@@ -3899,14 +3989,23 @@
       "category": "transaction",
       "canonical_term": "proposta d’acquisto",
       "normalized_term": "proposta d’acquisto",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "proposta di acquisto",
+        "proposta immobiliare"
+      ],
+      "definition": "Dichiarazione con cui un potenziale acquirente propone condizioni per acquistare un immobile.",
+      "disambiguation": "Non affermare che sia accettata o vincolante senza verificare testo, comunicazione e circostanze.",
+      "examples": [
+        "Il cliente vuole presentare una proposta d’acquisto."
+      ],
+      "confusable_with": [
+        "preliminare di compravendita",
+        "manifestazione d’interesse"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "real_estate.transaction.236",
@@ -3974,14 +4073,23 @@
       "category": "transaction",
       "canonical_term": "caparra confirmatoria",
       "normalized_term": "caparra confirmatoria",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "caparra",
+        "caparra confirmatoria immobiliare"
+      ],
+      "definition": "Somma consegnata in relazione a un contratto con gli effetti previsti dalla disciplina applicabile.",
+      "disambiguation": "Non confonderla con un semplice acconto; gli effetti dipendono dal contratto e dal contesto giuridico.",
+      "examples": [
+        "La proposta indica una caparra confirmatoria."
+      ],
+      "confusable_with": [
+        "acconto prezzo",
+        "deposito cauzionale"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "real_estate.transaction.241",
@@ -4799,14 +4907,23 @@
       "category": "lending",
       "canonical_term": "mutuo ipotecario",
       "normalized_term": "mutuo ipotecario",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "finanziamento ipotecario",
+        "mutuo con ipoteca"
+      ],
+      "definition": "Finanziamento garantito da ipoteca su un bene immobile, secondo le condizioni contrattuali.",
+      "disambiguation": "La menzione non implica approvazione, delibera o erogazione da parte della banca.",
+      "examples": [
+        "Il cliente chiede informazioni su un mutuo ipotecario."
+      ],
+      "confusable_with": [
+        "prestito personale",
+        "leasing immobiliare"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "financial_intermediation.lending.296",
@@ -4829,14 +4946,23 @@
       "category": "lending",
       "canonical_term": "surroga del mutuo",
       "normalized_term": "surroga del mutuo",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "portabilità del mutuo",
+        "surroga"
+      ],
+      "definition": "Trasferimento del finanziamento a un altro istituto secondo la disciplina applicabile, con subentro nella garanzia.",
+      "disambiguation": "Non confonderla con una rinegoziazione presso lo stesso istituto; condizioni e ammissibilità vanno verificate.",
+      "examples": [
+        "Il cliente vuole valutare la surroga del mutuo."
+      ],
+      "confusable_with": [
+        "rinegoziazione del mutuo",
+        "estinzione anticipata"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "financial_intermediation.lending.298",
@@ -4994,14 +5120,23 @@
       "category": "lending",
       "canonical_term": "piano di ammortamento",
       "normalized_term": "piano di ammortamento",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "piano rate mutuo",
+        "tabella di ammortamento"
+      ],
+      "definition": "Prospetto che descrive nel tempo le rate e la ripartizione prevista tra capitale e interessi.",
+      "disambiguation": "Usare il documento dell’istituto o i dati confermati; non ricostruire condizioni contrattuali mancanti.",
+      "examples": [
+        "Il cliente richiede il piano di ammortamento aggiornato."
+      ],
+      "confusable_with": [
+        "estratto conto",
+        "conteggio estintivo"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "financial_intermediation.lending.309",
@@ -5054,14 +5189,22 @@
       "category": "lending",
       "canonical_term": "TAEG",
       "normalized_term": "taeg",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "tasso annuo effettivo globale"
+      ],
+      "definition": "Indicatore del costo complessivo del credito per il consumatore, calcolato secondo regole normative.",
+      "disambiguation": "Non equivale al TAN e non va stimato senza i dati e il prodotto applicabili.",
+      "examples": [
+        "Il cliente chiede il TAEG dell’offerta."
+      ],
+      "confusable_with": [
+        "TAN",
+        "tasso nominale"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "financial_intermediation.lending.313",
@@ -6074,14 +6217,23 @@
       "category": "documents",
       "canonical_term": "decreto ingiuntivo",
       "normalized_term": "decreto ingiuntivo",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "ingiunzione di pagamento",
+        "decreto monitorio"
+      ],
+      "definition": "Provvedimento giudiziario emesso in un procedimento monitorio quando ricorrono i presupposti di legge.",
+      "disambiguation": "Non dedurre definitività, termini o possibilità di opposizione senza esaminare il provvedimento e la notifica.",
+      "examples": [
+        "Il cliente ha ricevuto un decreto ingiuntivo e chiede un appuntamento."
+      ],
+      "confusable_with": [
+        "precetto",
+        "sentenza"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "legal.documents.381",
@@ -6209,14 +6361,23 @@
       "category": "documents",
       "canonical_term": "messa in mora",
       "normalized_term": "messa in mora",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "costituzione in mora",
+        "comunicazione di mora"
+      ],
+      "definition": "Atto o comunicazione diretta a costituire il debitore in mora quando ne ricorrono i presupposti.",
+      "disambiguation": "Non confonderla con qualsiasi sollecito; gli effetti dipendono da contenuto e situazione.",
+      "examples": [
+        "È arrivata una comunicazione di messa in mora."
+      ],
+      "confusable_with": [
+        "diffida",
+        "sollecito di pagamento"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "legal.documents.390",
@@ -6284,14 +6445,23 @@
       "category": "documents",
       "canonical_term": "accordo transattivo",
       "normalized_term": "accordo transattivo",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "transazione",
+        "accordo di definizione della controversia"
+      ],
+      "definition": "Accordo con cui le parti compongono una controversia mediante reciproche concessioni, nei limiti previsti dalla legge.",
+      "disambiguation": "Non considerare una bozza come accordo perfezionato o firmato.",
+      "examples": [
+        "Le parti stanno esaminando una bozza di accordo transattivo."
+      ],
+      "confusable_with": [
+        "proposta transattiva",
+        "quietanza liberatoria"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "legal.documents.395",
@@ -6359,14 +6529,23 @@
       "category": "documents",
       "canonical_term": "PEC",
       "normalized_term": "pec",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "posta elettronica certificata",
+        "email PEC"
+      ],
+      "definition": "Sistema di posta elettronica che fornisce evidenze certificate di invio e consegna secondo le regole applicabili.",
+      "disambiguation": "Non dedurre il contenuto o l’esito giuridico dalla sola menzione di una PEC; conservare ricevute e allegati pertinenti.",
+      "examples": [
+        "Il documento è stato inviato tramite PEC."
+      ],
+      "confusable_with": [
+        "email ordinaria",
+        "raccomandata"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "legal.documents.400",
@@ -6629,14 +6808,23 @@
       "category": "procedure",
       "canonical_term": "termine processuale",
       "normalized_term": "termine processuale",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "scadenza processuale",
+        "termine per il deposito"
+      ],
+      "definition": "Intervallo o data limite prevista per un atto o adempimento processuale.",
+      "disambiguation": "Non calcolare o confermare una scadenza legale senza verificare atto, notifica, regole applicabili e calendario.",
+      "examples": [
+        "Il legale segnala un termine processuale da verificare."
+      ],
+      "confusable_with": [
+        "scadenza contrattuale",
+        "prescrizione"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "legal.procedure.418",
@@ -7664,14 +7852,23 @@
       "category": "appointments",
       "canonical_term": "impegnativa",
       "normalized_term": "impegnativa",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "prescrizione per prestazione",
+        "ricetta per visita o esame"
+      ],
+      "definition": "Documento prescrittivo richiesto per determinate prestazioni sanitarie secondo il percorso applicabile.",
+      "disambiguation": "Non equivale a una prenotazione confermata; verificare validità e requisiti presso la struttura.",
+      "examples": [
+        "Per prenotare l’esame serve l’impegnativa."
+      ],
+      "confusable_with": [
+        "ricetta farmacologica",
+        "prenotazione CUP"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "medical.appointments.487",
@@ -7694,14 +7891,23 @@
       "category": "appointments",
       "canonical_term": "referto",
       "normalized_term": "referto",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "referto medico",
+        "esito dell’esame"
+      ],
+      "definition": "Documento sanitario che riporta i risultati o le conclusioni di una prestazione o indagine.",
+      "disambiguation": "Non reinterpretare o diagnosticare il contenuto; distinguere referto preliminare da definitivo quando indicato.",
+      "examples": [
+        "Il paziente chiede come ritirare il referto."
+      ],
+      "confusable_with": [
+        "cartella clinica",
+        "prescrizione"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "medical.appointments.489",
@@ -7724,14 +7930,23 @@
       "category": "appointments",
       "canonical_term": "anamnesi",
       "normalized_term": "anamnesi",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "storia clinica",
+        "raccolta anamnestica"
+      ],
+      "definition": "Raccolta di informazioni sulla storia sanitaria e sui sintomi riferiti dalla persona.",
+      "disambiguation": "Registrare i dati come riferiti e non trasformarli in diagnosi verificate.",
+      "examples": [
+        "La prima visita prevede la raccolta dell’anamnesi."
+      ],
+      "confusable_with": [
+        "esame obiettivo",
+        "diagnosi"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "medical.appointments.491",
@@ -7739,14 +7954,23 @@
       "category": "appointments",
       "canonical_term": "consenso informato",
       "normalized_term": "consenso informato",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "consenso alla prestazione",
+        "consenso sanitario"
+      ],
+      "definition": "Processo e documentazione con cui la persona riceve informazioni pertinenti e accetta o rifiuta una prestazione secondo le regole applicabili.",
+      "disambiguation": "Non presumere che il consenso sia stato acquisito dalla sola prenotazione o da un messaggio generico.",
+      "examples": [
+        "Il modulo di consenso informato deve essere completato prima della procedura."
+      ],
+      "confusable_with": [
+        "informativa privacy",
+        "consenso al trattamento dati"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "medical.appointments.492",
@@ -7784,14 +8008,22 @@
       "category": "appointments",
       "canonical_term": "triage",
       "normalized_term": "triage",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "valutazione iniziale di priorità"
+      ],
+      "definition": "Processo di valutazione e assegnazione della priorità assistenziale in un contesto sanitario organizzato.",
+      "disambiguation": "Non sostituire il personale sanitario né assegnare priorità cliniche sulla base di un dizionario o di un riepilogo automatico.",
+      "examples": [
+        "Il paziente viene informato che la priorità sarà valutata dal triage."
+      ],
+      "confusable_with": [
+        "prenotazione urgente",
+        "diagnosi"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "medical.appointments.495",
@@ -9149,14 +9381,23 @@
       "category": "request_management",
       "canonical_term": "richiesta di richiamata",
       "normalized_term": "richiesta di richiamata",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "richiamare il cliente",
+        "richiesta di essere richiamato"
+      ],
+      "definition": "Richiesta esplicita di ricevere una chiamata successiva.",
+      "disambiguation": "Non equivale a una chiamata già pianificata; raccogliere fascia oraria e recapito se mancanti.",
+      "examples": [
+        "Il cliente chiede di essere richiamato dopo le 16."
+      ],
+      "confusable_with": [
+        "richiesta di appuntamento",
+        "contatto effettuato"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "generic.request_management.586",
@@ -9614,14 +9855,23 @@
       "category": "request_management",
       "canonical_term": "informazione da verificare",
       "normalized_term": "informazione da verificare",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "dato da confermare",
+        "informazione incerta"
+      ],
+      "definition": "Informazione disponibile ma non ancora confermata da una fonte adeguata o dalla persona autorizzata.",
+      "disambiguation": "Non usarla come dato certo per compilare campi obbligatori o autorizzare azioni.",
+      "examples": [
+        "Il numero civico è un’informazione da verificare."
+      ],
+      "confusable_with": [
+        "dato dichiarato",
+        "dato verificato"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "generic.request_management.617",
@@ -10345,14 +10595,23 @@
       "category": "communication",
       "canonical_term": "azione da confermare",
       "normalized_term": "azione da confermare",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "azione in attesa di approvazione",
+        "proposta in attesa"
+      ],
+      "definition": "Azione proposta ma non ancora autorizzata dalla persona richiesta dalla policy.",
+      "disambiguation": "Non eseguire l’azione e non dichiararla completata prima della conferma valida e persistita.",
+      "examples": [
+        "L’invio del preventivo è un’azione da confermare."
+      ],
+      "confusable_with": [
+        "azione concordata",
+        "azione completata"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "generic.communication.665",
@@ -10720,14 +10979,23 @@
       "category": "communication",
       "canonical_term": "conferma esplicita",
       "normalized_term": "conferma esplicita",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "conferma diretta",
+        "approvazione esplicita"
+      ],
+      "definition": "Risposta chiara e attribuibile a una persona autorizzata che accetta una proposta specifica.",
+      "disambiguation": "Un assenso ambiguo, una reazione emoji o una conferma riferita a un’altra proposta non bastano se il workflow richiede un consenso esplicito e contestualizzato.",
+      "examples": [
+        "Il titolare conferma esplicitamente il riepilogo della pratica."
+      ],
+      "confusable_with": [
+        "presa visione",
+        "conferma automatica"
+      ],
       "review_status": "draft",
       "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "review_note": "Contenuto redazionale preliminare; non approvato da un responsabile di dominio. Verificare definizioni, sinonimi, esempi e termini confondibili prima dell’attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "generic.communication.690",
@@ -10882,7 +11150,7 @@
   ],
   "enrichment_summary": {
     "updated_on": "2026-10-23",
-    "enriched_entries": 40,
+    "enriched_entries": 70,
     "status": "DRAFT_NEEDS_DOMAIN_REVIEW",
     "note": "Entries enriched with preliminary definitions, synonyms, disambiguation, examples and confusable terms. This is editorial preparation, not expert approval; all entries remain draft and must not be used as approved runtime context."
   }
