@@ -139,3 +139,17 @@ The original voice-note summarizer remains a valuable entry point. The core user
 ## Operational source of truth
 
 The current verified status, user guardrails, staging seed result, unresolved owner identity, and prioritized release gates are maintained in [Libro sacro VocalFlash — operational baseline v1](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/libro-sacro-vocalflash-operational-baseline-v1.md). Read it before every further implementation step and update it after material changes.
+
+## Owner decision register and glossary target (updated 2026-10-23)
+
+The detailed approval checklist and official cost/reference links live in the [Libro sacro — section 10](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/libro-sacro-vocalflash-operational-baseline-v1.md#10-decisioni-e-interventi-richiesti-al-titolare). Do not create paid resources or live integrations before the corresponding explicit approval.
+
+- **Supabase development branch:** pending approval; last available quote was $0.01344/hour (~$9.68 for 30 days continuous), recheck before creation.
+- **Bird SMS:** pending approval; published Italy rate consulted 2026-10-23 was $0.065 per segment, with possible carrier/sender/registration costs. Supabase Auth + Bird Send SMS Hook remains the intended path; no provider account/hook is configured.
+- **Payments:** product decision pending. Candidate is Stripe Checkout + Billing, cards and eligible Apple Pay/Google Pay; decide whether to include SEPA Direct Debit, plans/prices, trial, billing cadence, dunning/suspension and cancellation/refund rules before implementing. Published card/Billing fees are recorded in the Libro sacro and must be rechecked before live setup.
+- **Real business member:** blocked until a real verified Supabase Auth identity exists; no placeholder member or fabricated UUID.
+- **Professional terminology:** target at least **300 curated, non-duplicative entries** across plumbing/maintenance, construction/site work, real estate, financial intermediation, legal, medical and generic language. Pharmacy remains outside the initial catalogue. Each term must carry sector/category, normalization, variants/synonyms, definition, disambiguation, examples and review status as applicable; draft entries remain non-authoritative until reviewed. Vocabulary never authorizes actions or substitutes for evidence/policy.
+- **Pilot business approval:** a real authorized domain owner must approve the sector workflow, required fields, policy, customer-facing text and sector vocabulary before real customer use.
+
+Work that has no unapproved cost or production impact should continue autonomously: source review, tests, glossary draft creation, migration provenance analysis, persistence/outbox design and CI/Preview checks. Keep both PRs Draft, owner writes fail-closed, and production untouched.
+
