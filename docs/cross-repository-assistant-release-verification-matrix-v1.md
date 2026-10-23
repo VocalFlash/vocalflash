@@ -69,6 +69,9 @@ Related blocker: bot issue #3. The current 24-hour Redis marker is at-most-once 
 - [ ] An unverified or inactive member cannot execute owner commands.
 - [ ] Cross-business member, workflow, policy, or event IDs are denied.
 - [ ] Required or uncertain customer data returns a clarification request without a business write.
+- [ ] Every extracted PROVIDED value and its evidence are literal excerpts of the source message after only Unicode/whitespace/case normalization; unsupported field-specific normalization must fail closed.
+- [ ] Confidence is finite and within the declared 0–1 range; confidence alone never authorizes a write.
+- [ ] Fabricated values, fabricated evidence, malformed confidence, and promised-future data are covered by regression tests.
 - [ ] A single authorized action writes only when policy allows it.
 - [ ] Duplicate source event replays return the existing result and do not create another work item.
 - [ ] Owner confirmation replay is idempotent and proposal-bound.
