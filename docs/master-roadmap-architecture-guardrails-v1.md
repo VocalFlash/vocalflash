@@ -160,3 +160,7 @@ A draft index has been added at [professional-terminology-catalog-v1-draft.json]
 - The draft catalog now has 699 unique sector-scoped entries; a read-only structural audit found 70 enriched entries across the initial sectors and no duplicate sector/normalized-term pairs. All entries remain draft; no expert review or runtime import is implied.
 - Added `scripts/validate-professional-terminology-catalog.mjs` and added its invocation to the Assistant test workflow. Its GitHub Actions result is pending confirmation; do not treat the local structural audit as CI evidence.
 - Next autonomous glossary step: enrich another carefully scoped batch and add semantic/sector review checks without promoting terms to approved or importing draft entries into the database.
+
+### Supabase branch quote rechecked — 2026-10-23
+
+Current read-only quote for the existing project's organization remains $0.01344/hour. This is ~$9.68 per 720 hours (30 days) or ~$9.81 per 730 hours, before other possible usage. No branch created; explicit owner approval remains required.
