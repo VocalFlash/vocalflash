@@ -140,7 +140,7 @@ Questa sezione separa le decisioni che richiedono autorizzazione o dati del tito
 
 ### D1 — Supabase development branch (approvazione di costo)
 - **Stato:** BLOCCATO in attesa di approvazione.
-- **Ultimo preventivo disponibile:** $0.01344/ora, circa $9.68 per 30 giorni di funzionamento continuo. Il totale effettivo può variare; ricalcolare prima della creazione.
+- **Preventivo ricalcolato in sola lettura il 23/10/2026:** $0.01344/ora; circa $9.68 per 720 ore (30 giorni) oppure $9.81 per 730 ore, prima di altri possibili consumi. Ricontrollare subito prima della creazione.
 - **Cosa serve:** autorizzare la creazione della branch di sviluppo. Non verrà creata prima della conferma.
 - **Link:** [Supabase Dashboard — progetto VocalFlash Assistant](https://supabase.com/dashboard/project/tkfyfqgtumoeywlqzmdt).
 - **Risposta attesa:** “Supabase branch: sì” oppure “Supabase branch: no”.
@@ -181,7 +181,7 @@ Questa sezione separa le decisioni che richiedono autorizzazione o dati del tito
 - **Link di lavoro:** [PR Assistant API #3](https://github.com/VocalFlash/vocalflash/pull/3) · [PR Bot WhatsApp #2](https://github.com/VocalFlash/vocalflash-bot/pull/2) · [Libro sacro operativo](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/libro-sacro-vocalflash-operational-baseline-v1.md).
 
 ### Registro sintetico delle decisioni in attesa
-1. **Supabase branch:** sì/no, dopo ricalcolo del preventivo.
+1. **Supabase branch:** sì/no. Preventivo ricalcolato il 23/10/2026: $0.01344/ora (~$9.68 per 720 ore o ~$9.81 per 730 ore); ricontrollare prima della creazione.
 2. **Bird SMS:** sì/no, solo consumo pubblicato; fermarsi se emergono costi accessori non approvati.
 3. **Pagamenti:** carte + wallet oppure anche SEPA Direct Debit; piani/prezzi e cadenza da definire prima dell'implementazione.
 4. **Attività pilota:** da individuare e far approvare prima di usare dati o clienti reali.
