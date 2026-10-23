@@ -197,3 +197,12 @@ Non richiedono un'autorizzazione economica e quindi proseguono in autonomia: rev
 - Aggiornata la roadmap master con i gate di qualità del catalogo e il registro delle decisioni.
 - Verifica GitHub sul codice applicativo `9bbb304e9ddd15bd80e2fe7cbf803286e7637cf0`: status Vercel **success**. I successivi commit sono documentali; non è stato eseguito un nuovo test end-to-end.
 - Non è stata creata una Supabase development branch, non è stato configurato Bird o Stripe, non è stato creato un utente/membro fittizio e non è stata modificata la produzione.
+
+
+## 12. Catalog quality and validation — 23 October 2026
+
+- The catalog remains an inventory of **699 draft entries** across the seven intended scopes, with no pharmaceutical sector and no duplicate `(sector, normalized_term)` pairs found in the current file.
+- The first **40 plumbing/maintenance entries** now have preliminary synonyms, definitions, disambiguation notes, examples and confusable terms. They remain `draft` and explicitly require domain-owner review; this is editorial enrichment, not expert approval.
+- Added `scripts/validate-professional-terminology-catalog.mjs` and wired it into `.github/workflows/customer-assistant-tests.yml`. The validator checks the minimum count, required sectors, exclusion of pharmacy, uniqueness, draft-only status and completeness of the enriched batch.
+- A read of the current catalog file and an equivalent structural check found 699 unique entries, 40 enriched entries, 0 structural issues, and no pharmacy sector. **This is a direct content audit, not yet a reported GitHub Actions pass.** The latest Vercel status for the commit adding the CI step was still `pending` at the last check; do not report a green result until the actual CI/Preview status is confirmed.
+- The validator intentionally does not certify professional correctness, legal/medical suitability, synonym quality, or production readiness. Those require expert review and sector-specific semantic tests.
