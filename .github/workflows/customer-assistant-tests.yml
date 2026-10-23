@@ -24,4 +24,4 @@ jobs:
       - name: Install dependencies
         run: npm install --ignore-scripts
       - name: Run focused assistant tests
-        run: node --test lib/supabase-rest-headers-v1.test.js lib/assistant-readiness-v1.test.js lib/new-work-required-data-extractor-v1.test.js lib/customer-assistant-reply-v1.test.js lib/customer-whatsapp-pipeline-v1.test.js lib/business-vocabulary-context-v1.test.js lib/request-classifier-validation-v2.test.js lib/new-work-intake-plan-v1.test.js lib/owner-command-runtime-v1.test.js lib/owner-command-confirmation-v1.test.js lib/assistant-whatsapp-dispatch-v1.test.js
+        run: node --test api/v1/assistant.test.js lib/supabase-rest-headers-v1.test.js lib/assistant-readiness-v1.test.js lib/new-work-required-data-extractor-v1.test.js lib/customer-assistant-reply-v1.test.js lib/customer-whatsapp-pipeline-v1.test.js lib/business-vocabulary-context-v1.test.js lib/request-classifier-validation-v2.test.js lib/new-work-intake-plan-v1.test.js lib/owner-command-runtime-v1.test.js lib/owner-command-confirmation-v1.test.js lib/assistant-whatsapp-dispatch-v1.test.js
