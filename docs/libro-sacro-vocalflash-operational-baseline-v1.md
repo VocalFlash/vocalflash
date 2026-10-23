@@ -168,23 +168,33 @@ Questa sezione separa le decisioni che richiedono autorizzazione o dati del tito
 - **Nota:** non creare identità placeholder né assegnare UUID manuali.
 
 ### D5 — Revisione del dizionario professionale
-- **Avanzamento documentale del 23/10/2026:** creato [catalogo professionale draft v1](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/professional-terminology-catalog-v1-draft.json) con **699 voci candidate** distribuite nei settori iniziali: idraulica/manutenzione, edilizia/cantiere, immobiliare, mediazione finanziaria, legale, medico e generico. Sono voci d'indice in stato `draft`, non un dizionario pronto per la produzione: sinonimi, definizioni, disambiguazioni ed esempi sono intenzionalmente da completare e revisionare. Non importare automaticamente queste voci nel database né abilitarle nel runtime.
+- **Avanzamento documentale del 23/10/2026:** creato [catalogo professionale draft v1](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/professional-terminology-catalog-v1-draft.json) con **699 voci candidate** distribuite nei settori iniziali: idraulica/manutenzione, edilizia/cantiere, immobiliare, mediazione finanziaria, legale, medico e generico. Sono voci in stato `draft`, non un dizionario pronto per la produzione: 100 voci hanno ora un primo arricchimento redazionale (sinonimi, definizioni, disambiguazioni ed esempi), ma tutte le voci arricchite restano da revisionare con esperti di dominio. Le restanti voci sono ancora indici da arricchire. Non importare automaticamente queste voci nel database né abilitarle nel runtime.
 - **Stato:** DA COSTRUIRE E VALIDARE; al momento ci sono 14 termini sintetici attivi nel solo fixture staging, con metadati estesi in stato draft.
 - **Obiettivo minimo di prodotto:** catalogo iniziale di **almeno 300 voci professionali curate**, suddivise per settore e per azienda, non 300 sinonimi duplicati. La prima tranche deve coprire idraulica/manutenzione, edilizia/cantiere, immobiliare, mediazione finanziaria, legale, medico e linguaggio generico. Il settore farmaceutico resta escluso dal catalogo iniziale.
 - **Qualità minima per ogni voce, ove applicabile:** termine canonico, forma normalizzata, sinonimi/varianti regionali, settore e categoria, definizione breve, contesto d'uso, termini confondibili, esempi positivi e controesempi, fonte/nota di revisione e stato draft/reviewed/active.
 - **Regola di sicurezza:** le voci non possono creare intenti, compilare campi obbligatori senza evidenza, scegliere workflow, diagnosticare o autorizzare azioni. Le voci non revisionate restano draft e non vengono promosse a produzione.
 - **Cosa serve al titolare:** nessun intervento immediato per redigere la bozza; prima dell'attivazione per un pilota, un responsabile reale di dominio deve revisionare i termini del proprio settore. Il lavoro tecnico di redazione e test prosegue senza costi esterni.
 
-### D6 — Approvazione di un'attività pilota reale
+### D6 — Approvazione del pilota reale
 - **Stato:** BLOCCATO prima di qualsiasi uso operativo con clienti reali.
-- **Cosa serve:** identificare un'attività reale e un responsabile autorizzato che approvino settore, workflow, campi obbligatori, messaggi al cliente, policy e termini professionali. Il fixture “VocalFlash — STAGING TEST” resta sintetico e non equivale a un cliente pilota.
+- **Direzione già prevista:** primo esperimento con 3–5 potenziali clienti, senza implementare subito una gestione multi-azienda completa; mantenere distinti e misurabili i consumi dei canali VocalFlash WhatsApp e VocalFlash API.
+- **Cosa serve:** individuare i 3–5 potenziali clienti e un'attività/responsabile autorizzato che approvino settore, workflow, campi obbligatori, messaggi al cliente, policy e termini professionali. Il fixture “VocalFlash — STAGING TEST” resta sintetico e non equivale a un cliente pilota.
 - **Link di lavoro:** [PR Assistant API #3](https://github.com/VocalFlash/vocalflash/pull/3) · [PR Bot WhatsApp #2](https://github.com/VocalFlash/vocalflash-bot/pull/2) · [Libro sacro operativo](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/libro-sacro-vocalflash-operational-baseline-v1.md).
+
+
+
+### D7 — Dati legali e privacy prima del lancio commerciale
+- **Stato:** BLOCCO PRE-LANCIO; non richiede un'azione immediata mentre proseguono test e sviluppo.
+- **Cosa dovrai fornire/decidere:** identità reale del titolare del trattamento e dati di contatto privacy; approvare i criteri di conservazione/cancellazione per audio, messaggi, dati operativi, log e backup; confermare i dati contrattuali necessari per gli account fornitori e per la fatturazione. Non inviare segreti in chat.
+- **Revisione necessaria:** inventario dei flussi dati effettivi, informativa, DPA ex art. 28 GDPR, termini B2B e trasferimenti internazionali dovranno corrispondere ai servizi davvero attivati ed essere revisionati da un professionista qualificato. Non inventare periodi di conservazione o identità legali.
+- **Link:** [Issue privacy pre-lancio #8](https://github.com/VocalFlash/vocalflash/issues/8) · [Libro sacro operativo](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/libro-sacro-vocalflash-operational-baseline-v1.md).
 
 ### Registro sintetico delle decisioni in attesa
 1. **Supabase branch:** sì/no. Preventivo ricalcolato il 23/10/2026: $0.01344/ora (~$9.68 per 720 ore o ~$9.81 per 730 ore); ricontrollare prima della creazione.
 2. **Bird SMS:** sì/no, solo consumo pubblicato; fermarsi se emergono costi accessori non approvati.
 3. **Pagamenti:** carte + wallet oppure anche SEPA Direct Debit; piani/prezzi e cadenza da definire prima dell'implementazione.
-4. **Attività pilota:** da individuare e far approvare prima di usare dati o clienti reali.
+4. **Pilota:** individuare 3–5 potenziali clienti e un responsabile di dominio; approvare workflow e dizionario prima dell'uso reale.
+5. **Privacy/lancio:** fornire identità del titolare e contatto privacy, concordare retention/cancellazione e far revisionare informativa/DPA/termini prima del lancio.
 
 Non richiedono un'autorizzazione economica e quindi proseguono in autonomia: revisione del codice e dei test, definizione del catalogo terminologico draft da almeno 300 voci, progettazione della persistenza e dell'outbox, test fail-closed, documentazione, revisione delle migrazioni in sola lettura e verifiche CI/Preview. Nessuna di queste attività autorizza modifiche allo schema live, merge o deploy in produzione.
 
