@@ -25,7 +25,7 @@ The original voice-note summarizer remains a valuable entry point. The core user
 - MultiVocale and audio processing remain on the legacy path while the customer-text assistant is isolated behind a separate wrapper/branch.
 - The central Assistant development PR adds persisted event ingest/routing, guarded new-work intake, required-data extraction and collection plans, fail-closed classifier validation, deterministic customer replies, and bounded read-only business vocabulary context.
 - Latest inspected JavaScript CI runs on 2026-10-23 were green; the latest inspected Python bot CI on 2026-10-22 was green. These are focused automated checks, not full production or staging E2E proof.
-- The Supabase business catalogue is still a test fixture: one generic test workflow, no active creation policy, no owner/member configured, and no vocabulary entries in the audited snapshot. Do not present it as a configured pilot business.
+- The Supabase business catalogue remains a synthetic staging fixture, not a real pilot business. A guarded seed now configures one active plumbing/maintenance workflow with three required fields, a confirmation-required policy, and 14 active canonical terms whose extended metadata remains draft. No verified owner/member exists; do not present this as a configured real pilot. The authoritative operational baseline is [Libro sacro VocalFlash](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/libro-sacro-vocalflash-operational-baseline-v1.md).
 - Owner confirmation writes remain disabled with `ATOMIC_CONFIRMATION_NOT_ENABLED`. Keep them disabled until confirmation binding, expiry, one-time consumption, and the write are atomic and tested.
 - Meta webhook signature verification exists on the bot development branch but is not proven active in Render. The correct `META_APP_SECRET` must be configured and tested in the target environment before rollout.
 - Durable outbound delivery/reconciliation and persistent multi-turn conversation state are not complete.
@@ -130,7 +130,12 @@ The original voice-note summarizer remains a valuable entry point. The core user
 
 1. Continue source-level review and focused tests on the isolated branches; correct defects that can be safely addressed without a live schema.
 2. Resolve whether the user approves the current quoted cost for a Supabase development branch before creating it. Until then, keep schema work at design/test-fixture level.
-3. Build the pilot configuration and end-to-end test plan with synthetic data; do not treat the current generic test workflow as a pilot.
+3. Keep the new plumbing/maintenance workflow and vocabulary as synthetic staging fixtures; review them with a real pilot business before activation outside staging.
 4. Implement persistent conversation state, atomic confirmation and outbox only through a versioned migration in the approved development environment.
 5. Implement media ingestion and model-backed sector/terminology evaluations after the persistence and safety contracts are stable.
 6. Keep the PRs Draft and production untouched until the release gates above are evidenced.
+
+
+## Operational source of truth
+
+The current verified status, user guardrails, staging seed result, unresolved owner identity, and prioritized release gates are maintained in [Libro sacro VocalFlash — operational baseline v1](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/libro-sacro-vocalflash-operational-baseline-v1.md). Read it before every further implementation step and update it after material changes.
