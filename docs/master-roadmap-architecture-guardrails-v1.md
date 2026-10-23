@@ -157,10 +157,13 @@ Work that has no unapproved cost or production impact should continue autonomous
 A draft index has been added at [professional-terminology-catalog-v1-draft.json](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/professional-terminology-catalog-v1-draft.json): **699 candidate entries** across the initial six business domains plus generic language. This satisfies the initial quantity target as an inventory only, not the quality/review target. Synonyms, definitions, disambiguation, examples and domain review remain incomplete; all entries are draft and must not be bulk-imported or treated as approved runtime context. Enrich and validate sector by sector, then import only reviewed terms into a business-scoped vocabulary.
 
 ### Catalog validation implementation — 2026-10-23
-- The draft catalog now has 699 unique sector-scoped entries; a read-only structural audit found 70 enriched entries across the initial sectors and no duplicate sector/normalized-term pairs. All entries remain draft; no expert review or runtime import is implied.
+- The draft catalog now has 699 unique sector-scoped entries; a read-only structural audit found 100 enriched entries across the initial sectors and no duplicate sector/normalized-term pairs. All entries remain draft; no expert review or runtime import is implied.
 - Added `scripts/validate-professional-terminology-catalog.mjs` and added its invocation to the Assistant test workflow. Its GitHub Actions result is pending confirmation; do not treat the local structural audit as CI evidence.
 - Next autonomous glossary step: enrich another carefully scoped batch and add semantic/sector review checks without promoting terms to approved or importing draft entries into the database.
 
 ### Supabase branch quote rechecked — 2026-10-23
 
 Current read-only quote for the existing project's organization remains $0.01344/hour. This is ~$9.68 per 720 hours (30 days) or ~$9.81 per 730 hours, before other possible usage. No branch created; explicit owner approval remains required.
+
+### Catalog enrichment batch 2 — 2026-10-23
+The draft catalog now has 699 candidate entries, of which 100 have preliminary synonyms, definitions, disambiguation, examples and confusable terms across all initial sectors. All remain draft pending domain review. The structural validator now requires at least 100 enriched entries; the read-only audit passed with 699 unique sector-scoped terms and no structural issues. Do not treat this as CI or domain-expert approval.
