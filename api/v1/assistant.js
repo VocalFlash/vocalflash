@@ -2,6 +2,7 @@ import {processCustomerWhatsappMessage} from "../../lib/customer-whatsapp-pipeli
 import {createWhatsappOriginResolver,dispatchAssistantWhatsappMessage} from "../../lib/assistant-whatsapp-dispatch-v1.js";
 import {processOwnerCommandMessage} from "../../lib/owner-command-runtime-v1.js";
 import {createOwnerRuntimeDependencies} from "../../lib/owner-command-runtime-adapter-v1.js";
+import {checkAssistantReadiness} from "../../lib/assistant-readiness-v1.js";
 
 function assistantKeys(){
   return (process.env.VOCALFLASH_ASSISTANT_API_KEYS||"").split(",").map(v=>v.trim()).filter(Boolean);
@@ -23,7 +24,19 @@ export default async function handler(req,res){
   }
 
   const action=clean(req.body?.action,64);
-  if(action==="health")return res.status(200).json({ok:true,action,auth:true});
+  if(action==="health"){
+    const readiness=await checkAssistantReadiness({
+      baseUrl:process.env.VF_ASSISTANT_SUPABASE_URL,
+      secret:process.env.VF_ASSISTANT_SUPABASE_SECRET_KEY
+    });
+    return res.status(readiness.ready?200:503).json({
+      ok:readiness.ready,
+      action,
+      auth:true,
+      ready:readiness.ready,
+      reason:readiness.reason
+    });
+  }
 
   const input={
     externalAccountId:clean(req.body?.external_account_id,256),
