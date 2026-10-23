@@ -167,3 +167,10 @@ Current read-only quote for the existing project's organization remains $0.01344
 
 ### Catalog enrichment batch 2 — 2026-10-23
 The draft catalog now has 699 candidate entries, of which 100 have preliminary synonyms, definitions, disambiguation, examples and confusable terms across all initial sectors. All remain draft pending domain review. The structural validator now requires at least 100 enriched entries; the read-only audit passed with 699 unique sector-scoped terms and no structural issues. Do not treat this as CI or domain-expert approval.
+
+### Owner action register — pilot and privacy
+
+- Initial validation direction: **3–5 potential customers**, without building a full multi-business management layer prematurely; keep VocalFlash WhatsApp and VocalFlash API consumption/billing distinguishable.
+- Before real customer use, the owner must identify the pilot activity and an authorized domain reviewer for the workflow, required fields, customer-facing copy and vocabulary.
+- Before paid launch, the owner must supply the real controller/legal identity and privacy contact, agree retention/deletion criteria, and arrange qualified review of the privacy notice, Article 28 DPA, B2B terms and international-transfer safeguards. Do not invent legal details or retention periods.
+- Detailed checklist: [Libro sacro, sections 10 and D7](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/libro-sacro-vocalflash-operational-baseline-v1.md).
