@@ -153,3 +153,6 @@ The detailed approval checklist and official cost/reference links live in the [L
 
 Work that has no unapproved cost or production impact should continue autonomously: source review, tests, glossary draft creation, migration provenance analysis, persistence/outbox design and CI/Preview checks. Keep both PRs Draft, owner writes fail-closed, and production untouched.
 
+### Terminology catalog progress — 2026-10-23
+A draft index has been added at [professional-terminology-catalog-v1-draft.json](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/professional-terminology-catalog-v1-draft.json): **699 candidate entries** across the initial six business domains plus generic language. This satisfies the initial quantity target as an inventory only, not the quality/review target. Synonyms, definitions, disambiguation, examples and domain review remain incomplete; all entries are draft and must not be bulk-imported or treated as approved runtime context. Enrich and validate sector by sector, then import only reviewed terms into a business-scoped vocabulary.
+
