@@ -1,6 +1,6 @@
 # VocalFlash — contratto proposto audio → Assistant API v1
 
-**Stato:** proposta tecnica per revisione, non implementata.  
+**Stato:** contratto proposto; normalizzatore puro implementato e coperto da CI sul branch, integrazione runtime/API non implementata.  
 **Branch:** `assistant-conversation-photo-v1`.  
 **Decisione di sicurezza:** non modificare il routing audio finché questo contratto e i gate della matrice di accettazione non sono approvati e testati.
 
@@ -101,14 +101,14 @@ Regole:
 
 ## 7. Piano minimo per implementazione sicura
 
-1. Confermare questo contratto e le decisioni aperte.
-2. Creare fixture sintetiche anonime per trascrizioni e batch; niente dati reali.
-3. Implementare e testare prima la normalizzazione/provenienza in funzioni pure, senza cambiare il webhook.
-4. Aggiungere test di dedup, batch concorrenti, replay e riavvio.
-5. Aggiornare il contratto API con test lato bot e lato API.
-6. Eseguire CI sui due repository.
+1. Normalizzazione pura e fixture sintetiche: implementate sul branch; CI da confermare sul commit più recente.
+2. Confermare le decisioni aperte su batch parziale, retention, idempotenza e risposta finale.
+3. Aggiungere test di dedup, batch concorrenti, replay e riavvio nel runtime bot.
+4. Estendere il contratto e i test API: l'endpoint attuale non trasferisce ancora i campi canonici del payload al workflow.
+5. Riconciliare lo schema SQL autorevole prima di qualsiasi persistenza aggiuntiva.
+6. Eseguire CI sui due repository e test d'integrazione isolati.
 7. Solo dopo, preparare un rollout reversibile dietro flag e staging isolato; nessun deploy o invio reale senza autorizzazione.
 
 ## 8. Gate
 
-Questo documento non autorizza l'implementazione del routing, il cambiamento del timing MultiVocale, DDL sul database live, merge o deployment. La prossima modifica di codice ammessa prima di questi gate è una funzione pura di normalizzazione con test unitari, senza side effects, una volta stabilite le decisioni sui campi e sugli errori.
+Questo documento non autorizza l'implementazione del routing, il cambiamento del timing MultiVocale, DDL sul database live, merge o deployment. La normalizzazione pura è stata aggiunta come `lib/audio-assistant-event-normalizer-v1.js`, con test dedicati. Non è ancora importata da `api/v1/assistant.js` né dal bot. Restano bloccati routing audio, modifiche al timing MultiVocale, DDL sul database live, merge e deployment.
