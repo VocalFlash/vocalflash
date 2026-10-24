@@ -183,3 +183,30 @@ The draft catalog now has 699 candidate entries, of which 100 have preliminary s
 - Current read-only Supabase check: project `VocalFlash Assistant` is `ACTIVE_HEALTHY`; 15 migrations recorded; zero Edge Functions; zero `auth.users`; zero `business_members`.
 - Next gates: add and run automated tests; confirm current Bird pricing, sender and destination eligibility; request explicit owner approval before creating credentials/paid setup or sending a billable SMS; deploy only to non-production; complete phone verification in the trusted UI; link the owner to the business only after Supabase Auth verification. Never create a fake user/member or mark a phone verified manually.
 - No live schema/data, production service, secrets, paid resource or deployment was changed by this work.
+
+
+### Autonomous work update — 2026-10-24
+
+**Terminology catalog**
+- Total candidates remain 699 across 7 initial sectors; 120 now have structured preliminary enrichment. All remain draft and disabled for approved runtime context.
+- Another 20 plumbing/maintenance terms were enriched with synonyms, definitions, ambiguity warnings, examples and confusable terms. No pharmaceutical sector added.
+- Re-run the validator/CI against the exact latest branch head. A previous successful run predates these changes and is not evidence for the current head.
+
+**Persistent multi-turn state and atomic owner confirmation**
+- Added design record `docs/persistent-conversation-and-owner-confirmation-design-v1.md`.
+- Required invariants: tenant/workflow scoping, field provenance, versioned proposals, confirmation invalidation on changed inputs, one-time confirmation/replay protection, atomic consume-and-command creation, unique logical write key, lease/fencing, restart recovery and fail-closed handling of unknown outcomes.
+- This remains design only. Persistent multi-turn runtime and atomic owner confirmation are not declared implemented. Keep writes gated until implementation, automated concurrency/failure tests and isolated staging evidence exist.
+
+**WhatsApp outbox**
+- Existing bot delivery-recovery design remains the source of the detailed failure-boundary analysis. Meta acceptance followed by a crash before local state persistence can leave delivery ambiguous; status callback reconciliation is still missing.
+- Required: durable outbox/attempt ledger, persist provider message ID, authenticated and idempotent status callback processing, no state regression on out-of-order callbacks, and `outcome_unknown` without blind resend.
+- Exactly-once must not be claimed unless a provider-supported idempotency/reconciliation guarantee proves it.
+
+**Owner recommendations book**
+- Created `docs/libro-raccomandazioni-titolare-vocalflash-v1.md` as a second living document, separate from the technical source-of-truth Libro sacro.
+- It records the collaboration protocol, product direction, vocabulary rules, fail-closed and owner-confirmation requirements, persistence/outbox safety, cost/privacy gates and evidence standards.
+
+**Verification and release gates**
+- No new database schema, migration, secret, environment setting, paid resource, SMS, production deployment or live data change.
+- Current head CI after the latest catalog/docs commits is not yet confirmed. Do not infer current CI success from earlier runs or from a Vercel Preview result.
+- Continue autonomous code review, test design/implementation and documentation. Before activating Bird SMS, first add automated tests and obtain explicit cost approval for any billable provider setup or real SMS.
