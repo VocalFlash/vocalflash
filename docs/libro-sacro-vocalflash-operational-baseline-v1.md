@@ -606,3 +606,22 @@ La ricerca delle PR aperte ha trovato anche `VocalFlash/vocalflash` PR #1, oltre
 
 ### Configurazione staging Supabase — snapshot aggiornato 24 ottobre 2026
 Query SELECT-only hanno aggiornato lo snapshot della configurazione, che non coincide più con quello storico del 22 ottobre: 1 attività con settore staging idraulica/manutenzione; 1 canale WhatsApp attivo con external account ID presente (valore non letto) ma address non popolato; **0 business_members**; 2 workflow (uno test generico inattivo, uno intervento/manutenzione attivo con un campo richiesto); 1 policy attiva per creazione pratica in modalità `confirm`; 14 termini aziendali attivi; 1 work item, 4 work events e 2 routing decisions. Nessun contenuto personale o identificativo esterno è stato estratto e nessun dato è stato modificato. Il membro titolare verificato manca: non creare identità fittizie. La policy `confirm` non autorizza a bypassare `ATOMIC_CONFIRMATION_NOT_ENABLED`.
+
+## Verifica operativa aggiuntiva — 24 ottobre 2026 (aggiornamento successivo)
+
+### Catalogo terminologico — stato esatto
+- Verificato il JSON della branch: 699 voci in 7 settori; 147 voci complete secondo il criterio strutturale corrente (sinonimi, definizione, disambiguazione, esempi, termini confondibili, fonte, nota revisione, stato arricchimento e review_status draft); 552 incomplete; zero duplicati di chiave settore + termine canonico normalizzato.
+- La CI run `40118513216`, sul commit `ba58fa9bc75bb89ce6ec0d4da6764525812a86d5`, è stata ricontrollata: tutti e 5 i job sono `completed/success`; nei job è riuscito anche il passo di validazione del catalogo draft e il gruppo di test focalizzati. Questo esito si riferisce a quel commit, non ai commit successivi.
+- È stato poi arricchito un batch di 15 termini del settore `construction_site` (cartongesso, laterizio, blocchi di cemento, acciaio per armatura, rete elettrosaldata, trave, pilastro, solaio, isolante termico, isolante acustico, rasante, primer, stucco, piastrella, gres porcellanato). Commit: `ab448b7306cd33a5f925b2ec71533477199ee53c`.
+- Le voci restano tutte `review_status: draft` e `enrichment_status: content_enriched_needs_domain_review`; nessuna è approvata per uso runtime. La nuova CI di questo commit non è stata ancora verificata come completata; non trasferire il PASS della run precedente al nuovo commit.
+
+### Contratto bot → Assistant API — revisione sorgente, non E2E
+- Riletti i file effettivi della branch `assistant-conversation-photo-v1`: bot `customer_text_bridge.py` e `app.py`; API `api/v1/assistant.js`.
+- Il bridge invia POST all'URL configurato in `VOCALFLASH_ASSISTANT_API_URL`, header `X-VocalFlash-Assistant-Key`, payload `external_account_id`, `sender_wa_id`, `external_message_id`, `normalized_text`, `occurred_at`, `content_type`; timeout Requests `(10, 120)`. L'API valida la stessa famiglia di header tramite `VOCALFLASH_ASSISTANT_API_KEYS`, richiede i quattro campi principali, e restituisce `ok:true` con `assistant_message` separato quando il mittente è un cliente.
+- Il bridge richiede `data.ok is True` e restituisce il JSON al chiamante; il solo file bridge non invia una risposta WhatsApp. Non è ancora attestato da questa lettura che ogni percorso del webhook consumi `assistant_message` e lo invii una sola volta.
+- Rischio/controllo ancora aperto: il timeout di 120 secondi può lasciare un esito remoto ambiguo; il payload contiene un ID messaggio esterno utile alla deduplicazione, ma questa lettura non prova l'idempotenza end-to-end dell'intera catena né la riconciliazione di una risposta WhatsApp fallita. Nessun messaggio reale inviato; nessun test Meta→bot→API→Supabase→WhatsApp eseguito.
+- Le due PR restano Draft. Nessun merge, deploy in produzione o modifica del database live.
+
+### Release gate invariati
+- Restano bloccanti: provenienza autorevole delle 15 migrazioni SQL live; RLS senza policy sulle 15 tabelle; 18 FK senza indice di copertura; membro titolare verificato assente; conferma atomica disabilitata (`ATOMIC_CONFIRMATION_NOT_ENABLED`); stato conversazione/outbox durevoli e riconciliazione invii non completati; E2E staging integrato non eseguito.
+
