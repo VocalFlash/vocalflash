@@ -275,3 +275,9 @@ Il registro canonico delle raccomandazioni è stato consolidato in `docs/libro-r
 Regola esplicita del titolare: il registro operativo è dinamico; rimuovere dal registro attivo i punti chiusi mantenendone evidenza nello storico, aggiungere le nuove raccomandazioni e marcare come sospesi i punti in attesa. Non dichiarare chiuso un punto sulla base di un piano.
 
 Verifica CI: run #330 `40076914648` risulta `completed/success` sul commit `e00dd7f7dd585817011ab3ab28b33ea0173ee840`. Il presente aggiornamento documentale genera un nuovo head: il risultato della run #330 non va esteso al nuovo head. Ricontrollare CI e Preview sulla revisione corrente prima di attribuire loro uno stato.
+
+## Follow-up engineering correction — 24 October 2026
+
+A fail-closed gap was identified in the read-only NEW work-creation policy evaluator: a policy row with missing or null `is_active` could previously be treated as applicable because only the explicit value `false` was excluded. The evaluator now considers a policy applicable only when `is_active === true`. Added a focused regression test covering missing, null and false activity states with an otherwise permissive `auto` mode. This remains a policy-evaluation gate only; it performs no writes and does not enable owner confirmation or work-item creation.
+
+Commit with implementation: `4839fed710cfcb463428fb9c2009a2c00addfca9`. Regression-test commit: `2ff13321f04e37b0ac7b573dba8771affb9bcb80`. CI run #341 (`40079074071`) was still in progress at the time of this note; its final result must be checked before calling the regression test passed.
