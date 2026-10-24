@@ -1,3 +1,4 @@
+import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0";
 import { createHandler } from "./index.ts";
 
 function assertEquals(actual: unknown, expected: unknown, message = "") {
@@ -8,8 +9,10 @@ function assertEquals(actual: unknown, expected: unknown, message = "") {
   }
 }
 
+const TEST_SECRET = btoa("01234567890123456789012345678901");
+
 const baseEnv: Record<string, string> = {
-  SEND_SMS_HOOK_SECRETS: "v1,whsec_test_secret",
+  SEND_SMS_HOOK_SECRETS: `v1,whsec_${TEST_SECRET}`,
   BIRD_API_KEY: "test-api-key",
   BIRD_SMS_SENDER: "VocalFlash",
 };
@@ -48,6 +51,71 @@ Deno.test("fails closed when hook secret or Bird configuration is missing", asyn
   const response = await handler(postRequest());
   assertEquals(response.status, 500);
   assertEquals((await response.json()).error, "sms_provider_not_configured");
+  assertEquals(fetchCalled, false);
+});
+
+
+Deno.test("accepts a correctly signed Standard Webhooks payload", async () => {
+  const payload = JSON.stringify({
+    user: { phone: "+393331234567" },
+    sms: { otp: "123456" },
+  });
+  const timestamp = new Date();
+  const id = "msg_unit_test";
+  const signer = new Webhook(`whsec_${TEST_SECRET}`);
+  const signature = signer.sign(id, timestamp, payload);
+  const request = new Request("https://unit.test/send-sms", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "webhook-id": id,
+      "webhook-timestamp": String(Math.floor(timestamp.getTime() / 1000)),
+      "webhook-signature": signature,
+    },
+    body: payload,
+  });
+  let fetchCalled = false;
+  const handler = createHandler({
+    getEnv: envReader(),
+    fetchImpl: async () => {
+      fetchCalled = true;
+      return new Response(null, { status: 202 });
+    },
+  });
+  const response = await handler(request);
+  assertEquals(response.status, 200);
+  assertEquals(fetchCalled, true);
+});
+
+Deno.test("rejects a signed payload if the body is tampered with", async () => {
+  const signedPayload = JSON.stringify({
+    user: { phone: "+393331234567" },
+    sms: { otp: "123456" },
+  });
+  const timestamp = new Date();
+  const id = "msg_tampered_test";
+  const signer = new Webhook(`whsec_${TEST_SECRET}`);
+  const signature = signer.sign(id, timestamp, signedPayload);
+  const request = new Request("https://unit.test/send-sms", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "webhook-id": id,
+      "webhook-timestamp": String(Math.floor(timestamp.getTime() / 1000)),
+      "webhook-signature": signature,
+    },
+    body: signedPayload.replace("123456", "654321"),
+  });
+  let fetchCalled = false;
+  const handler = createHandler({
+    getEnv: envReader(),
+    fetchImpl: async () => {
+      fetchCalled = true;
+      return new Response(null, { status: 202 });
+    },
+  });
+  const response = await handler(request);
+  assertEquals(response.status, 401);
   assertEquals(fetchCalled, false);
 });
 
