@@ -264,3 +264,5 @@ No branch was created and this check incurred no branch charge. Explicit owner a
 
 - **Verifica successiva:** GitHub Actions run #324 (`40076814169`) sul commit `d4cea0a6829d97555d581d0e6aad0c5185b33e46` è terminato `success`; gli step “Validate draft professional terminology catalog” e “Run focused assistant tests” risultano completati con esito positivo. È una prova valida per quel commit. Dopo l'aggiornamento del Libro sacro e della roadmap, va controllato il run generato dal nuovo head.
 - Vercel Preview sul commit `d4cea0a6829d97555d581d0e6aad0c5185b33e46` era ancora `pending` al controllo; non dichiarare Preview pronta finché non si osserva uno stato terminale.
+
+- **Re-check finale:** GitHub Actions run #328 (`40076877316`) è terminato `success` sul commit `6dba0c0a0345c6b975c424fed7ee30c3cd164ad2`; validator del catalogo e test focalizzati Assistant risultano verdi. Vercel Preview sul medesimo commit era ancora `pending` al controllo; questa parte resta da verificare separatamente.
