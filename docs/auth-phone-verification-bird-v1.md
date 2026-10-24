@@ -5,7 +5,7 @@
 - **Implemented on an isolated branch only:** `supabase/functions/send-sms/index.ts`.
 - **Not deployed:** no Edge Function is present in the Supabase project yet.
 - **Not configured:** no Bird credentials/sender and no Supabase Auth Send SMS Hook configured by this change.
-- **Automated tests added on the isolated branch:** `supabase/functions/send-sms/index_test.ts`, covering fail-closed configuration, signature rejection, malformed event, provider rejection, timeout/no-blind-retry, and provider acceptance. The dedicated workflow is `.github/workflows/bird-sms-hook-tests.yml`; its current-head result still needs authoritative confirmation.
+- **Automated tests added on the isolated branch:** `supabase/functions/send-sms/index_test.ts`, covering fail-closed configuration, valid/missing/tampered signatures, malformed event, provider rejection, timeout/no-blind-retry, and provider acceptance. The dedicated workflow is `.github/workflows/bird-sms-hook-tests.yml`; its current-head result still needs authoritative confirmation.
 - **Not tested end to end:** no SMS has been sent; no user or business member has been created.
 - **No production data/schema was changed.**
 
