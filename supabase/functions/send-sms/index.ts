@@ -53,87 +53,95 @@ export function createHandler(dependencies: HandlerDependencies = {}) {
   const verify = dependencies.verify ?? verifyHook;
 
   return async (req: Request): Promise<Response> => {
-  if (req.method !== "POST") return json(405, { error: "method_not_allowed" });
+    if (req.method !== "POST") return json(405, { error: "method_not_allowed" });
 
-  const contentLength = Number(req.headers.get("content-length") ?? "0");
-  if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
-    return json(413, { error: "payload_too_large" });
-  }
-
-  const hookSecretList = hookSecrets(getEnv);
-  const birdApiKey = getEnv("BIRD_API_KEY");
-  const birdSender = getEnv("BIRD_SMS_SENDER");
-
-  // Fail closed before processing an authentication event if configuration is incomplete.
-  if (hookSecretList.length === 0 || !birdApiKey || !birdSender) {
-    console.error("send-sms configuration incomplete");
-    return json(500, { error: "sms_provider_not_configured" });
-  }
-
-  let payload: string;
-  try {
-    payload = await req.text();
-  } catch {
-    return json(400, { error: "invalid_request_body" });
-  }
-
-  if (new TextEncoder().encode(payload).byteLength > MAX_BODY_BYTES) {
-    return json(413, { error: "payload_too_large" });
-  }
-
-  const event = verify(payload, req.headers, getEnv) as
-    | { user?: { phone?: unknown }; sms?: { otp?: unknown } }
-    | null;
-
-  if (!event) {
-    return json(401, { error: "invalid_hook_signature" });
-  }
-
-  const phone = event.user?.phone;
-  const otp = event.sms?.otp;
-  if (
-    typeof phone !== "string" ||
-    !/^\+[1-9]\d{7,14}$/.test(phone) ||
-    typeof otp !== "string" ||
-    !/^\d{4,10}$/.test(otp)
-  ) {
-    return json(400, { error: "invalid_auth_event" });
-  }
-
-  const controller = new AbortController();
-  // Leave headroom for cold start and response handling inside the Auth hook's time budget.
-  const timeout = setTimeout(() => controller.abort(), 3000);
-  try {
-    const response = await fetchImpl(BIRD_SEND_URL, {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${birdApiKey}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        to: phone,
-        from: birdSender,
-        text: `Il tuo codice di verifica VocalFlash è: ${otp}. Non condividerlo con nessuno.`,
-        category: "authentication",
-      }),
-      signal: controller.signal,
-    });
-
-    if (!response.ok) {
-      // Do not return provider response bodies: they may contain operational details.
-      console.error("Bird SMS request rejected", { status: response.status });
-      return json(502, { error: "sms_provider_rejected_request" });
+    const contentLength = Number(req.headers.get("content-length") ?? "0");
+    if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
+      return json(413, { error: "payload_too_large" });
     }
 
-    // Bird's 202 Accepted means queued/accepted by the provider, not delivered to the handset.
-    return new Response(null, { status: 200 });
-  } catch (error) {
-    const timedOut = error instanceof DOMException && error.name === "AbortError";
-    console.error("Bird SMS request failed", { timedOut });
-    return json(502, { error: timedOut ? "sms_provider_timeout" : "sms_provider_unavailable" });
-  } finally {
-    clearTimeout(timeout);
-  }
+    const hookSecretList = hookSecrets(getEnv);
+    const birdApiKey = getEnv("BIRD_API_KEY");
+    const birdSender = getEnv("BIRD_SMS_SENDER");
+
+    // Fail closed before processing an authentication event if configuration is incomplete.
+    if (hookSecretList.length === 0 || !birdApiKey || !birdSender) {
+      console.error("send-sms configuration incomplete");
+      return json(500, { error: "sms_provider_not_configured" });
+    }
+
+    let payload: string;
+    try {
+      payload = await req.text();
+    } catch {
+      return json(400, { error: "invalid_request_body" });
+    }
+
+    if (new TextEncoder().encode(payload).byteLength > MAX_BODY_BYTES) {
+      return json(413, { error: "payload_too_large" });
+    }
+
+    const event = verify(payload, req.headers, getEnv) as
+      | { user?: { phone?: unknown }; sms?: { otp?: unknown } }
+      | null;
+
+    if (!event) {
+      return json(401, { error: "invalid_hook_signature" });
+    }
+
+    // The signed Standard Webhooks event ID is stable across delivery retries.
+    // Reuse it as Bird's idempotency key to avoid duplicate SMS acceptance.
+    const webhookId = req.headers.get("webhook-id");
+    if (!webhookId || webhookId.length > 255) {
+      return json(401, { error: "invalid_hook_signature" });
+    }
+
+    const phone = event.user?.phone;
+    const otp = event.sms?.otp;
+    if (
+      typeof phone !== "string" ||
+      !/^\+[1-9]\d{7,14}$/.test(phone) ||
+      typeof otp !== "string" ||
+      !/^\d{4,10}$/.test(otp)
+    ) {
+      return json(400, { error: "invalid_auth_event" });
+    }
+
+    const controller = new AbortController();
+    // Leave headroom for cold start and response handling inside the Auth hook's time budget.
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    try {
+      const response = await fetchImpl(BIRD_SEND_URL, {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${birdApiKey}`,
+          "content-type": "application/json",
+          "Idempotency-Key": webhookId,
+        },
+        body: JSON.stringify({
+          to: phone,
+          from: birdSender,
+          text: `Il tuo codice di verifica VocalFlash è: ${otp}. Non condividerlo con nessuno.`,
+          category: "authentication",
+        }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        // Do not return provider response bodies: they may contain operational details.
+        console.error("Bird SMS request rejected", { status: response.status });
+        return json(502, { error: "sms_provider_rejected_request" });
+      }
+
+      // Bird's 202 Accepted means queued/accepted by the provider, not delivered to the handset.
+      return new Response(null, { status: 200 });
+    } catch (error) {
+      const timedOut = error instanceof DOMException && error.name === "AbortError";
+      console.error("Bird SMS request failed", { timedOut });
+      return json(502, { error: timedOut ? "sms_provider_timeout" : "sms_provider_unavailable" });
+    } finally {
+      clearTimeout(timeout);
+    }
   };
 }
 
