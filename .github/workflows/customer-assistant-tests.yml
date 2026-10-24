@@ -4,12 +4,14 @@ on:
   pull_request:
     branches:
       - assistant-auth-v1
-  push:
-    branches:
-      - assistant-conversation-photo-v1
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: assistant-customer-pipeline-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   customer-pipeline-tests:
