@@ -337,3 +337,36 @@ Tutte risultano `SECURITY DEFINER`, proprietario `postgres`, con `search_path` e
 - **NON ESEGUITO:** modifiche SQL, migrazioni, scritture dati, creazione di branch Supabase, deploy o cambi in produzione.
 
 Prossimo passo tecnico sicuro: tracciare le chiamate RPC dal codice applicativo sul branch corrente e confrontare nome/ordine/numero degli argomenti con le firme sopra, senza eseguire scritture. La correzione della conferma atomica richiede prima un ambiente di sviluppo sicuro; la creazione della branch Supabase resta subordinata all'approvazione esplicita del costo.
+
+
+## Ciclo di lavoro — verifica raccomandazioni e SMS hook (24 ottobre 2026)
+
+### Libro delle raccomandazioni — verificato e corretto
+- Letto il documento canonico `docs/libro-raccomandazioni-titolare-vocalflash-v1.md` sul branch `assistant-conversation-photo-v1`.
+- Il registro contiene le regole di collaborazione, visione prodotto, sintesi e provenienza dei dati, vocabolario, fail-closed, conferma atomica, persistenza, outbox, costi/onboarding/privacy, test/rilascio, ricerca dei bisogni e checklist.
+- Rilevata una raccomandazione esplicita non presente: riepilogo ricorrente del venerdì con avanzamenti, blocchi, decisioni aperte, aree Meta/MultiVocale/Account & Billing/privacy-sicurezza e tre priorità successive. Aggiunta come sezione 16. Commit documentale: `ceaf35d9624136cc5541938e59dd1d7227092e8d`.
+- Il libro resta un registro di raccomandazioni: non costituisce prova di implementazione né autorizzazione a operazioni protette.
+
+### Intervento sicuro sulla PR SMS via Bird
+- PR #9 `auth-bird-sms-hook-v1` resta **Draft** e non è stata unita.
+- Refactoring isolato del Send SMS Hook per permettere test deterministici tramite dipendenze iniettate; nessuna configurazione live modificata.
+- Aggiunti test Deno per configurazione fail-closed, firma Standard Webhooks valida/mancante/manomessa, evento non valido, rifiuto provider, timeout senza retry cieco e accettazione provider.
+- Aggiunto workflow GitHub Actions dedicato: `.github/workflows/bird-sms-hook-tests.yml`.
+- Documentazione della PR aggiornata per distinguere test aggiunti da test effettivamente eseguiti.
+- **Test CI sul commit corrente: NON VERIFICATI.** Gli strumenti disponibili non hanno restituito un esito autorevole del workflow push-triggered; non dichiarare i test superati finché il run non è consultabile. Nessun SMS reale è stato inviato.
+
+### Verifiche Supabase e blocchi che restano
+- La verifica read-only precedente ha confermato le firme live delle quattro RPC titolare e i privilegi: nessun EXECUTE per `anon`/`authenticated`, EXECUTE per `service_role`.
+- La conferma atomica resta incompleta nelle RPC di commit. `ATOMIC_CONFIRMATION_NOT_ENABLED` deve rimanere attivo.
+- La corrispondenza di tutte le chiamate RPC nel codice applicativo non è ancora stata verificata end-to-end.
+- La provenienza delle 15 migrazioni live non è riconciliata con una sequenza SQL autorevole.
+- Persistenza multi-turn, outbox durevole e riconciliazione degli invii restano da implementare e testare.
+- La branch Supabase di sviluppo non è stata creata: il preventivo precedente era `$0.01344/ora`; serve approvazione esplicita del costo prima di creare una risorsa.
+- Nessun utente Auth o membro aziendale fittizio; nessun segreto o hook Bird configurato; nessun SMS fatturabile, deploy o modifica live.
+
+### Stato verificato alla chiusura di questo ciclo
+**Completato:** audit del Libro delle raccomandazioni; aggiunta della sezione mancante sul riepilogo periodico; refactoring isolato del handler SMS per testabilità; aggiunta dei test e del workflow; aggiornamento della descrizione PR e della documentazione dedicata.
+
+**Non dichiarato completato:** esecuzione verde dei nuovi test; verifica reale del Send SMS Hook; conferma atomica; migrazioni; persistenza/outbox; onboarding con identità reale; staging E2E; rilascio.
+
+**Prossimo passo autonomo e sicuro:** ottenere il risultato del workflow Deno sul branch `auth-bird-sms-hook-v1`, correggere eventuali errori e aggiornare le evidenze. Nessun merge, deploy, costo, SMS reale o modifica di schema senza le autorizzazioni previste.
