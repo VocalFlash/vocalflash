@@ -432,3 +432,34 @@ Prossimo passo tecnico sicuro: tracciare le chiamate RPC dal codice applicativo 
 2. Recuperare e riconciliare le 15 migrazioni autorevoli prima di progettare modifiche DB.
 3. Implementare e testare la transazione di conferma atomica in ambiente isolato prima di abilitare le scritture.
 4. Implementare persistenza/outbox/reconciliation e poi eseguire il runbook E2E in staging isolato, con credenziali e costi approvati.
+
+## Recheck di chiusura e riconciliazione dei risultati — 24 ottobre 2026
+
+### Ripetizione finale delle suite automatiche (evidenza riletta dai log)
+- **Assistant API, sul commit documentale finale `56ef6a85a96325f5a82ffc975de23104c871d9f4`:** run [#40114332345](https://github.com/VocalFlash/vocalflash/actions/runs/40114332345). Ho recuperato i log di tutti e cinque i job: ciascun log riporta `# tests 89`, `# pass 89`, `# fail 0`. Esito verificato: **5/5 pass, 445 esecuzioni riuscite**. Il riepilogo dei job mostrava temporaneamente uno stato step incoerente per il pass 5, ma il log di quel job contiene il riepilogo finale 89/89 e il job ha conclusione `success`; la conclusione è basata sul log, non sull'etichetta dello step.
+- **Bot WhatsApp Python / MultiVocale:** run [#40113909039](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40113909039), head `7ad05b42122c939a5669c2fdceeae604185aec09`. I cinque job risultano `success`; il log controllato riporta `Ran 35 tests` e `OK`. Totale verificato della matrice: **175 esecuzioni riuscite**.
+- **SMS Hook / Bird:** run [#40113926527](https://github.com/VocalFlash/vocalflash/actions/runs/40113926527), head `ca1d3f46cef0f8fa38a8c534eb70985500481dcc`. Log dei cinque job verificati: ciascuno riporta 11 test, 11 passati, 0 falliti. Totale: **55 esecuzioni riuscite**.
+- Le matrici principali sommano **675 esecuzioni riuscite** (445 API + 175 bot + 55 SMS). Considerando anche il secondo run API sul commit documentale finale (445) e il secondo run SMS sul medesimo head di codice (55), i run citati in questo registro totalizzano **1.175 esecuzioni riuscite**. Questo totale riguarda suite automatiche ripetute, non test E2E completi.
+- Il run API precedente sul codice applicativo `77fbddfa19d04a7a163e3af1ba6c9ed379abee97` ([#40114128653](https://github.com/VocalFlash/vocalflash/actions/runs/40114128653)) resta una seconda evidenza positiva: 5/5 job, 89/89 test per job.
+
+### Nuovo controllo Supabase in sola lettura
+- Progetto `tkfyfqgtumoeywlqzmdt`: il registro live restituisce ancora **15 migrazioni** e l'introspezione conferma **15 tabelle nello schema public**; l'elenco Edge Functions è vuoto.
+- Security advisor aggiornato il 24/10: **15 tabelle RLS-enabled senza policy**. Non creare policy permissive per azzerare l'avviso: valutare i percorsi di accesso e i privilegi dopo aver ripristinato la fonte delle migrazioni.
+- Performance advisor: **18 foreign key senza indice di copertura** e **26 indici segnalati come inutilizzati**. Non rimuovere indici automaticamente; verificare il carico reale e riconciliare prima le migrazioni.
+- L'ispezione delle definizioni delle RPC di conferma/commit non fornisce prova che conferma valida, scadenza, consumo monouso e scrittura siano vincolati nella stessa transazione. Rimane obbligatorio `ATOMIC_CONFIRMATION_NOT_ENABLED`.
+- Non è stata trovata una sequenza SQL autorevole completa nel branch di sviluppo; la lettura di un percorso di migrazione ipotizzato ha restituito 404. Questo non autorizza a ricostruire migrazioni per supposizione o ad applicare SQL sul database live.
+
+### Distinzione essenziale: suite ripetute vs flusso end-to-end
+- **Completato e verificato:** cinque esecuzioni indipendenti per ognuna delle suite API, bot e SMS, con i risultati sopra elencati; controllo dei log dei job; nuova lettura del registro migrazioni, tabelle, funzioni Edge e advisor Supabase; ricontrollo delle PR.
+- **Non completato e non dichiarabile PASS:** il flusso reale integrato Meta → bot → Assistant API → Supabase → risposta WhatsApp non è stato eseguito cinque volte né è stato certificato in staging. I prerequisiti sicuri (ambiente DB isolato con migrazioni riconciliate, credenziali di staging verificate, secret Meta corretto, membro autorizzato, conferma atomica e outbox/reconciliation) non risultano tutti disponibili/provati. Non sostituire questo gate con le suite unitarie.
+- PR #3 (Assistant API), PR #2 (bot) e PR #9 (SMS/Bird) restano Draft e non integrate. Nessun merge, deploy in produzione, cambiamento schema/dati live, configurazione SMS/Auth, segreto aggiunto o SMS reale è stato eseguito.
+
+### Esito operativo
+**NO-GO al rilascio invariato.** Il ciclo automatico di cinque passaggi è chiuso con risultati positivi e documentati; non è corretto dichiarare chiuso “tutto” finché restano i gate di sicurezza e integrazione sopra elencati.
+
+### Prossime azioni sicure e ordinate
+1. Recuperare la fonte autorevole delle 15 migrazioni e riconciliarla con il registro live senza modificare il database.
+2. Preparare un ambiente di sviluppo/staging isolato con schema riproducibile, solo dopo aver chiarito costi e autorizzazioni.
+3. Implementare e testare atomicamente il vincolo di conferma del titolare, mantenendo il blocco fail-closed finché la prova non è completa.
+4. Completare persistenza multi-turno, outbox durevole e riconciliazione degli esiti ambigui; poi eseguire il runbook E2E in staging con dati sintetici e ripeterlo cinque volte.
+5. Tenere tutte le PR in Draft fino alla revisione dei gate; nessuna modifica live, merge o deploy implicito.
