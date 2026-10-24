@@ -117,3 +117,7 @@ Questa sezione aggiorna il Gate A senza dichiarare concluso lo staging end-to-en
 - Nessun SMS reale, deploy, modifica schema live, credenziale, utente Auth o business member creato.
 
 Il totale dei tre test matrix principali è 675 esecuzioni riuscite (API 445 + bot 175 + SMS 55), zero fallimenti nei run finali verificati. Questo non autorizza a promuovere le PR: mantenere Draft e NO-GO fino al completamento dei gate E2E e delle decisioni di costo/configurazione.
+
+## Gate status refresh — 24 October 2026
+
+**Do not execute or mark the integrated E2E as passed yet.** The automated component suites have five successful passes each (API 89 tests/pass, bot 35/pass, Bird SMS 11/pass), but prerequisites for safe integrated staging remain unverified. Before the five E2E repetitions: recover and reconcile all 15 authoritative migrations; prepare an isolated replayable staging database without adding paid resources absent approval; implement and test atomic confirmation; complete durable conversation state and outbound outbox/reconciliation; verify staging-only Meta credentials and authorized test identity. Then run five independent, traceable E2E attempts with synthetic data and record inbound event, routing, persisted state, outbound attempt and final/ambiguous delivery outcome. Never infer delivery from HTTP acceptance alone. Production release remains NO-GO.
