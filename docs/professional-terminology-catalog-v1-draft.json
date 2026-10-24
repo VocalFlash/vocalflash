@@ -2266,17 +2266,27 @@
     {
       "id": "construction_site.materials.92",
       "sector": "construction_site",
-      "category": "materials",
+      "category": "components",
       "canonical_term": "cartongesso",
       "normalized_term": "cartongesso",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "lastre in cartongesso",
+        "parete in cartongesso"
+      ],
+      "definition": "Materiale e sistema costruttivo a secco basato su lastre a base di gesso fissate a una struttura di supporto.",
+      "disambiguation": "La menzione non specifica se si tratti di parete, controsoffitto o rivestimento; non dedurre danni o prestazioni senza dettagli.",
+      "examples": [
+        "La parete in cartongesso va tinteggiata.",
+        "C'è un foro nel cartongesso vicino alla porta."
+      ],
+      "confusable_with": [
+        "intonaco",
+        "fibrogesso"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.93",
@@ -2284,14 +2294,24 @@
       "category": "materials",
       "canonical_term": "laterizio",
       "normalized_term": "laterizio",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "blocco in laterizio",
+        "mattoni forati"
+      ],
+      "definition": "Materiale ceramico da costruzione impiegato in elementi come mattoni e blocchi per murature o tramezzi.",
+      "disambiguation": "Non inferire la funzione strutturale, la classe o le prestazioni dal solo termine.",
+      "examples": [
+        "Il divisorio è realizzato in laterizio.",
+        "Dobbiamo verificare alcuni blocchi in laterizio scheggiati."
+      ],
+      "confusable_with": [
+        "calcestruzzo",
+        "blocchi di cemento"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.94",
@@ -2299,14 +2319,24 @@
       "category": "materials",
       "canonical_term": "blocchi di cemento",
       "normalized_term": "blocchi di cemento",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "blocco in calcestruzzo",
+        "blocco cementizio"
+      ],
+      "definition": "Elementi prefabbricati a base cementizia utilizzati per realizzare murature o altre opere.",
+      "disambiguation": "Il nome comune non specifica composizione, resistenza o funzione portante.",
+      "examples": [
+        "Il muro è costruito con blocchi di cemento.",
+        "Mancano alcuni blocchi di cemento per completare il tratto."
+      ],
+      "confusable_with": [
+        "laterizio",
+        "calcestruzzo cellulare"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.95",
@@ -2314,14 +2344,24 @@
       "category": "materials",
       "canonical_term": "acciaio per armatura",
       "normalized_term": "acciaio per armatura",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "tondini per cemento armato",
+        "ferri d'armatura"
+      ],
+      "definition": "Acciaio inserito nel calcestruzzo per contribuire alla resistenza agli sforzi di trazione.",
+      "disambiguation": "Non dedurre diametro, classe, quantità o conformità senza elaborati e verifiche tecniche.",
+      "examples": [
+        "Nel getto sono previsti ferri d'armatura.",
+        "Prima del getto va controllata la disposizione dell'acciaio per armatura."
+      ],
+      "confusable_with": [
+        "rete elettrosaldata",
+        "profilati in acciaio"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.96",
@@ -2329,59 +2369,96 @@
       "category": "materials",
       "canonical_term": "rete elettrosaldata",
       "normalized_term": "rete elettrosaldata",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "rete metallica elettrosaldata",
+        "rete per armatura"
+      ],
+      "definition": "Rete composta da fili o barre d'acciaio saldati nei punti d'incrocio, usata in specifiche applicazioni di armatura.",
+      "disambiguation": "Non assumere maglia, diametro o destinazione d'uso se non indicati nel progetto.",
+      "examples": [
+        "Serve la rete elettrosaldata per il massetto.",
+        "La rete elettrosaldata deve essere posata prima del getto."
+      ],
+      "confusable_with": [
+        "acciaio per armatura",
+        "rete portaintonaco"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.97",
       "sector": "construction_site",
-      "category": "materials",
+      "category": "structural_elements",
       "canonical_term": "trave",
       "normalized_term": "trave",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "trave strutturale"
+      ],
+      "definition": "Elemento strutturale disposto prevalentemente in orizzontale che trasferisce carichi agli appoggi.",
+      "disambiguation": "La parola può essere usata informalmente: non stabilire materiale, funzione portante o dimensioni senza contesto tecnico.",
+      "examples": [
+        "La trave sopra l'apertura deve essere verificata dal tecnico.",
+        "È visibile una fessura vicino alla trave."
+      ],
+      "confusable_with": [
+        "architrave",
+        "pilastro"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.98",
       "sector": "construction_site",
-      "category": "materials",
+      "category": "structural_elements",
       "canonical_term": "pilastro",
       "normalized_term": "pilastro",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "colonna strutturale"
+      ],
+      "definition": "Elemento strutturale prevalentemente verticale che trasferisce carichi verso le strutture sottostanti o le fondazioni.",
+      "disambiguation": "Non confondere un pilastro strutturale con un elemento decorativo o di rivestimento.",
+      "examples": [
+        "Il pilastro è indicato nella tavola strutturale.",
+        "Occorre liberare l'area intorno al pilastro per l'ispezione."
+      ],
+      "confusable_with": [
+        "colonna decorativa",
+        "trave"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.99",
       "sector": "construction_site",
-      "category": "materials",
+      "category": "structural_elements",
       "canonical_term": "solaio",
       "normalized_term": "solaio",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "struttura del solaio"
+      ],
+      "definition": "Elemento o sistema strutturale che separa piani di un edificio e sostiene i carichi del piano sovrastante.",
+      "disambiguation": "Non dedurre tipologia costruttiva, capacità portante o causa di deformazioni dalla sola parola.",
+      "examples": [
+        "Il solaio del piano superiore è da ispezionare.",
+        "Sono comparse macchie sul soffitto in corrispondenza del solaio."
+      ],
+      "confusable_with": [
+        "controsoffitto",
+        "copertura"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.100",
@@ -2437,14 +2514,24 @@
       "category": "materials",
       "canonical_term": "isolante termico",
       "normalized_term": "isolante termico",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "materiale isolante termico",
+        "pannello isolante"
+      ],
+      "definition": "Materiale o sistema destinato a ridurre il trasferimento di calore attraverso un elemento edilizio.",
+      "disambiguation": "Non assumere materiale, spessore, prestazione o idoneità senza scheda tecnica e contesto.",
+      "examples": [
+        "È previsto un isolante termico sulla parete esterna.",
+        "Va completata la posa dell'isolante termico nel sottotetto."
+      ],
+      "confusable_with": [
+        "isolante acustico",
+        "barriera al vapore"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.103",
@@ -2452,14 +2539,24 @@
       "category": "materials",
       "canonical_term": "isolante acustico",
       "normalized_term": "isolante acustico",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "materiale fonoisolante",
+        "pannello acustico isolante"
+      ],
+      "definition": "Materiale o sistema usato per limitare la trasmissione del rumore tra ambienti o attraverso elementi edilizi.",
+      "disambiguation": "Non confondere isolamento acustico con trattamento fonoassorbente; non inferire una prestazione certificata.",
+      "examples": [
+        "Serve un isolante acustico tra i due locali.",
+        "Il cliente segnala rumori provenienti dalla parete divisoria."
+      ],
+      "confusable_with": [
+        "isolante termico",
+        "materiale fonoassorbente"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.104",
@@ -2491,14 +2588,24 @@
       "category": "materials",
       "canonical_term": "rasante",
       "normalized_term": "rasante",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "rasatura",
+        "prodotto rasante"
+      ],
+      "definition": "Prodotto applicato in uno strato sottile per regolarizzare una superficie prima della finitura.",
+      "disambiguation": "Non assumere compatibilità con supporto, ambiente o finitura senza specifica del prodotto.",
+      "examples": [
+        "Dopo la riparazione va applicato il rasante.",
+        "La rasatura della parete presenta avvallamenti."
+      ],
+      "confusable_with": [
+        "intonaco",
+        "stucco"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.106",
@@ -2506,14 +2613,24 @@
       "category": "materials",
       "canonical_term": "primer",
       "normalized_term": "primer",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "fondo preparatore",
+        "mano di primer"
+      ],
+      "definition": "Prodotto preparatorio applicato su un supporto per favorire adesione o uniformare l'assorbimento prima di una lavorazione successiva.",
+      "disambiguation": "Il termine è generico: non dedurre composizione o compatibilità senza identificare il prodotto e il supporto.",
+      "examples": [
+        "Prima della pittura è richiesto il primer.",
+        "Il primer non è ancora stato applicato sulla superficie ripristinata."
+      ],
+      "confusable_with": [
+        "fissativo",
+        "vernice di finitura"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.107",
@@ -2521,29 +2638,49 @@
       "category": "materials",
       "canonical_term": "stucco",
       "normalized_term": "stucco",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "prodotto stuccante",
+        "stuccatura"
+      ],
+      "definition": "Materiale usato per riempire piccoli vuoti, giunti o imperfezioni, secondo il tipo di prodotto e il supporto.",
+      "disambiguation": "Può indicare prodotti diversi; non dedurre uso, tempi di asciugatura o compatibilità senza ulteriori dettagli.",
+      "examples": [
+        "Serve stucco per chiudere i piccoli fori.",
+        "Lo stucco applicato deve essere levigato prima della finitura."
+      ],
+      "confusable_with": [
+        "rasante",
+        "sigillante"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.108",
       "sector": "construction_site",
-      "category": "materials",
+      "category": "finishes",
       "canonical_term": "piastrella",
       "normalized_term": "piastrella",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "piastrella ceramica",
+        "elemento di rivestimento"
+      ],
+      "definition": "Elemento modulare di finitura impiegato per rivestire pavimenti o pareti; il materiale va specificato quando rilevante.",
+      "disambiguation": "Non assumere materiale, formato, posa o destinazione dal solo termine.",
+      "examples": [
+        "Una piastrella del bagno è scheggiata.",
+        "Mancano tre piastrelle per completare il rivestimento."
+      ],
+      "confusable_with": [
+        "gres porcellanato",
+        "lastra di pietra"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.109",
@@ -2551,14 +2688,24 @@
       "category": "materials",
       "canonical_term": "gres porcellanato",
       "normalized_term": "gres porcellanato",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "piastrella in gres",
+        "gres"
+      ],
+      "definition": "Materiale ceramico compatto usato per piastrelle e superfici di rivestimento, disponibile in diverse finiture e formati.",
+      "disambiguation": "Non dedurre classe di scivolosità, assorbimento o idoneità all'esterno senza dati del prodotto.",
+      "examples": [
+        "Il pavimento è in gres porcellanato.",
+        "Il gres porcellanato consegnato non corrisponde al formato ordinato."
+      ],
+      "confusable_with": [
+        "piastrella ceramica",
+        "monocottura"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "draft_editorial_enrichment_2026-10-24",
+      "review_note": "Arricchimento redazionale preliminare; non approvato da un responsabile di dominio. Verificare terminologia, contesto tecnico, sinonimi e distinzioni prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.110",
