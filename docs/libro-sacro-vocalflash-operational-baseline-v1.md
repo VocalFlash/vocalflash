@@ -566,3 +566,28 @@ Il registro di continuità storico è un documento lungo (5.076 righe) con decis
 
 ### Esito
 **Libro raccomandazioni: consolidamento aggiornato; audit tecnico 360°: IN CORSO, non chiuso.** La copertura e le raccomandazioni sono state registrate, ma varie aree restano BLOCKED/NOT RUN e richiedono prove concrete. In particolare: riconciliazione delle migrazioni; disegno e test delle policy RLS; conferma atomica; stato conversazionale durevole; outbox e riconciliazione degli invii; verifica di configurazione staging; E2E integrato ripetuto cinque volte; privacy/retention; onboarding, billing, gruppi e costi. Non considerare il progetto pronto al lancio.
+
+
+## 10. Aggiornamento del controllo tecnico 360° — 24 ottobre 2026
+
+Questa sezione registra le verifiche read-only successive al consolidamento delle raccomandazioni. Non rappresenta un'approvazione al rilascio.
+
+### Evidenze tecniche aggiuntive
+- Catalogo terminologico draft, blob `5aa93e3391c10db5b303249f0d4ba54d3aa8d34f`: JSON parsabile, 699 voci; conteggi dichiarati per settore coerenti con le voci effettive; nessuna duplicazione `sector + normalized_term` rilevata; nessuna voce priva delle chiavi strutturali controllate. Solo 120/699 voci hanno definizione, disambiguazione ed esempi non vuoti secondo il controllo automatico di base; tutte le 699 sono ancora `draft`. È controllo strutturale, non approvazione semantica o di esperti.
+- Il runtime titolare corrente mantiene il fail-closed ATOMIC_CONFIRMATION_NOT_ENABLED prima di elaborare conferme esplicite. Non abilitare il percorso finché il vincolo atomico non è implementato e provato.
+- Il bot corrente usa Meta Graph API v26.0, limita file e batch, ma mantiene in memoria locale sessioni e code audio; il sorgente impone un solo worker Gunicorn fino a quando lo stato audio non diventa durevole. Non dichiarare resistenza ai riavvii.
+- Il codice SMS Hook è ancora su branch/PR Draft. Il controllo automatico del sorgente e i test non provano che la funzione sia distribuita, che Bird sia configurato o che un OTP reale sia stato inviato. Supabase continua a riportare zero Edge Functions distribuite.
+- Le API GitHub di review non hanno restituito review approvate o thread per PR #2, #3 e #9. Questo non equivale ad approvazione del codice.
+- I risultati CI positivi sono riferiti agli SHA/runs documentati; non è stata osservata una nuova esecuzione CI associata agli ultimi commit documentali. Nessun nuovo PASS viene attribuito a tali commit senza un run osservabile.
+
+### Ordine operativo raccomandato
+1. Recuperare e riconciliare le migrazioni SQL autorevoli.
+2. Mantenere disabilitate le scritture titolare fino alla conferma atomica verificata.
+3. Rendere durevoli stato conversazionale/audio e outbox, con riconciliazione esiti ambigui.
+4. Progettare e testare policy RLS per ruolo e tenant; non aggiungere policy permissive per eliminare i finding.
+5. Preparare staging isolato con app/numero Meta di test, segreti gestiti fuori dal repository e candidato API+bot accoppiato; solo dopo eseguire la matrice E2E e cinque run integrati tracciabili.
+6. Portare il catalogo terminologico da bozza a revisione settoriale: 579 voci non hanno contemporaneamente definizione, disambiguazione ed esempi non vuoti secondo il controllo di base. Tutte le voci restano non approvate.
+7. Chiudere privacy/retention, onboarding, billing, limiti commerciali hosting, compatibilità Meta, monitoraggio e costi unitari prima del pilot commerciale.
+
+### Stato aggiornato
+**Controllo tecnico 360°: IN CORSO. Rilascio: NO-GO.** Questa tornata ha eseguito verifiche read-only e aggiornato la documentazione; non ha modificato codice applicativo, schema/dati live, segreti, provider, deployment, stato delle PR o risorse a pagamento.
