@@ -660,3 +660,10 @@ La tabella seguente diventa il criterio primario di priorità e accettazione del
 
 ### Ricerca SQL e blocchi
 La ricerca nei repository accessibili non ha trovato una fonte SQL autorevole completa per le 15 migrazioni registrate nel database live. Non ricostruire migrazioni a intuito. Restano aperti i gate già elencati: provenienza SQL, RLS/policy, indici FK, identità titolare verificata, conferma atomica, persistenza/outbox/reconciliation e staging E2E.
+
+
+### Esito della gestione del contratto risposta dopo la revisione
+- Sul ramo bot è stata applicata una modifica circoscritta: se l'API restituisce `ok: true` ma manca `assistant_message` utilizzabile, il bot ora solleva `ASSISTANT_REPLY_MISSING` invece di consumare silenziosamente il messaggio senza risposta. L'errore passa dal percorso diagnostico esistente e rilascia la deduplica inbound; nessun invio viene tentato in questo caso.
+- Aggiunto test unitario per il caso senza risposta. CI bot run [40120662180](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40120662180), commit `5c0cf3b830389471f5ff1a9770b5593d95e6721b`: 5/5 job success, inclusi compilazione e test.
+- La CI della revisione documentale/tabella principale è verde: run [40120606969](https://github.com/VocalFlash/vocalflash/actions/runs/40120606969), commit `ee094608ee6f45adb06f9eebfbb5b7f06168e693`: 5/5 job success.
+- La correzione è verificata a livello unitario, non end-to-end. Non risolve ancora il fatto che i vocali del bot continuino sul percorso MultiVocale/legacy invece di entrare nel workflow operativo customer: integrare i vocali richiede un progetto separato, preservando il comportamento MultiVocale e la sintesi unica.

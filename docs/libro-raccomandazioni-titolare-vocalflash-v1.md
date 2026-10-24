@@ -202,3 +202,7 @@ La tabella “capacità → esigenza reale → valore da dimostrare → prova mi
 Prima di promuovere una funzione, dichiarare quale esigenza reale risolve, quale riga della tabella migliora, come si misurerà il risultato e quali rischi/blocchi restano. Non privilegiare il completamento del catalogo terminologico rispetto alla dimostrazione del valore operativo end-to-end. La completezza strutturale del vocabolario non equivale a revisione di dominio né a miglioramento misurato della sintesi/classificazione.
 
 La revisione statica del 24 ottobre ha inoltre rilevato due gap da tenere espliciti fino alla chiusura con test: il bot inoltra il testo ordinario all'Assistant API ma lascia i vocali sul percorso MultiVocale/legacy; inoltre, se `assistant_message` è vuoto o assente, non invia risposta e non segnala esplicitamente il contratto incompleto. Non considerare risolti questi gap senza modifica circoscritta, test sul commit e verifica del contratto.
+
+
+### Evidenza successiva — contratto di risposta cliente
+Il caso in cui l'Assistant API dichiara successo ma non fornisce `assistant_message` non deve essere ignorato. Sul ramo bot è stata aggiunta una gestione fail-closed con errore diagnostico `ASSISTANT_REPLY_MISSING` e relativo test unitario; CI sul commit `5c0cf3b830389471f5ff1a9770b5593d95e6721b` superata 5/5. Questo non equivale a E2E: il routing operativo del bot copre ancora il testo ordinario, mentre i vocali seguono il percorso MultiVocale/legacy. Mantenere questa lacuna tra le priorità legate alla tabella principale di valore.

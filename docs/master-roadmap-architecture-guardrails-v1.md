@@ -402,3 +402,9 @@ Latest CI verified on exact commits:
 - Bot PR #2 head `7ad05b42122c939a5669c2fdceeae604185aec09`: run 40113909039, 5/5 jobs successful.
 
 These CI runs are not integrated E2E evidence. Static review found the customer-assistant bot wrapper currently forwards ordinary text to the Assistant API, while audio remains on MultiVocale/legacy paths. A missing/empty `assistant_message` is silently skipped by the bot wrapper. Treat both as explicit pre-pilot gaps. Do not enable owner writes or relax the SQL provenance, identity, RLS, atomic confirmation, durable outbox, and reconciliation gates.
+
+
+Follow-up verified 2026-10-24:
+- Bot commit `5c0cf3b830389471f5ff1a9770b5593d95e6721b` now fails visibly with `ASSISTANT_REPLY_MISSING` if a successful Assistant API response lacks a usable customer reply; a focused unit test was added. CI run 40120662180 passed 5/5 jobs.
+- Documentation/table commit `ee094608ee6f45adb06f9eebfbb5b7f06168e693` passed API/catalogue CI run 40120606969, 5/5 jobs.
+- This closes only the silent-empty-reply handling gap at unit-test level. Ordinary text is still the only input currently routed to the customer Assistant workflow; audio remains on MultiVocale/legacy. Integrated staging E2E remains a release gate.
