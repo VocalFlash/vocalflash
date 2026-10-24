@@ -1474,14 +1474,24 @@
       "category": "symptoms",
       "canonical_term": "caldaia in blocco",
       "normalized_term": "caldaia in blocco",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "caldaia bloccata",
+        "caldaia ferma"
+      ],
+      "definition": "Condizione segnalata in cui la caldaia interrompe il funzionamento o non completa l'avvio; la causa non è determinabile dal solo sintomo.",
+      "disambiguation": "Distinguere il blocco osservato dal codice di errore e dalla causa tecnica accertata. Non suggerire manovre su gas o componenti interni.",
+      "examples": [
+        "La caldaia è andata in blocco stamattina.",
+        "La caldaia si ferma e non riparte."
+      ],
+      "confusable_with": [
+        "errore caldaia",
+        "assenza di acqua calda"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da verificare con tecnico abilitato",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.symptoms.61",
@@ -1489,14 +1499,24 @@
       "category": "symptoms",
       "canonical_term": "errore caldaia",
       "normalized_term": "errore caldaia",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "codice errore caldaia",
+        "segnalazione anomalia caldaia"
+      ],
+      "definition": "Messaggio o codice mostrato dal display o dall'interfaccia della caldaia che segnala una condizione rilevata dall'apparecchio.",
+      "disambiguation": "Registrare il codice esatto e il modello se disponibili; non dedurre la causa senza documentazione del produttore e verifica tecnica.",
+      "examples": [
+        "Sul display compare errore E10.",
+        "La caldaia mostra un codice rosso, posso mandare una foto?"
+      ],
+      "confusable_with": [
+        "caldaia in blocco",
+        "spia di manutenzione"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da verificare con tecnico abilitato",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.symptoms.62",
@@ -1504,14 +1524,24 @@
       "category": "symptoms",
       "canonical_term": "consumo anomalo",
       "normalized_term": "consumo anomalo",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "consumi elevati",
+        "aumento dei consumi"
+      ],
+      "definition": "Percezione o rilevazione di consumi di acqua, gas o energia superiori al livello abituale in un periodo confrontabile.",
+      "disambiguation": "Specificare la risorsa, il periodo e l'eventuale lettura del contatore. Il consumo anomalo non dimostra da solo una perdita o un guasto.",
+      "examples": [
+        "Questo mese il consumo dell'acqua è quasi raddoppiato.",
+        "La bolletta del gas è salita senza cambiamenti evidenti."
+      ],
+      "confusable_with": [
+        "contatore che gira",
+        "perdita d'acqua"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; definizione da validare",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.symptoms.63",
@@ -1519,14 +1549,24 @@
       "category": "symptoms",
       "canonical_term": "contatore che gira",
       "normalized_term": "contatore che gira",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "contatore in movimento",
+        "contatore gira anche a rubinetti chiusi"
+      ],
+      "definition": "Osservazione secondo cui l'indicatore del contatore continua a muoversi in una condizione in cui l'utente si aspetta assenza di consumo.",
+      "disambiguation": "Annotare quali utenze erano chiuse e se esistono apparecchi automatici attivi. È un indizio da verificare, non una diagnosi certa di perdita.",
+      "examples": [
+        "Ho chiuso tutti i rubinetti ma il contatore continua a girare.",
+        "Il contatore dell'acqua avanza anche di notte."
+      ],
+      "confusable_with": [
+        "consumo anomalo",
+        "perdita occulta"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare sul campo",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.symptoms.64",
@@ -1534,14 +1574,24 @@
       "category": "symptoms",
       "canonical_term": "rubinetto bloccato",
       "normalized_term": "rubinetto bloccato",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "rubinetto bloccato",
+        "manopola del rubinetto dura"
+      ],
+      "definition": "Rubinetto o comando che non ruota o non si aziona normalmente, oppure resta bloccato in una posizione.",
+      "disambiguation": "Non confondere il blocco meccanico del comando con l'assenza di erogazione o con una valvola generale chiusa.",
+      "examples": [
+        "La manopola del rubinetto del lavabo non gira.",
+        "Il rubinetto è rimasto bloccato e non riesco ad aprirlo."
+      ],
+      "confusable_with": [
+        "rubinetto che gocciola",
+        "assenza di pressione"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da verificare con professionista",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.symptoms.65",
@@ -1549,14 +1599,24 @@
       "category": "symptoms",
       "canonical_term": "scarico rumoroso",
       "normalized_term": "scarico rumoroso",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "rumore nello scarico",
+        "scarico che gorgoglia"
+      ],
+      "definition": "Rumore insolito proveniente da uno scarico durante o dopo il deflusso, descritto dall'utente come gorgoglio, risucchio o borbottio.",
+      "disambiguation": "Rilevare quando compare e quali apparecchi sono coinvolti. Il rumore da solo non identifica la causa né prova un'ostruzione.",
+      "examples": [
+        "Quando svuoto il lavello lo scarico gorgoglia.",
+        "Si sente un rumore nello scarico della doccia."
+      ],
+      "confusable_with": [
+        "scarico lento",
+        "scarico ostruito"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare sul campo",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.symptoms.66",
@@ -1564,14 +1624,24 @@
       "category": "symptoms",
       "canonical_term": "sifone che perde",
       "normalized_term": "sifone che perde",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "perdita dal sifone",
+        "sifone gocciolante"
+      ],
+      "definition": "Presenza segnalata di gocce o acqua in corrispondenza del sifone o dei suoi raccordi.",
+      "disambiguation": "Chiedere dove si vede l'acqua e, se sicuro, una foto. La posizione apparente non conferma quale giunto o componente sia responsabile.",
+      "examples": [
+        "C'è una goccia sotto il sifone del lavello.",
+        "Il mobile sotto il lavabo si bagna vicino al sifone."
+      ],
+      "confusable_with": [
+        "perdita dalla piletta",
+        "perdita dal flessibile"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da verificare con tecnico",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.67",
@@ -1579,14 +1649,24 @@
       "category": "actions",
       "canonical_term": "ricerca perdita",
       "normalized_term": "ricerca perdita",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "ricerca di una perdita",
+        "localizzazione perdita"
+      ],
+      "definition": "Attività diagnostica volta a individuare la provenienza di una perdita sospetta attraverso controlli e strumenti appropriati.",
+      "disambiguation": "È un'attività proposta o richiesta, non la conferma che la perdita esista né che sia stata localizzata.",
+      "examples": [
+        "Serve una ricerca della perdita nel bagno.",
+        "Vorrei capire da dove arriva l'infiltrazione."
+      ],
+      "confusable_with": [
+        "riparazione tubazione",
+        "verifica infiltrazione"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare con tecnico",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.68",
@@ -1594,14 +1674,24 @@
       "category": "actions",
       "canonical_term": "disostruzione",
       "normalized_term": "disostruzione",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "rimozione ostruzione",
+        "disintasamento"
+      ],
+      "definition": "Intervento volto a rimuovere un'ostruzione che impedisce o rallenta il deflusso in una tubazione o in uno scarico.",
+      "disambiguation": "Non assumere che l'ostruzione sia confermata né scegliere metodi chimici o meccanici senza valutare impianto e rischio.",
+      "examples": [
+        "Chiedo una disostruzione dello scarico della cucina.",
+        "L'acqua non scende e serve controllare il tubo."
+      ],
+      "confusable_with": [
+        "lavaggio impianto",
+        "ripristino scarico"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare con tecnico",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.69",
@@ -1609,14 +1699,24 @@
       "category": "actions",
       "canonical_term": "spurgo impianto",
       "normalized_term": "spurgo impianto",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "spurgo delle tubazioni",
+        "spurgo circuito"
+      ],
+      "definition": "Operazione di espulsione controllata di aria, acqua o residui da una parte dell'impianto, secondo il tipo di circuito e la procedura prevista.",
+      "disambiguation": "Il termine è ambiguo senza indicare il circuito: riscaldamento, scarico o altra linea. Chiedere quale impianto è coinvolto.",
+      "examples": [
+        "Il tecnico deve fare lo spurgo dei radiatori.",
+        "È previsto lo spurgo del circuito dopo l'intervento."
+      ],
+      "confusable_with": [
+        "lavaggio impianto",
+        "riempimento impianto"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare per impianto",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.70",
@@ -1624,14 +1724,24 @@
       "category": "actions",
       "canonical_term": "sostituzione rubinetto",
       "normalized_term": "sostituzione rubinetto",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "cambio rubinetto",
+        "montaggio di un nuovo rubinetto"
+      ],
+      "definition": "Attività di rimozione di un rubinetto esistente e installazione di un altro compatibile, con verifiche di tenuta e funzionamento.",
+      "disambiguation": "Non equivale alla riparazione del rubinetto. Verificare tipologia, attacchi e disponibilità del componente prima di confermare l'intervento.",
+      "examples": [
+        "Vorrei sostituire il rubinetto del lavello.",
+        "Il cliente chiede un nuovo miscelatore per il bagno."
+      ],
+      "confusable_with": [
+        "riparazione rubinetto",
+        "sostituzione cartuccia"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare con professionista",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.71",
@@ -1639,14 +1749,24 @@
       "category": "actions",
       "canonical_term": "sostituzione guarnizione",
       "normalized_term": "sostituzione guarnizione",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "cambio guarnizione",
+        "sostituzione della tenuta"
+      ],
+      "definition": "Sostituzione di una guarnizione o elemento di tenuta identificato come componente dell'intervento.",
+      "disambiguation": "La richiesta non identifica necessariamente quale guarnizione sia difettosa. Non dedurre misura, materiale o compatibilità senza verifica.",
+      "examples": [
+        "Il raccordo perde e forse va cambiata la guarnizione.",
+        "Chiedo la sostituzione della guarnizione del rubinetto."
+      ],
+      "confusable_with": [
+        "sostituzione flessibile",
+        "riparazione raccordo"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare con tecnico",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.72",
@@ -1654,14 +1774,24 @@
       "category": "actions",
       "canonical_term": "riparazione tubazione",
       "normalized_term": "riparazione tubazione",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "riparazione di un tubo",
+        "intervento sulla tubazione"
+      ],
+      "definition": "Intervento per ripristinare la funzionalità o la tenuta di una tubazione, dopo averne valutato materiale, posizione e danno.",
+      "disambiguation": "Non specifica da solo se occorra riparare, sostituire o rifare un tratto. La causa e la soluzione vanno confermate sul posto.",
+      "examples": [
+        "C'è una perdita sul tubo sotto il lavello.",
+        "Serve valutare la riparazione della tubazione nel muro."
+      ],
+      "confusable_with": [
+        "ricerca perdita",
+        "sostituzione flessibile"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare con tecnico",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.73",
@@ -1669,14 +1799,24 @@
       "category": "actions",
       "canonical_term": "sostituzione sifone",
       "normalized_term": "sostituzione sifone",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "cambio sifone",
+        "montaggio sifone nuovo"
+      ],
+      "definition": "Rimozione di un sifone esistente e installazione di un componente sostitutivo adatto all'apparecchio e agli attacchi.",
+      "disambiguation": "Non dedurre che il sifone sia la causa della perdita solo perché l'acqua si trova nella stessa zona; verificare collegamenti e componenti vicini.",
+      "examples": [
+        "Vorrei cambiare il sifone sotto il lavandino.",
+        "Il sifone è danneggiato e va valutata la sostituzione."
+      ],
+      "confusable_with": [
+        "sostituzione piletta",
+        "sostituzione guarnizione"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare con tecnico",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.74",
@@ -1684,14 +1824,24 @@
       "category": "actions",
       "canonical_term": "pulizia filtro",
       "normalized_term": "pulizia filtro",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "pulizia del filtro",
+        "rimozione residui dal filtro"
+      ],
+      "definition": "Rimozione dei depositi da un filtro accessibile, seguendo le istruzioni applicabili all'apparecchio o al circuito.",
+      "disambiguation": "Chiarire quale filtro è coinvolto. Non suggerire l'apertura di apparecchi a gas o componenti in pressione da parte di persone non abilitate.",
+      "examples": [
+        "Il filtro dell'acqua sembra intasato.",
+        "È prevista la pulizia del filtro secondo il manuale."
+      ],
+      "confusable_with": [
+        "sostituzione filtro",
+        "disostruzione"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare per apparecchio",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.75",
@@ -1699,14 +1849,24 @@
       "category": "actions",
       "canonical_term": "controllo pressione",
       "normalized_term": "controllo pressione",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "misurazione della pressione",
+        "controllo pressione acqua"
+      ],
+      "definition": "Verifica della pressione in un punto o circuito mediante strumento e condizioni di misura adeguati.",
+      "disambiguation": "Specificare se si tratta di acqua sanitaria o riscaldamento e, quando rilevante, pressione statica o durante il flusso. Non inferire una causa dal solo valore riferito.",
+      "examples": [
+        "L'acqua esce con poca pressione: chiediamo una misurazione.",
+        "Serve controllare la pressione del circuito di riscaldamento."
+      ],
+      "confusable_with": [
+        "portata insufficiente",
+        "riempimento impianto"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare con tecnico",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.76",
@@ -1714,14 +1874,24 @@
       "category": "actions",
       "canonical_term": "verifica caldaia",
       "normalized_term": "verifica caldaia",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "controllo della caldaia",
+        "ispezione caldaia"
+      ],
+      "definition": "Attività di verifica dello stato e del funzionamento della caldaia, con ambito definito in base alla richiesta e alle indicazioni del produttore.",
+      "disambiguation": "Non equivale automaticamente a manutenzione periodica, riparazione o controllo obbligatorio. Per apparecchi a gas rivolgersi a personale abilitato.",
+      "examples": [
+        "Vorrei prenotare una verifica della caldaia.",
+        "La caldaia fa rumore e chiedo un controllo tecnico."
+      ],
+      "confusable_with": [
+        "manutenzione ordinaria",
+        "riparazione caldaia"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da verificare con tecnico abilitato",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.77",
@@ -1729,14 +1899,24 @@
       "category": "actions",
       "canonical_term": "manutenzione ordinaria",
       "normalized_term": "manutenzione ordinaria",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "manutenzione periodica",
+        "interventi ordinari di manutenzione"
+      ],
+      "definition": "Insieme di controlli o operazioni ricorrenti previsti per mantenere un impianto o apparecchio nelle condizioni di funzionamento attese.",
+      "disambiguation": "L'ambito dipende dall'impianto e dal piano applicabile. Non dichiarare effettuati controlli normativi o obbligatori senza documentazione.",
+      "examples": [
+        "Vorrei programmare la manutenzione ordinaria dell'impianto.",
+        "È ora del controllo periodico previsto dal piano di manutenzione."
+      ],
+      "confusable_with": [
+        "verifica caldaia",
+        "riparazione guasto"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare con tecnico",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.78",
@@ -1744,14 +1924,24 @@
       "category": "actions",
       "canonical_term": "sopralluogo idraulico",
       "normalized_term": "sopralluogo idraulico",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "sopralluogo tecnico idraulico",
+        "visita sul posto dell'idraulico"
+      ],
+      "definition": "Visita sul luogo per osservare la situazione, raccogliere informazioni e valutare le attività necessarie.",
+      "disambiguation": "Il sopralluogo non implica diagnosi definitiva, preventivo approvato o esecuzione dei lavori.",
+      "examples": [
+        "Può passare un idraulico per un sopralluogo?",
+        "Serve vedere sul posto da dove arriva l'acqua."
+      ],
+      "confusable_with": [
+        "intervento di riparazione",
+        "preventivo idraulico"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.79",
@@ -1759,14 +1949,24 @@
       "category": "actions",
       "canonical_term": "preventivo idraulico",
       "normalized_term": "preventivo idraulico",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "preventivo per lavori idraulici",
+        "stima costi idraulico"
+      ],
+      "definition": "Stima economica proposta per un intervento idraulico, con condizioni, inclusioni ed eventuali esclusioni da chiarire.",
+      "disambiguation": "Un preventivo non è un ordine di lavoro né prova di accettazione. Registrare importo, validità e approvazione solo se esplicitamente disponibili.",
+      "examples": [
+        "Mi mandi un preventivo per cambiare il rubinetto?",
+        "Vorrei sapere quanto costa la ricerca della perdita."
+      ],
+      "confusable_with": [
+        "fattura idraulico",
+        "ordine di lavoro"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.80",
@@ -1774,14 +1974,24 @@
       "category": "actions",
       "canonical_term": "prova di tenuta",
       "normalized_term": "prova di tenuta",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "test di tenuta",
+        "prova tenuta impianto"
+      ],
+      "definition": "Prova tecnica finalizzata a verificare la tenuta di una parte dell'impianto secondo procedura, condizioni e criteri appropriati.",
+      "disambiguation": "Specificare il tipo di impianto e la procedura applicabile. Non affermare che il test sia superato senza risultato registrato.",
+      "examples": [
+        "Dopo la riparazione è richiesta una prova di tenuta.",
+        "Serve verificare la tenuta del circuito prima della rimessa in servizio."
+      ],
+      "confusable_with": [
+        "ricerca perdita",
+        "controllo pressione"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare con tecnico",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.81",
@@ -1789,14 +1999,24 @@
       "category": "actions",
       "canonical_term": "lavaggio impianto",
       "normalized_term": "lavaggio impianto",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "lavaggio delle tubazioni",
+        "pulizia del circuito"
+      ],
+      "definition": "Operazione di pulizia mediante circolazione o ricambio controllato di un fluido in un circuito, secondo materiali e specifiche del sistema.",
+      "disambiguation": "Chiarire quale circuito va lavato e con quale finalità. Non equiparare il lavaggio allo spurgo o alla disostruzione.",
+      "examples": [
+        "È stato proposto il lavaggio del circuito di riscaldamento.",
+        "Vorrei sapere se serve lavare le tubazioni dopo i lavori."
+      ],
+      "confusable_with": [
+        "spurgo impianto",
+        "disostruzione"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare per sistema",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.82",
@@ -1804,14 +2024,24 @@
       "category": "actions",
       "canonical_term": "sostituzione flessibile",
       "normalized_term": "sostituzione flessibile",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "cambio tubo flessibile",
+        "sostituzione tubo di collegamento flessibile"
+      ],
+      "definition": "Sostituzione di un tubo flessibile di collegamento con un ricambio compatibile per uso, attacchi, dimensioni e condizioni d'esercizio.",
+      "disambiguation": "Identificare quale flessibile e a quale apparecchio è collegato. Non dedurre compatibilità o specifiche dalla sola descrizione.",
+      "examples": [
+        "Il flessibile sotto il lavabo perde.",
+        "Vorrei sostituire il tubo flessibile della lavatrice."
+      ],
+      "confusable_with": [
+        "sostituzione tubazione rigida",
+        "sostituzione guarnizione"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare con tecnico",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.83",
@@ -1819,14 +2049,24 @@
       "category": "actions",
       "canonical_term": "ripristino scarico",
       "normalized_term": "ripristino scarico",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "ripristino dello scarico",
+        "riattivazione deflusso"
+      ],
+      "definition": "Attività volta a riportare uno scarico a un deflusso adeguato dopo un'anomalia, previa verifica della causa.",
+      "disambiguation": "È un obiettivo generale, non identifica il metodo né conferma un'ostruzione; evitare di trasformarlo automaticamente in una disostruzione.",
+      "examples": [
+        "Lo scarico della doccia va ripristinato.",
+        "Dopo i lavori l'acqua non defluisce correttamente."
+      ],
+      "confusable_with": [
+        "disostruzione",
+        "riparazione tubazione"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare con tecnico",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.84",
@@ -1834,14 +2074,24 @@
       "category": "actions",
       "canonical_term": "verifica infiltrazione",
       "normalized_term": "verifica infiltrazione",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "controllo infiltrazione",
+        "accertamento infiltrazione d'acqua"
+      ],
+      "definition": "Verifica di una possibile infiltrazione per raccogliere elementi sulla presenza, estensione e possibile origine dell'umidità o dell'acqua.",
+      "disambiguation": "Distinguere macchia o umidità osservata dalla causa accertata. La provenienza può essere diversa dal punto in cui appare il danno.",
+      "examples": [
+        "C'è una macchia sul soffitto e serve verificare un'infiltrazione.",
+        "L'acqua compare sul muro vicino al bagno."
+      ],
+      "confusable_with": [
+        "ricerca perdita",
+        "condensa"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare con tecnico",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.85",
@@ -1849,14 +2099,24 @@
       "category": "actions",
       "canonical_term": "installazione sanitari",
       "normalized_term": "installazione sanitari",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "montaggio sanitari",
+        "installazione di lavabo o WC"
+      ],
+      "definition": "Installazione e collegamento di apparecchi sanitari compatibili, secondo predisposizioni, attacchi e verifiche necessarie.",
+      "disambiguation": "Chiarire quali sanitari, se si tratta di nuova installazione o sostituzione e se le predisposizioni sono già presenti.",
+      "examples": [
+        "Devo installare un nuovo lavabo e il WC.",
+        "Vorrei un preventivo per il montaggio dei sanitari del bagno."
+      ],
+      "confusable_with": [
+        "sostituzione rubinetto",
+        "riparazione scarico"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare con tecnico",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "plumbing_maintenance.actions.86",
@@ -1864,14 +2124,24 @@
       "category": "actions",
       "canonical_term": "riparazione cassetta WC",
       "normalized_term": "riparazione cassetta wc",
-      "synonyms": [],
-      "definition": null,
-      "disambiguation": null,
-      "examples": [],
-      "confusable_with": [],
+      "synonyms": [
+        "riparazione cassetta WC",
+        "intervento sullo scarico del WC"
+      ],
+      "definition": "Intervento sulla cassetta di scarico del WC per verificare o ripristinare il corretto riempimento, comando o scarico dell'acqua.",
+      "disambiguation": "Il termine non identifica il componente guasto. Distinguere cassetta, galleggiante, valvola di carico, comando e meccanismo di scarico.",
+      "examples": [
+        "La cassetta del WC continua a caricare acqua.",
+        "Il pulsante dello scarico del WC non funziona."
+      ],
+      "confusable_with": [
+        "riparazione vaso WC",
+        "perdita dal raccordo"
+      ],
       "review_status": "draft",
-      "source": "draft_catalog_seed",
-      "review_note": "Bozza iniziale: sinonimi, definizione, disambiguazione ed esempi devono essere completati e revisionati da un responsabile di dominio prima dell'attivazione."
+      "source": "Redazione terminologica interna; da validare con tecnico",
+      "review_note": "Arricchimento redazionale iniziale; non approvato da esperto di settore. Verificare terminologia, sicurezza e varianti locali prima dell'attivazione.",
+      "enrichment_status": "content_enriched_needs_domain_review"
     },
     {
       "id": "construction_site.materials.87",
