@@ -237,3 +237,27 @@ No branch was created and this check incurred no branch charge. Explicit owner a
 - **Solo revisione statica contro la documentazione corrente:** non sono ancora stati aggiunti/eseguiti test automatizzati; nessun deploy, configurazione Auth Hook, segreto, account Bird, SMS reale o test OTP effettuato. Il codice non è pronto per attivazione.
 - Nessuna modifica a schema/dati live, nessuna chiave generata, nessun credito acquistato, nessuna risorsa a pagamento e nessun deploy in produzione.
 - Gate prima di procedere: aggiungere test automatici; verificare sender/allowlist Italia e costi Bird; ottenere approvazione esplicita per ogni costo e SMS fatturabile; distribuire solo in un ambiente non produttivo con JWT verification disabilitata per la funzione ma firma Standard Webhooks obbligatoria; completare il flusso OTP direttamente nell'interfaccia sicura e collegare il titolare solo dopo verifica Auth.
+
+
+## 15. Avanzamento autonomo: vocabolario, persistenza e raccomandazioni — 24 ottobre 2026
+
+### Vocabolario
+- Catalogo letto e verificato: 699 voci candidate in 7 settori iniziali, nessun settore farmaceutico.
+- Arricchite altre 20 voci idrauliche/manutentive con sinonimi, definizione, disambiguazione, esempi e termini confondibili. Totale arricchito: 120/699.
+- Tutte le voci restano `draft`; il lavoro editoriale non equivale a revisione da esperto e non abilita il catalogo al runtime.
+- Aggiornato `docs/professional-terminology-catalog-v1-draft.json` sul branch `assistant-conversation-photo-v1`, commit `c681f442a08165613b58c7c01d342cd94811542f`.
+- La validazione del catalogo via GitHub Actions sul commit più recente è ancora da confermare. Il workflow visto verde prima delle modifiche è un run precedente, quindi non viene considerato prova del nuovo contenuto.
+
+### Persistenza conversazionale e conferma atomica
+- Creato `docs/persistent-conversation-and-owner-confirmation-design-v1.md`: confini per tenant/conversazione/workflow, provenienza dei campi, versionamento, invalidazione della conferma quando cambiano i dati, replay protection, compare-and-set, lease/fencing, ripresa dopo crash e test minimi.
+- Il documento è progettuale: non introduce schema né implementa la transazione atomica. Le scritture restano disabilitate finché il gate non è implementato e testato.
+- Il design bot già esistente conferma il rischio di crash tra accettazione Meta e persistenza dello stato Redis; callback status Meta e riconciliazione restano da implementare. Nessuna garanzia exactly-once.
+
+### Secondo libro delle raccomandazioni
+- Creato `docs/libro-raccomandazioni-titolare-vocalflash-v1.md`, registro vivo delle regole di collaborazione, principi di prodotto, vocabolario, fail-closed, conferma del titolare, persistenza, invii, costi/privacy e test/release.
+- Il secondo libro complementa il Libro sacro: il primo registra stato e prove; il secondo conserva le raccomandazioni e i vincoli espressi dal titolare.
+
+### CI / release e limiti
+- Per il commit della PR #9 è stato rilevato un run Vercel Preview concluso con successo; riguarda la Preview web e non prova l'esecuzione dell'Edge Function SMS.
+- Per il commit più recente del ramo di sviluppo, un controllo workflow disponibile ha restituito un run precedente concluso con successo. Dopo gli aggiornamenti a catalogo e documentazione, serve un run riferito all'head esatto prima di dichiarare la CI verde.
+- Nessun test SMS, nessuna configurazione di credenziali, nessun deploy Supabase, nessuna modifica live o acquisto è stato eseguito.
