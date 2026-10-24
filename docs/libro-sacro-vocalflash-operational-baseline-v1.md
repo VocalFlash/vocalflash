@@ -598,3 +598,7 @@ Questa sezione registra le verifiche read-only successive al consolidamento dell
 - Per le cinque RPC esaminate (risoluzione titolare, registrazione conferma, commit nota, commit azione calendario, ingest evento WhatsApp), `EXECUTE` risulta negato a `anon` e `authenticated` e concesso a `service_role` e `postgres`.
 - Questo riduce il rischio di esposizione diretta tramite i grant controllati, ma non chiude l'audit completo: restano da esaminare grant di schema, viste, sequenze, default privileges, tutte le altre funzioni, esposizione PostgREST, gestione della service key e autorizzazione applicativa. Le tabelle senza policy rimangono un blocco per qualsiasi accesso client previsto.
 - Tutte le query eseguite sono state SELECT-only; nessuna scrittura SQL o modifica del database.
+
+
+### Inventario PR aggiornato — 24 ottobre 2026
+La ricerca delle PR aperte ha trovato anche `VocalFlash/vocalflash` PR #1, oltre alle PR #3 e #9, e `VocalFlash/vocalflash-bot` PR #2. PR #1 riguarda il solo `package.json`/modalità ES module e documenta un test Preview isolato; descrive anche una credenziale Supabase che restituisce HTTP 401 in un ambiente Preview usato per il questionario. Non assumere che quella credenziale sia la chiave dell'Assistant API: occorre tracciare esattamente deployment e progetto prima di intervenire. Prima di qualsiasi merge, verificare SHA base/head, checks, conflitti e se la modifica di PR #1 è già inclusa nella branch di PR #3. Le API di review non hanno restituito review inviate per queste PR; nessuna approvazione viene presunta.
