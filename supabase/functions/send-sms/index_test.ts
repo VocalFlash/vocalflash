@@ -15,7 +15,10 @@ const baseEnv: Record<string, string> = {
 };
 
 function envReader(overrides: Record<string, string | undefined> = {}) {
-  return (name: string) => overrides[name] ?? baseEnv[name];
+  return (name: string) =>
+    Object.prototype.hasOwnProperty.call(overrides, name)
+      ? overrides[name]
+      : baseEnv[name];
 }
 
 function postRequest(body = "{}") {
