@@ -193,3 +193,12 @@ Questo documento consolida le raccomandazioni esplicite e le decisioni disponibi
 - Indicare sempre le **tre priorità successive** e separare le decisioni che richiedono il titolare dalle attività che possono proseguire autonomamente.
 - Non presentare un riepilogo programmato come completato se il relativo controllo o aggiornamento non è stato effettivamente eseguito.
 - Usare lo stato dei repository, dei test, dei provider e dei documenti aggiornati; evitare di ripetere verifiche senza nuove evidenze.
+
+
+## 2026-10-24 — Override operativo: tabella del valore come criterio principale
+
+La tabella “capacità → esigenza reale → valore da dimostrare → prova minima → stato/gate” nel Libro sacro operativo è il criterio primario per ordinare e accettare il lavoro VocalFlash. Questa regola si applica a roadmap, classificatore, vocabolario, persistenza, integrazioni WhatsApp e funzioni future.
+
+Prima di promuovere una funzione, dichiarare quale esigenza reale risolve, quale riga della tabella migliora, come si misurerà il risultato e quali rischi/blocchi restano. Non privilegiare il completamento del catalogo terminologico rispetto alla dimostrazione del valore operativo end-to-end. La completezza strutturale del vocabolario non equivale a revisione di dominio né a miglioramento misurato della sintesi/classificazione.
+
+La revisione statica del 24 ottobre ha inoltre rilevato due gap da tenere espliciti fino alla chiusura con test: il bot inoltra il testo ordinario all'Assistant API ma lascia i vocali sul percorso MultiVocale/legacy; inoltre, se `assistant_message` è vuoto o assente, non invia risposta e non segnala esplicitamente il contratto incompleto. Non considerare risolti questi gap senza modifica circoscritta, test sul commit e verifica del contratto.

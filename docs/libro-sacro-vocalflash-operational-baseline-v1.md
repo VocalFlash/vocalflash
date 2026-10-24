@@ -625,3 +625,38 @@ Query SELECT-only hanno aggiornato lo snapshot della configurazione, che non coi
 ### Release gate invariati
 - Restano bloccanti: provenienza autorevole delle 15 migrazioni SQL live; RLS senza policy sulle 15 tabelle; 18 FK senza indice di copertura; membro titolare verificato assente; conferma atomica disabilitata (`ATOMIC_CONFIRMATION_NOT_ENABLED`); stato conversazione/outbox durevoli e riconciliazione invii non completati; E2E staging integrato non eseguito.
 
+
+
+## 2026-10-24 — Riesame coordinato e criterio primario di valore
+
+### CI verificata sull'head corrente
+- Assistant API/catalogo: run [40118965684](https://github.com/VocalFlash/vocalflash/actions/runs/40118965684), commit `ab448b7306cd33a5f925b2ec71533477199ee53c`: 5/5 job success; in ogni job sono passati validator del catalogo e test focalizzati.
+- Libro sacro/Assistant API: run [40119000634](https://github.com/VocalFlash/vocalflash/actions/runs/40119000634), commit `d9768031ac6e4990bd08b0630c867786cdec6b2d`: 5/5 job success, inclusi validator e test focalizzati.
+- Bot: run [40113909039](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40113909039), commit `7ad05b42122c939a5669c2fdceeae604185aec09`: 5/5 job success, inclusi compilazione dei moduli e test unitari del bot.
+- Questi sono risultati CI specifici per i commit indicati; non sono test E2E né prove che i rami siano distribuiti. PR #2 e #3 restano Draft, aperte e non integrate.
+
+### Tabella principale per decidere cosa sviluppare
+La tabella seguente diventa il criterio primario di priorità e accettazione del prodotto. La roadmap, il catalogo terminologico e le attività tecniche sono subordinati a essa: una funzione non merita priorità solo perché è tecnicamente interessante o aumenta il numero di voci del vocabolario. Deve migliorare un esito concreto per cliente o titolare ed essere verificabile.
+
+| Capacità | Esigenza reale dell'utente | Valore da dimostrare | Prova minima richiesta | Stato corrente / gate |
+|---|---|---|---|---|
+| Sintesi di vocali e messaggi | Capire rapidamente cosa conta senza rileggere/ascoltare tutto | Sintesi fedele, breve, orientata a fatti e azioni; niente trascrizione completa automatica | Corpus realistico italiano con omissioni critiche, numeri, nomi, negazioni e terminologia; confronto con input originale | Flusso audio storico funzionante; qualità sul percorso corrente da ricontrollare |
+| Classificazione della richiesta | Capire quale problema o richiesta viene posta | Instradamento corretto e pochi falsi positivi; ambiguità esplicitata | Batteria multi-settore realistica, inclusi casi ambigui e non azionabili | Guardrail e test focalizzati presenti; valutazione model-backed ampia da eseguire |
+| Estrazione dei dati | Non perdere luogo, problema, disponibilità e altri dati essenziali | Campi supportati da evidenze, provenienza preservata, nessun dettaglio inventato | Casi positivi/negativi con dati mancanti, contraddittori e inferiti | Componenti implementati e testati in CI; E2E non provato |
+| Domande mirate | Evitare scambi inutili per completare una richiesta | Chiedere soltanto i campi mancanti/ambigui e mantenere quanto già raccolto | Scenari multi-turno con riavvio, messaggi duplicati e contesti distinti | Stato multi-turno durevole non implementato |
+| Vocabolario professionale | Capire termini tecnici, sinonimi, varianti colloquiali e riconoscimento vocale imperfetto | Ridurre errori di interpretazione senza creare intenti o autorizzazioni | Valutazione prima/dopo su casi reali anonimizzati e controesempi; revisione di dominio | 699 voci; 147 strutturalmente complete, 552 incomplete; tutte non approvate restano draft |
+| Contesto persistente della richiesta | Riprendere la stessa pratica senza mescolare clienti o richieste | Continuità affidabile dopo restart e isolamento tenant | Test multi-turno, concorrenza, scadenza, restart e messaggi fuori ordine | Disegnato/parziale; gate di persistenza e percorso SQL sicuro aperti |
+| Policy e conferme | Evitare azioni non autorizzate o basate su dati incompleti | Nessuna scrittura se mancano identità, dati, policy o conferma atomica valida | Replay, scadenza, doppia conferma concorrente, policy malformata e atomicità | Fail-closed; conferma atomica disabilitata |
+| Risposta WhatsApp al cliente | Ricevere una risposta coerente e sapere il passo successivo | Una risposta utile, non duplicata, con esito dell'invio gestito correttamente | Test contratto API-bot e staging E2E con duplicati, timeout e riconciliazione | Contratto unitario parzialmente coperto; nessun E2E Meta→bot→API→Supabase→WhatsApp |
+
+**Regola di priorità:** ogni nuova attività deve dichiarare (1) la riga della tabella che migliora, (2) l'utente e il problema concreto, (3) la metrica/prova di accettazione, (4) i rischi e i blocchi, (5) il costo/effetto operativo. Se non è possibile indicare un beneficio verificabile, l'attività resta esplorativa e non supera il lavoro necessario a dimostrarlo. Il catalogo non è il prodotto e la completezza strutturale non è prova di valore semantico.
+
+### Revisione statica del contratto bot ↔ Assistant API
+- Sull'head bot PR #2, `app_customer.py` inoltra all'Assistant API i messaggi testuali ordinari; i comandi MultiVocale e i messaggi audio seguono il percorso MultiVocale/legacy. Quindi il nuovo workflow operativo cliente non è ancora dimostrato per i vocali: questa è una lacuna funzionale rispetto alla visione “dal vocale all'azione”, non un test fallito.
+- Il bridge inoltra `external_account_id`, `sender_wa_id`, `external_message_id`, testo normalizzato, timestamp e tipo contenuto; autentica con `X-VocalFlash-Assistant-Key`, timeout `(10,120)`, e richiede `ok === true`.
+- L'API ritorna `assistant_message` per il percorso customer e il bot invia soltanto quel campo, con guard Redis at-most-once. Se il campo è vuoto/mancante, il bot attualmente non invia una risposta e non solleva un errore esplicito: aggiungere un test e una gestione fail-closed/diagnosticabile prima del pilot, senza retry ciechi in caso di esito Meta ambiguo.
+- Il timeout di 120 secondi può lasciare incerto l'esito lato bot; la deduplica dell'invio evita doppie risposte ma non sostituisce outbox durevole e riconciliazione.
+- Revisione effettuata sui file del ramo corretto e in sola lettura; nessun invio WhatsApp reale, nessuna modifica al database live, nessun merge o deploy eseguito.
+
+### Ricerca SQL e blocchi
+La ricerca nei repository accessibili non ha trovato una fonte SQL autorevole completa per le 15 migrazioni registrate nel database live. Non ricostruire migrazioni a intuito. Restano aperti i gate già elencati: provenienza SQL, RLS/policy, indici FK, identità titolare verificata, conferma atomica, persistenza/outbox/reconciliation e staging E2E.

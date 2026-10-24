@@ -390,3 +390,15 @@ The PR search result does not provide a complete merge-readiness verdict, and th
 - The empty business-member table is the decisive onboarding/auth blocker: there is no verified owner/member binding. Do not create a placeholder member. The configured policy's `confirm` mode does not supersede the runtime's atomic confirmation guard.
 - Full public-schema SECURITY DEFINER function inspection found nine functions; all have explicit function `search_path` settings. None is executable by `anon` or `authenticated`; application RPCs are executable by `service_role` and `postgres`. `rls_auto_enable` is not executable by those application roles in the privilege check, consistent with its use as a trigger helper.
 - No personal row values, WhatsApp IDs, phone numbers, or customer message text were selected. All queries were read-only.
+
+
+## 2026-10-24 — Product-value acceptance table is the primary prioritization rule
+
+Use the table in the [operational baseline](libro-sacro-vocalflash-operational-baseline-v1.md#2026-10-24--riesame-coordinato-e-criterio-primario-di-valore) as the primary product prioritization and acceptance criterion. Technical work, sector coverage and vocabulary size are subordinate to measurable user value. Every proposed feature must identify the user problem, the table row it improves, the acceptance evidence, risk/dependencies and cost. If no observable benefit can be defined, keep the work exploratory rather than promoting it to a roadmap priority.
+
+Latest CI verified on exact commits:
+- API/catalogue commit `ab448b7306cd33a5f925b2ec71533477199ee53c`: run 40118965684, 5/5 jobs successful.
+- Operational baseline/API commit `d9768031ac6e4990bd08b0630c867786cdec6b2d`: run 40119000634, 5/5 jobs successful.
+- Bot PR #2 head `7ad05b42122c939a5669c2fdceeae604185aec09`: run 40113909039, 5/5 jobs successful.
+
+These CI runs are not integrated E2E evidence. Static review found the customer-assistant bot wrapper currently forwards ordinary text to the Assistant API, while audio remains on MultiVocale/legacy paths. A missing/empty `assistant_message` is silently skipped by the bot wrapper. Treat both as explicit pre-pilot gaps. Do not enable owner writes or relax the SQL provenance, identity, RLS, atomic confirmation, durable outbox, and reconciliation gates.
