@@ -674,3 +674,32 @@ La ricerca nei repository accessibili non ha trovato una fonte SQL autorevole co
 - Migliorato il test del bot: oltre a verificare che il caso `ASSISTANT_REPLY_MISSING` non invii messaggi, ora verifica anche che la deduplicazione inbound sia effettivamente rilasciata sia in Redis sia nello stato locale. Commit bot `28f381aec6635197b67d010bc7308902c7fa2b7a`; run 40121561641 completata con 5/5 job success.
 - La ricerca mirata nei repository accessibili non ha trovato la fonte SQL autorevole delle 15 migrazioni live. Il gate di provenienza resta aperto: nessuna migrazione ricostruita, nessuna scrittura al database.
 - La revisione del routing conferma che i messaggi audio sono ancora gestiti dal percorso MultiVocale/legacy. L'integrazione nell'Assistant workflow non viene effettuata con una modifica automatica al webhook perché richiede un contratto di prodotto esplicito: distinguere trascrizione di singolo vocale, batch MultiVocale e richiesta operativa; preservare la sintesi unica; impedire doppie risposte; gestire contesto, idempotenza e timeout. Prima si prepara una matrice di casi e test, poi si implementa in un cambiamento separato e verificabile.
+
+## Aggiornamento operativo 2026-10-24 — Audio → Assistant API
+
+### Stato verificato
+- Il contratto proposto e la matrice di accettazione sono presenti nel branch isolato.
+- La normalizzazione pura è implementata in `lib/audio-assistant-event-normalizer-v1.js`, con test in `lib/audio-assistant-event-normalizer-v1.test.js`.
+- Il normalizzatore consente solo i tipi evento definiti, verifica identificativi e timestamp, richiede trascrizione riuscita, rifiuta batch incompleti/duplicati/ordine incoerente e costruisce il testo aggregato dal contenuto dei segmenti ordinati.
+- La whitelist evita di propagare nel payload campi arbitrari, inclusi URL media e segreti.
+- CI run `40125843761` per il commit di test timestamp/batch ha conclusione `success`. I run precedenti hanno incluso un fallimento durante l'introduzione della validazione timestamp; la correzione del pattern è stata poi verificata da CI verde. Non nascondere il fallimento intermedio se si ricostruisce la cronologia.
+- CI verde non significa integrazione E2E: il normalizzatore non è chiamato dal webhook bot né dall'Assistant API.
+
+### Progettato
+- Evento audio singolo e batch con provenienza per messaggio sorgente.
+- Generazione deterministica del testo aggregato con delimitatori espliciti.
+- Gate di accettazione per sintesi, duplicati, fallimenti ASR, replay e risposta unica.
+
+### Bloccato / non iniziato
+- Nessuna modifica al routing audio e al timing MultiVocale.
+- Nessuna modifica a schema o dati Supabase live.
+- Nessun merge delle PR Draft, deployment o invio WhatsApp reale.
+- Restano da definire la gestione dei batch parziali, retention, deduplica persistente, restart, timeout e riconciliazione degli esiti outbound.
+- La pipeline API attuale non trasporta ancora nel workflow il payload audio canonico: non collegare il normalizzatore senza prima aggiornare e testare il contratto API e il bridge Python.
+
+### Gate per il prossimo passo
+1. Attendere/verificare la CI sui commit documentali più recenti.
+2. Estendere test sintetici e contratto API senza side effects.
+3. Aggiungere test di replay, concorrenza e restart nel runtime bot.
+4. Riconciliare lo schema SQL autorevole prima di qualunque persistenza.
+5. Eseguire E2E soltanto in staging esplicitamente verificato e senza destinatari reali non autorizzati.
