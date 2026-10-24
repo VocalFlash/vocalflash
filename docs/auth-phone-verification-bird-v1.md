@@ -5,6 +5,7 @@
 - **Implemented on an isolated branch only:** `supabase/functions/send-sms/index.ts`.
 - **Not deployed:** no Edge Function is present in the Supabase project yet.
 - **Not configured:** no Bird credentials/sender and no Supabase Auth Send SMS Hook configured by this change.
+- **Automated tests added on the isolated branch:** `supabase/functions/send-sms/index_test.ts`, covering fail-closed configuration, signature rejection, malformed event, provider rejection, timeout/no-blind-retry, and provider acceptance. The dedicated workflow is `.github/workflows/bird-sms-hook-tests.yml`; its current-head result still needs authoritative confirmation.
 - **Not tested end to end:** no SMS has been sent; no user or business member has been created.
 - **No production data/schema was changed.**
 
@@ -14,7 +15,7 @@ Supabase Auth generates and validates the OTP. Its signed Send SMS Hook calls th
 
 ## Required configuration — do not put values in GitHub issues or chat
 
-Before any real SMS test, review the function and add automated tests, then configure secrets through the Supabase project dashboard:
+Before any real SMS test, verify that the new automated test workflow passes, review the function, then configure secrets through the Supabase project dashboard:
 
 - `SEND_SMS_HOOK_SECRETS`: the signing secret shown when configuring the Supabase Auth Send SMS Hook. Store the full `v1,whsec_...` value. Rotation values may be separated with `|`.
 - `BIRD_API_KEY`: a Bird API key for the EU region, only after the implementation has been reviewed and the account's billing/charges understood.
@@ -24,7 +25,7 @@ The function deliberately fails closed if any secret or sender is missing. It do
 
 ## Controlled activation checklist
 
-1. **Review and test before deployment.** Add automated tests for signature failure, malformed event, missing configuration, provider rejection and timeout. Confirm the hook's maximum execution time remains within Supabase's HTTP-hook timeout.
+1. **Review and test before deployment.** Confirm the isolated Deno tests pass for signature failure, malformed event, missing configuration, provider rejection and timeout. Confirm the hook's maximum execution time remains within Supabase's HTTP-hook timeout.
 2. Confirm Bird account status, Italy destination allowlist, permitted sender, message category and current per-segment/registration/carrier charges. Do not buy credits or send messages until the owner has explicitly approved the cost.
 3. Deploy this Edge Function to the intended **non-production** Supabase project only after review. Because the function authenticates requests with the Supabase Auth Standard Webhooks signature rather than a user JWT, deploy with Supabase CLI's `--no-verify-jwt` option (or the equivalent reviewed function setting). Do not expose this endpoint as a general public SMS API; reject every request that fails signature verification.
 4. Add the function secrets in the Supabase dashboard; never commit them.
@@ -39,6 +40,6 @@ The function deliberately fails closed if any secret or sender is missing. It do
 - A bad/missing signature is rejected.
 - Bird's HTTP acceptance is not delivery confirmation.
 - Timeout/provider errors fail the hook; there is no blind retry in this function because an uncertain provider outcome must not be mistaken for a confirmed send.
-- The current implementation has not yet been deployed, unit-tested, or exercised against Bird.
+- The current implementation has not yet been deployed or exercised against Bird. Unit tests have been added, but their latest CI result must be checked before treating them as passed.
 - The Supabase project currently has zero Auth users and zero business members. This is an observed baseline, not a reason to bypass verification.
 - This function sends an OTP only; it does not create an account, establish an owner role, or write a business membership.
