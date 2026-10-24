@@ -408,3 +408,10 @@ Follow-up verified 2026-10-24:
 - Bot commit `5c0cf3b830389471f5ff1a9770b5593d95e6721b` now fails visibly with `ASSISTANT_REPLY_MISSING` if a successful Assistant API response lacks a usable customer reply; a focused unit test was added. CI run 40120662180 passed 5/5 jobs.
 - Documentation/table commit `ee094608ee6f45adb06f9eebfbb5b7f06168e693` passed API/catalogue CI run 40120606969, 5/5 jobs.
 - This closes only the silent-empty-reply handling gap at unit-test level. Ordinary text is still the only input currently routed to the customer Assistant workflow; audio remains on MultiVocale/legacy. Integrated staging E2E remains a release gate.
+
+
+Verification update 2026-10-24:
+- Documentation commit `bb800588d079f4920c19b96cc87e8ffe9e64d0dd` passed run 40120754178, 5/5 jobs.
+- Bot test commit `28f381aec6635197b67d010bc7308902c7fa2b7a` passed run 40121561641, 5/5 jobs. The missing-reply test now explicitly verifies inbound dedup release in Redis and local state.
+- No authoritative source for the 15 live SQL migrations was found in accessible repositories; keep all database-write and owner-action gates closed.
+- Audio-to-operational-assistant integration remains a design/test task, not implemented. Preserve the MultiVocale single-summary behavior and do not reroute audio until its acceptance matrix covers batching, duplicate webhooks, ambiguous sends, transcription failures, missing data, and reply idempotency.

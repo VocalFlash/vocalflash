@@ -206,3 +206,9 @@ La revisione statica del 24 ottobre ha inoltre rilevato due gap da tenere esplic
 
 ### Evidenza successiva — contratto di risposta cliente
 Il caso in cui l'Assistant API dichiara successo ma non fornisce `assistant_message` non deve essere ignorato. Sul ramo bot è stata aggiunta una gestione fail-closed con errore diagnostico `ASSISTANT_REPLY_MISSING` e relativo test unitario; CI sul commit `5c0cf3b830389471f5ff1a9770b5593d95e6721b` superata 5/5. Questo non equivale a E2E: il routing operativo del bot copre ancora il testo ordinario, mentre i vocali seguono il percorso MultiVocale/legacy. Mantenere questa lacuna tra le priorità legate alla tabella principale di valore.
+
+
+### Verifiche aggiuntive del 24 ottobre
+La CI dell'ultimo aggiornamento documentale precedente (`bb800588d079f4920c19b96cc87e8ffe9e64d0dd`) è stata verificata: 5/5 job success. Sul bot è stato rafforzato il test del caso risposta mancante, verificando anche il rilascio effettivo della deduplicazione inbound; commit `28f381aec6635197b67d010bc7308902c7fa2b7a`, CI 5/5 success.
+
+Non è stata trovata la fonte SQL autorevole delle 15 migrazioni live. Non ricostruire schema o policy a intuito. I vocali restano sul percorso MultiVocale/legacy: non modificare il routing finché non esiste una matrice di accettazione che protegga sintesi unica, deduplica, contesto, timeout e assenza di doppie risposte.

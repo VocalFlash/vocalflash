@@ -667,3 +667,10 @@ La ricerca nei repository accessibili non ha trovato una fonte SQL autorevole co
 - Aggiunto test unitario per il caso senza risposta. CI bot run [40120662180](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40120662180), commit `5c0cf3b830389471f5ff1a9770b5593d95e6721b`: 5/5 job success, inclusi compilazione e test.
 - La CI della revisione documentale/tabella principale è verde: run [40120606969](https://github.com/VocalFlash/vocalflash/actions/runs/40120606969), commit `ee094608ee6f45adb06f9eebfbb5b7f06168e693`: 5/5 job success.
 - La correzione è verificata a livello unitario, non end-to-end. Non risolve ancora il fatto che i vocali del bot continuino sul percorso MultiVocale/legacy invece di entrare nel workflow operativo customer: integrare i vocali richiede un progetto separato, preservando il comportamento MultiVocale e la sintesi unica.
+
+
+### Verifica conclusiva della sessione — 2026-10-24
+- CI del commit documentale `bb800588d079f4920c19b96cc87e8ffe9e64d0dd`: run 40120754178 completata con 5/5 job success.
+- Migliorato il test del bot: oltre a verificare che il caso `ASSISTANT_REPLY_MISSING` non invii messaggi, ora verifica anche che la deduplicazione inbound sia effettivamente rilasciata sia in Redis sia nello stato locale. Commit bot `28f381aec6635197b67d010bc7308902c7fa2b7a`; run 40121561641 completata con 5/5 job success.
+- La ricerca mirata nei repository accessibili non ha trovato la fonte SQL autorevole delle 15 migrazioni live. Il gate di provenienza resta aperto: nessuna migrazione ricostruita, nessuna scrittura al database.
+- La revisione del routing conferma che i messaggi audio sono ancora gestiti dal percorso MultiVocale/legacy. L'integrazione nell'Assistant workflow non viene effettuata con una modifica automatica al webhook perché richiede un contratto di prodotto esplicito: distinguere trascrizione di singolo vocale, batch MultiVocale e richiesta operativa; preservare la sintesi unica; impedire doppie risposte; gestire contesto, idempotenza e timeout. Prima si prepara una matrice di casi e test, poi si implementa in un cambiamento separato e verificabile.
