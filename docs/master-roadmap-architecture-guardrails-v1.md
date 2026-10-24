@@ -238,3 +238,7 @@ Policy evaluation now rejects malformed applicable rows rather than silently ign
 ## CI signal/noise correction — 2026-10-24
 
 The Assistant and bot workflows previously listened to both `push` on the PR head branch and `pull_request` against the PR base, producing two runs for the same commit. Both workflows now rely on `push` to their dedicated PR branches plus manual `workflow_dispatch`, and use branch concurrency to cancel stale runs. This keeps one test run per branch update without a second copy from the PR event. Assistant workflow run #364 (`40079464505`) passed on its workflow-change commit; bot workflow validation was still in progress at the latest check. This reduces duplicate CI activity and notifications but does not establish the cause of unrelated failed jobs/emails. PRs remain Draft.
+
+## Data collection plan validation — 2026-10-24
+
+The NEW work-creation policy evaluator now validates the completed data plan's shape at its trust boundary: `CREATION_POLICY_REQUIRED` requires an array `required_fields`, and any listed field must be explicitly `PROVIDED`. Missing arrays, malformed rows, and missing/uncertain statuses fail closed as `DATA_PLAN_NOT_READY`; no write path is enabled. Focused CI run #368 (`40079606945`) passed on test commit `0f6208e2c304fb8b3cf8962eab3147218819ef67`. Later documentation commits require fresh status checks.
