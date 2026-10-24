@@ -248,3 +248,24 @@ The NEW work-creation policy evaluator now validates the completed data plan's s
 La revisione statica del bot ha rilevato un rischio specifico in `PersistentMultivocaleRuntime._process_batch()`: dopo un esito ambiguo dell'invio WhatsApp, il batch può essere marcato `failed` e l'azione `Riprova` può reinviare la risposta già memorizzata. Questo può duplicare una sintesi se Meta l'ha accettata ma la risposta HTTP si è persa. È un rischio di codice individuato staticamente, non un incidente riprodotto.
 
 Tracking: [bot issue #4](https://github.com/VocalFlash/vocalflash-bot/issues/4). Implementato un primo guard conservativo sul ramo Draft: stato di consegna persistito prima dell'invio, blocco del recovery dopo il confine d'invio e nessun pulsante di retry in caso di esito ambiguo. CI bot run [40081928311](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40081928311) è passato sul commit `1a717d314ab07ea670c4e20a0bb0dd8b676c469b`; il documento di design registra esplicitamente le limitazioni. Restano da fare outbox durevole, message ID Meta, callback e riconciliazione, gestione operativa degli esiti sconosciuti e test di staging. Nessuna migrazione, configurazione a pagamento, merge o deploy eseguito. PR #2 e #3 restano Draft.
+
+
+## Recheck operativo — 24 ottobre 2026
+
+### Stato corrente verificato
+- Assistant API PR #3 e bot WhatsApp PR #2: aperte, Draft, non integrate. La Preview Vercel sulla PR #3 non è una prova di E2E; per l'head corrente della PR #2 non è stato ottenuto uno status check verificabile.
+- SMS Hook PR #9: aperta, Draft, non integrata. È stata aggiunta protezione idempotente alla richiesta Bird riutilizzando il `webhook-id` firmato come `Idempotency-Key`; il test unitario verifica la propagazione della chiave.
+- Il codice e i test SMS sono stati aggiornati sul branch `auth-bird-sms-hook-v1`. I test Deno restano **non verificati**: il connector non restituisce run GitHub Actions per questo head; Vercel è un check distinto e non sostituisce il workflow Deno.
+- Supabase live è `ACTIVE_HEALTHY`; 15 migrazioni nel registro live, nessuna development branch. Riconciliazione migrazioni ancora aperta.
+- Advisor live: 15 tabelle con RLS senza policy, 18 FK senza indice di copertura e 26 indici inutilizzati segnalati. Non aggiungere policy permissive o rimuovere indici in automatico; verificare access paths/grants e workload prima di intervenire.
+- Le RPC di commit non garantiscono ancora atomicamente conferma valida/non scaduta/one-time insieme alla scrittura. Mantenere `ATOMIC_CONFIRMATION_NOT_ENABLED`.
+
+### Hardening SMS e limiti
+- Bird documenta `Idempotency-Key` con retention di 3 ore: riusare il `webhook-id` dello stesso evento riduce doppie accettazioni se il hook viene riconsegnato. Non equivale a delivery exactly-once, conferma di consegna o outbox durevole.
+- Nessun SMS reale, configurazione Auth/Bird, segreto, deploy, modifica schema live o risorsa a pagamento è stata creata.
+- Gate invariato: ottenere un risultato Deno autorevole, correggere eventuali errori, poi eseguire review; non distribuire finché non siano approvati costi e target non-production.
+
+### Priorità operative aggiornate
+1. Verificare i test Deno sull'head attuale di PR #9.
+2. Riconciliare le 15 migrazioni live con la sequenza SQL autorevole senza modificare il database.
+3. Progettare e testare una scrittura atomica che vincoli conferma, scadenza, consumo one-time e commit; poi proseguire con persistenza conversazioni/outbox.
