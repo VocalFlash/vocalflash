@@ -87,3 +87,20 @@ La fase design è completa soltanto quando sono approvati:
 - il piano di rollout reversibile che non cambia il comportamento legacy prima che la nuova via sia verificata.
 
 Questa matrice non afferma che i test siano stati eseguiti e non autorizza routing, merge o deployment.
+
+## 7. Aggiornamento verificato — 2026-10-24
+
+- Il normalizzatore puro ha test CI verdi per testo, trascrizione singola, batch ordinato, fallimenti ASR, whitelist del payload e timestamp. L'ultimo workflow del branch, commit `c45e01416cf8e0dfc959a6465d3bd26fac235bee`, è concluso con esito **success** (run 40126316962).
+- Questo risultato non prova routing audio, dedup persistente, concorrenza del runtime, recupero dopo restart, invio WhatsApp o comportamento E2E. A01–A20 restano da eseguire o parzialmente coperti come indicato nella tabella.
+- La coda GitHub Actions non è un blocco permanente: il run prima segnalato come queued è terminato con successo circa un minuto dopo. Il problema era attesa di esecuzione del runner, non una prova di test bloccato.
+
+### Decisioni tecniche proposte per preparare i test
+
+1. Batch parziale ASR: fail closed; nessuna finalizzazione silenziosa di un batch incompleto.
+2. Idempotenza: singolo evento per account + sender + ID WhatsApp sorgente; batch per account + sender + batch ID + versione/fingerprint contenuto, con vincolo persistente da verificare.
+3. Concorrenza: finalizzazione atomica condivisa, non solo lock locale; un solo risultato finale per batch.
+4. Timeout API o WhatsApp: stato incerto, nessun retry cieco di azioni non idempotenti e nessuna falsa dichiarazione di consegna.
+5. Restart: test esplicito con processo riavviato e storage durevole. Il nome di una classe o Redis dedup non costituiscono prova sufficiente.
+6. Schema: nessuna migrazione finché la fonte SQL autorevole non è riconciliata; i test preparatori devono usare fixture e dipendenze isolate.
+
+**Prossima attività sicura:** aggiungere test unitari per le regole pure di idempotenza/normalizzazione e definire interfacce fake per API/bot. Non collegare il routing reale finché persistenza, idempotenza, parziali ASR e timeout non hanno test verificabili. Nessun merge, deploy o invio reale è stato eseguito.
