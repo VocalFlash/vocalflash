@@ -261,3 +261,6 @@ No branch was created and this check incurred no branch charge. Explicit owner a
 - Per il commit della PR #9 è stato rilevato un run Vercel Preview concluso con successo; riguarda la Preview web e non prova l'esecuzione dell'Edge Function SMS.
 - Per il commit più recente del ramo di sviluppo, un controllo workflow disponibile ha restituito un run precedente concluso con successo. Dopo gli aggiornamenti a catalogo e documentazione, serve un run riferito all'head esatto prima di dichiarare la CI verde.
 - Nessun test SMS, nessuna configurazione di credenziali, nessun deploy Supabase, nessuna modifica live o acquisto è stato eseguito.
+
+- **Verifica successiva:** GitHub Actions run #324 (`40076814169`) sul commit `d4cea0a6829d97555d581d0e6aad0c5185b33e46` è terminato `success`; gli step “Validate draft professional terminology catalog” e “Run focused assistant tests” risultano completati con esito positivo. È una prova valida per quel commit. Dopo l'aggiornamento del Libro sacro e della roadmap, va controllato il run generato dal nuovo head.
+- Vercel Preview sul commit `d4cea0a6829d97555d581d0e6aad0c5185b33e46` era ancora `pending` al controllo; non dichiarare Preview pronta finché non si osserva uno stato terminale.
