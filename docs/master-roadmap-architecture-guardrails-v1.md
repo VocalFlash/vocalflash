@@ -224,3 +224,9 @@ The canonical owner recommendations register was consolidated at `docs/libro-rac
 The register also consolidates the latest overrides and product/engineering constraints for concise but evidence-based reporting, preserving the working deployed path, validating V4 before expanding terminology, single unified MultiVocale summaries, source-data provenance, fail-closed behavior, atomic owner confirmation, durable multi-turn state, concurrency/replay protection, WhatsApp outbox reconciliation, no invented identities, privacy/cost approvals, and evidence tied to the exact commit.
 
 CI run #330 (`40076914648`) completed successfully on `e00dd7f7dd585817011ab3ab28b33ea0173ee840`. Since this roadmap update creates a newer head, do not treat that run as validation of the current head; re-check CI and Preview on the latest revision.
+
+## Fail-closed policy applicability — 2026-10-24
+
+The read-only NEW work-creation policy gate was tightened: only rows with an explicit boolean `is_active === true` can participate in effective policy resolution. Missing/null activity flags can no longer make a permissive policy appear applicable. A regression test covers missing, null and false values with `autonomy_mode: auto`; the expected outcome is `CONFIG_REQUIRED`, with no authorization and no writes.
+
+This correction does not implement persistent multi-turn state, atomic owner confirmation, or work-item creation. CI run #341 (`40079074071`) was in progress when this note was written and must be checked on its exact test commit; subsequent documentation commits require their own CI/Preview status checks.
