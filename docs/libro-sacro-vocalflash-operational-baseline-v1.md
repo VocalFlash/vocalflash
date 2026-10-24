@@ -703,3 +703,25 @@ La ricerca nei repository accessibili non ha trovato una fonte SQL autorevole co
 3. Aggiungere test di replay, concorrenza e restart nel runtime bot.
 4. Riconciliare lo schema SQL autorevole prima di qualunque persistenza.
 5. Eseguire E2E soltanto in staging esplicitamente verificato e senza destinatari reali non autorizzati.
+
+## Aggiornamento operativo — 2026-10-24, dopo la verifica CI
+
+### Già fatto/testato
+- CI run `40126316962`, commit `c45e01416cf8e0dfc959a6465d3bd26fac235bee`: **success**. Include i test aggiuntivi sui limiti di orario/offset e data bisestile.
+- La coda segnalata nella precedente risposta si è risolta: il run è terminato circa un minuto dopo essere stato avviato. Non è un blocco persistente.
+- Il contratto audio e la matrice A01–A20 sono stati aggiornati con criteri conservativi per batch incompleti, idempotenza, concorrenza, timeout, restart e privacy.
+
+### Progettato, non implementato
+- Fail closed per batch con segmento ASR fallito.
+- Nessun retry cieco in caso di timeout dell'Assistant API o invio WhatsApp ambiguo.
+- Dedup/finalizzazione atomiche e condivise; test di restart con storage durevole.
+- Un solo risultato finale per batch; niente invio per singolo segmento seguito da secondo riepilogo.
+
+### Bloccato / da fare
+- La matrice completa A01–A20 non è eseguita E2E.
+- Il normalizzatore resta fuori dal percorso runtime; l'API non trasferisce ancora il payload audio canonico.
+- Test isolati mancanti: replay, collisione account/sender, concorrenza batch, ASR parziale, timeout, restart e regressione MultiVocale.
+- Fonte SQL autorevole non riconciliata: nessun DDL live.
+- CI da verificare per gli ultimi commit documentali.
+
+**Gate invariati:** nessun merge, deploy, invio WhatsApp reale o modifica al database live senza autorizzazione. Non dichiarare risolti i punti finché non ci sono test pertinenti verdi e riferimenti ai relativi run.
