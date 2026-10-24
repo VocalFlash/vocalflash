@@ -119,3 +119,25 @@ A GO decision requires review of exact candidate SHAs, all gate evidence, rollba
 - Full current-candidate staging end-to-end: NOT RUN.
 - Gates 1 and 3: BLOCKED by the issues cited above.
 - Supabase isolated development environment: BLOCKED pending current cost check and explicit approval.
+
+## Risultati CI aggiornati — 24 ottobre 2026
+
+### PASS — suite automatizzate ripetute 5 volte
+- API Assistant commit `77fbddfa19d04a7a163e3af1ba6c9ed379abee97`: [run #40114128653](https://github.com/VocalFlash/vocalflash/actions/runs/40114128653), 5/5 job success; ogni job 89 test passati, 0 falliti.
+- Bot WhatsApp commit `7ad05b42122c939a5669c2fdceeae604185aec09`: [run #40113909039](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40113909039), 5/5 job success; ogni job 35 test.
+- SMS Hook head `ca1d3f46cef0f8fa38a8c534eb70985500481dcc`: [run #40113926527](https://github.com/VocalFlash/vocalflash/actions/runs/40113926527), 5/5 job success; ogni job 11 test, 0 fallimenti. Il secondo evento [#40113921972](https://github.com/VocalFlash/vocalflash/actions/runs/40113921972) ha anch'esso 5/5 job success.
+- Le suite automatizzate sommano almeno 675 esecuzioni riuscite nei tre sottosistemi. I test coprono i rispettivi casi unitari; non costituiscono prova di un flusso end-to-end live.
+
+### Stato dei gate di rilascio
+- Gate 0 candidato/CI: PASS per i commit sopra indicati; PR #2, #3, #9 ancora Draft.
+- Preview Vercel per commit API `77fbddfa19d04a7a163e3af1ba6c9ed379abee97`: `success`, Preview soltanto.
+- Gate 1 credenziali/readiness: test automatizzati passati; la verifica di staging di tutte le configurazioni e del servizio reale resta NOT RUN.
+- Gate 2 Meta trust boundary: suite di firma bot passata; configurazione segreto e delivery reale in staging NOT RUN.
+- Gate 3 outbox/reconciliation: BLOCKED; protezioni dedup/ambiguous-send esistenti non equivalgono a outbox durevole e riconciliazione.
+- Gate 4 scritture/confirm: BLOCKED; `ATOMIC_CONFIRMATION_NOT_ENABLED` resta attivo.
+- Gate 5 audio/MultiVocale: regressioni unit test bot passate; prova corrente su numero Meta di test e restart worker NOT RUN.
+- Gate 6 ASR/multisettore: corpus completo congelato con score di qualità NOT RUN.
+- Gate 7: **NO-GO** finché i blocchi sopra e staging E2E non sono chiusi.
+
+### Supabase live
+15 migrazioni registrate, nessuna Edge Function distribuita; advisor aggiornati: 15 tabelle RLS senza policy, 18 FK senza indice di copertura, 26 indici inutilizzati segnalati. La provenienza delle migrazioni resta aperta. Non modificare policy/indici né applicare schema senza fonte SQL riconciliata e test in ambiente isolato.

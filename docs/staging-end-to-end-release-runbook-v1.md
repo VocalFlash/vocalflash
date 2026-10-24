@@ -102,3 +102,18 @@ Stop immediately if any of the following occurs:
 - a test result cannot be distinguished from an unverified assumption.
 
 Do not promote either PR independently. After all gates pass, review both PRs together, confirm cost/security/business configuration decisions, obtain explicit release authorization, and deploy to production only through the approved release procedure.
+
+
+## Snapshot evidenze automatizzate — 24 ottobre 2026
+
+Questa sezione aggiorna il Gate A senza dichiarare concluso lo staging end-to-end.
+
+- [PASS] API Assistant, commit `77fbddfa19d04a7a163e3af1ba6c9ed379abee97`: [GitHub Actions #40114128653](https://github.com/VocalFlash/vocalflash/actions/runs/40114128653), cinque passaggi riusciti; ciascuno 89 test passati, zero fallimenti.
+- [PASS] Bot WhatsApp, commit `7ad05b42122c939a5669c2fdceeae604185aec09`: [GitHub Actions #40113909039](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40113909039), cinque passaggi riusciti; ciascuno 35 test.
+- [PASS] SMS Hook/Bird, head `ca1d3f46cef0f8fa38a8c534eb70985500481dcc`: [GitHub Actions #40113926527](https://github.com/VocalFlash/vocalflash/actions/runs/40113926527), cinque passaggi riusciti; ciascuno 11 test, zero fallimenti. Un secondo run sullo stesso head ha superato anch'esso cinque passaggi.
+- [PASS] Preview Vercel del commit API `77fbddfa19d04a7a163e3af1ba6c9ed379abee97` = `success`; non è produzione.
+- [NOT RUN] Webhook Meta reale firmato in staging, configurazione Render/Meta segreti, persistenza multi-turno dopo restart, scrittura titolare atomica, outbox/reconciliation, prova end-to-end customer→API→Supabase→bot e regressione audio su numero test.
+- [BLOCKED] Conferma titolare atomica, fonte SQL delle 15 migrazioni, ambiente staging DB isolato non stabilito/approvato.
+- Nessun SMS reale, deploy, modifica schema live, credenziale, utente Auth o business member creato.
+
+Il totale dei tre test matrix principali è 675 esecuzioni riuscite (API 445 + bot 175 + SMS 55), zero fallimenti nei run finali verificati. Questo non autorizza a promuovere le PR: mantenere Draft e NO-GO fino al completamento dei gate E2E e delle decisioni di costo/configurazione.

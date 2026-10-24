@@ -274,3 +274,15 @@ Tracking: [bot issue #4](https://github.com/VocalFlash/vocalflash-bot/issues/4).
 ### Snapshot CI dopo aggiornamento documentale — 24 ottobre 2026
 - Il commit documentale `9fe0064aef4711ba410fb22cf099eeb2a70351cc` aveva status Vercel `pending` al momento del controllo. È un controllo Preview e non dimostra il superamento dei test Deno né l'E2E.
 - Sul head SMS `f95effedb8a5d000e70706d9b6fec87aafdce1ff` lo status Vercel risultava `success`, ma il connector delle workflow run continuava a restituire una lista vuota; test Deno non dichiarati superati.
+
+
+## Verifica a cinque passaggi — aggiornamento 24 ottobre 2026
+
+- API Assistant: run [#40114128653](https://github.com/VocalFlash/vocalflash/actions/runs/40114128653), commit `77fbddfa19d04a7a163e3af1ba6c9ed379abee97`: 5/5 passaggi riusciti, ciascuno 89/89 test, 0 fallimenti; Preview Vercel `success`.
+- Bot WhatsApp: run [#40113909039](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40113909039), commit `7ad05b42122c939a5669c2fdceeae604185aec09`: 5/5 passaggi riusciti, ciascuno 35 test.
+- SMS Hook/Bird: run [#40113926527](https://github.com/VocalFlash/vocalflash/actions/runs/40113926527), head `ca1d3f46cef0f8fa38a8c534eb70985500481dcc`: 5/5 passaggi riusciti, ciascuno 11/11 test; anche il run push [#40113921972](https://github.com/VocalFlash/vocalflash/actions/runs/40113921972) è riuscito 5/5.
+- Matrice minima: 675 esecuzioni di test riuscite nei tre sottosistemi, senza fallimenti nei run finali verificati. Un run API parallelo precedente è rimasto in-progress, ma il run seriale successivo ha completato tutti e cinque i passaggi.
+- Il workflow API ora serializza i cinque passaggi e impone un timeout di 10 minuti per job. Il workflow SMS testa anche body limitato a 20 KiB senza Content-Length e chiave idempotente Bird.
+
+### Non sbloccato dai test unitari
+Rimangono NO-GO: conferma titolare atomica, riconciliazione della fonte SQL delle 15 migrazioni, persistenza conversazioni multi-turno, outbox WhatsApp durevole/reconciliation, staging E2E, verifica delle configurazioni Meta/Render e revisione dei rilievi Supabase. Nessuna modifica live, deploy o SMS reale è stato effettuato. Le PR #2, #3 e #9 restano Draft.

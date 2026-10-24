@@ -402,3 +402,33 @@ Prossimo passo tecnico sicuro: tracciare le chiamate RPC dal codice applicativo 
 
 ### Nota di stato dopo l'aggiornamento della roadmap — 24 ottobre 2026
 - La roadmap è stata aggiornata sul branch `assistant-conversation-photo-v1`; lo status Vercel osservato sul commit documentale `9fe0064aef4711ba410fb22cf099eeb2a70351cc` era `pending` al momento del controllo. Questo status riguarda il branch documentale e non costituisce prova dei test Deno della PR #9 o di un test E2E.
+
+
+## Ciclo di verifica ripetuto cinque volte — esito verificato (24 ottobre 2026)
+
+### Risultati CI effettivi
+- **Assistant API / sito:** run GitHub Actions [#40114128653](https://github.com/VocalFlash/vocalflash/actions/runs/40114128653), commit candidato `77fbddfa19d04a7a163e3af1ba6c9ed379abee97`: 5/5 job completati con successo; ogni pass ha eseguito 89 test, 89 passati, 0 falliti (445 esecuzioni di test). Il controllo Vercel Preview dello stesso commit è `success`; è Preview, non produzione.
+- **Bot WhatsApp Python / MultiVocale:** run [#40113909039](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40113909039), commit `7ad05b42122c939a5669c2fdceeae604185aec09`: 5/5 job completati con successo; ogni pass ha eseguito 35 test, senza errori (175 esecuzioni).
+- **SMS Hook / Bird:** run [#40113926527](https://github.com/VocalFlash/vocalflash/actions/runs/40113926527), head `ca1d3f46cef0f8fa38a8c534eb70985500481dcc): 5/5 job completati con successo; ogni pass ha eseguito 11 test, 11 passati, 0 falliti (55 esecuzioni). Un secondo evento CI sullo stesso head, run [#40113921972](https://github.com/VocalFlash/vocalflash/actions/runs/40113921972), ha completato anch'esso 5/5 job con successo.
+- **Totale minimo della matrice richiesta:** 675 esecuzioni di test riuscite nei tre sottosistemi (445 API + 175 bot + 55 SMS), zero fallimenti nei job finali selezionati. Il secondo run SMS aggiunge ulteriori 55 esecuzioni riuscite.
+- Un precedente run API parallelo `40113906429` è rimasto `in_progress` nell'ultima lettura, ma è superato dal run successivo seriale `40114128653`, completato `success`. Non usare il run precedente come evidenza di completamento.
+
+### Implementazioni CI/SMS incluse nella verifica
+- Il workflow API ripete la suite cinque volte in sequenza, con timeout per job di 10 minuti.
+- I workflow bot e SMS eseguono cinque pass indipendenti per run.
+- SMS Hook: aggiunta lettura del body con limite effettivo di 20 KiB anche quando manca `Content-Length`; idempotency key Bird derivata da `webhook-id`; 11 test Deno coprono firma, payload manomesso, configurazione fail-closed, input malformato, limiti del body, provider rejection, timeout senza retry cieco e propagazione della chiave.
+- PR #3, PR #2 e PR #9 restano Draft e non integrate. Nessun deploy, nessun SMS reale, nessun segreto o risorsa a pagamento creati.
+
+### Blocchi ancora aperti — NO-GO al rilascio
+- **Conferma titolare atomica:** le RPC live di commit non legano ancora in modo atomico la conferma valida/non scaduta/monouso alla scrittura. Mantenere `ATOMIC_CONFIRMATION_NOT_ENABLED`.
+- **Migrazioni:** 15 versioni presenti nel registro Supabase, ma la sequenza SQL autorevole completa non è stata trovata e riconciliata nel repository.
+- **Persistenza conversazioni e outbox:** il flusso multi-turno completo, la outbox durevole e la riconciliazione degli esiti WhatsApp ambigui non sono ancora provati end-to-end.
+- **Staging E2E:** non eseguito. Test unitari verdi e Preview verde non equivalgono a prova Meta→API→Supabase→bot→risposta.
+- **Supabase live:** nessuna Edge Function distribuita; advisor aggiornati rilevano 15 tabelle RLS senza policy, 18 FK senza indice di copertura e 26 indici segnalati come inutilizzati. Sono rilievi da valutare, non autorizzazione a modifiche automatiche. Nessuna development branch creata.
+- Nessun cambiamento al database/schema live, nessun utente Auth/membro business fittizio, nessun SMS reale e nessuna modifica di produzione.
+
+### Prossime azioni sicure
+1. Conservare l'evidenza dei tre run a cinque passaggi e non promuovere le PR.
+2. Recuperare e riconciliare le 15 migrazioni autorevoli prima di progettare modifiche DB.
+3. Implementare e testare la transazione di conferma atomica in ambiente isolato prima di abilitare le scritture.
+4. Implementare persistenza/outbox/reconciliation e poi eseguire il runbook E2E in staging isolato, con credenziali e costi approvati.
