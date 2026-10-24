@@ -266,3 +266,12 @@ No branch was created and this check incurred no branch charge. Explicit owner a
 - Vercel Preview sul commit `d4cea0a6829d97555d581d0e6aad0c5185b33e46` era ancora `pending` al controllo; non dichiarare Preview pronta finché non si osserva uno stato terminale.
 
 - **Re-check finale:** GitHub Actions run #328 (`40076877316`) è terminato `success` sul commit `6dba0c0a0345c6b975c424fed7ee30c3cd164ad2`; validator del catalogo e test focalizzati Assistant risultano verdi. Vercel Preview sul medesimo commit era ancora `pending` al controllo; questa parte resta da verificare separatamente.
+
+
+## Registro aggiornato — 24 ottobre 2026
+
+Il registro canonico delle raccomandazioni è stato consolidato in `docs/libro-raccomandazioni-titolare-vocalflash-v1.md` (v2 del contenuto, stesso percorso). Comprende override storici e attuali, metodo di collaborazione, qualità della sintesi, vocabolario, sicurezza/owner confirmation, MultiVocale, persistenza, outbox, costi, privacy, test e pilot.
+
+Regola esplicita del titolare: il registro operativo è dinamico; rimuovere dal registro attivo i punti chiusi mantenendone evidenza nello storico, aggiungere le nuove raccomandazioni e marcare come sospesi i punti in attesa. Non dichiarare chiuso un punto sulla base di un piano.
+
+Verifica CI: run #330 `40076914648` risulta `completed/success` sul commit `e00dd7f7dd585817011ab3ab28b33ea0173ee840`. Il presente aggiornamento documentale genera un nuovo head: il risultato della run #330 non va esteso al nuovo head. Ricontrollare CI e Preview sulla revisione corrente prima di attribuire loro uno stato.
