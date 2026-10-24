@@ -112,3 +112,33 @@ Regole:
 ## 8. Gate
 
 Questo documento non autorizza l'implementazione del routing, il cambiamento del timing MultiVocale, DDL sul database live, merge o deployment. La normalizzazione pura è stata aggiunta come `lib/audio-assistant-event-normalizer-v1.js`, con test dedicati. Non è ancora importata da `api/v1/assistant.js` né dal bot. Restano bloccati routing audio, modifiche al timing MultiVocale, DDL sul database live, merge e deployment.
+
+## 9. Risoluzioni conservative per i gate ancora aperti (2026-10-24)
+
+Queste sono decisioni tecniche proposte per rendere verificabile la prossima fase; non autorizzano routing runtime, migrazioni o invii reali.
+
+1. **Batch parziale:** scelta predefinita = fail closed. Non inviare il batch al workflow come completo se un segmento non è trascritto con successo. Conservare gli esiti per segmento; richiedere retry controllato o segnalare il batch incompleto. Escludere un segmento senza avviso è vietato.
+2. **Identità evento:** chiave logica stabile = account + sender + batch ID + fingerprint/versione del contenuto. Per evento singolo usare account + sender + external message ID. La chiave deve essere validata lato server e non sostituisce il controllo univoco persistente.
+3. **Concorrenza:** una sola finalizzazione per batch. Il controllo deve essere atomico e condiviso tra istanze; lock soltanto in memoria non è sufficiente. Gli eventi concorrenti vanno ordinati tramite timestamp sorgente quando affidabile e sequenza di ricezione stabile come fallback.
+4. **Timeout Assistant API:** classificare l'esito come sconosciuto; non ripetere automaticamente azioni non idempotenti. Un replay è consentito soltanto quando l'API verifica la stessa chiave d'idempotenza e può restituire l'esito già registrato.
+5. **Timeout invio WhatsApp:** nessun retry cieco. Stato REPLY_OUTCOME_UNKNOWN finché non è riconciliato con un identificativo/stato del provider o una procedura operativa controllata. Senza outbox persistente non promettere exactly-once.
+6. **Riavvio:** il batch finalizzato/in attesa deve essere ricostruibile da storage durevole. Redis volatile o una struttura Python chiamata “persistent” non dimostrano da soli la durabilità; servono test espliciti di restart e riconciliazione.
+7. **Persistenza/schema:** nessun DDL finché non viene recuperata e verificata la fonte SQL autorevole. Fino ad allora, i test devono usare repository fake/in-memory e dimostrare il contratto senza scrivere sul database live.
+8. **Risposta:** una sola risposta finale per batch. Non inviare risposte per singolo segmento e poi un secondo riepilogo batch. I comandi espliciti MultiVocale restano nel runtime esistente.
+9. **Retention e privacy:** non aggiungere nuove copie permanenti di audio/trascrizioni per debug; loggare identificativi tecnici minimizzati, non token, URL media o testo integrale. La retention definitiva resta decisione di prodotto/legale prima della persistenza.
+10. **Rollout:** introdurre prima test isolati e un flag disattivato per default; staging separato e reversibile prima di qualsiasi abilitazione. Il flag non va aggiunto finché non esiste un percorso testato per spegnere il flusso senza perdere eventi.
+
+## 10. Gate minimi per dichiarare i punti risolti
+
+- [ ] Test replay: stesso evento ripetuto non crea un secondo effetto.
+- [ ] Test collisione: due account/sender diversi non condividono dedup o batch.
+- [ ] Test batch: ordine stabile, una sola finalizzazione, nessuna perdita del primo vocale.
+- [ ] Test parziale ASR: nessun batch dichiarato completo quando un segmento fallisce.
+- [ ] Test timeout API: esito sconosciuto e retry non cieco.
+- [ ] Test timeout WhatsApp: nessuna falsa dichiarazione di consegna e nessun retry automatico ambiguo.
+- [ ] Test restart: recupero batch e outbox dopo riavvio del processo.
+- [ ] Test API: payload canonico validato, non ignorato o ridotto al solo normalized_text.
+- [ ] Test di regressione sui comandi MultiVocale e sul flusso testuale ordinario.
+- [ ] CI verde su entrambi i repository e matrice A01–A20 aggiornata con evidenze.
+
+**Stato alla data:** nessuno dei gate qui elencati va marcato completo solo perché il contratto è scritto. I test puri del normalizzatore sono coperti da CI; i gate di routing, idempotenza persistente, restart e consegna esterna restano da eseguire.
