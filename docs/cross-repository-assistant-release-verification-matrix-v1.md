@@ -141,3 +141,9 @@ A GO decision requires review of exact candidate SHAs, all gate evidence, rollba
 
 ### Supabase live
 15 migrazioni registrate, nessuna Edge Function distribuita; advisor aggiornati: 15 tabelle RLS senza policy, 18 FK senza indice di copertura, 26 indici inutilizzati segnalati. La provenienza delle migrazioni resta aperta. Non modificare policy/indici né applicare schema senza fonte SQL riconciliata e test in ambiente isolato.
+
+## Recheck refresh — 24 October 2026
+
+Repeated automated suite results have been verified from individual GitHub Actions logs: Assistant API 5 × 89/89, WhatsApp bot 5 × 35/35, Bird SMS Hook 5 × 11/11. Main matrix: 675 successful test executions. Additional API and SMS five-pass runs add 500 and 55 successful executions respectively. These remain unit/focused suites; no five-run integrated staging E2E evidence exists.
+
+Release gates remain open: authoritative 15-migration baseline reconciliation, atomic one-time owner confirmation bound to writes, durable multi-turn conversation state, outbound outbox/reconciliation, and signed Meta-to-WhatsApp staging E2E. No live DB change, merge, or production deploy was performed. Detailed current evidence is in the Libro sacro operativo and the refreshed atomicity/migration audits.
