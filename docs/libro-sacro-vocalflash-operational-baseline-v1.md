@@ -725,3 +725,25 @@ La ricerca nei repository accessibili non ha trovato una fonte SQL autorevole co
 - CI da verificare per gli ultimi commit documentali.
 
 **Gate invariati:** nessun merge, deploy, invio WhatsApp reale o modifica al database live senza autorizzazione. Non dichiarare risolti i punti finché non ci sono test pertinenti verdi e riferimenti ai relativi run.
+
+
+## Aggiornamento operativo 2026-10-25 — Audit isolamento Redis e stato CI
+
+### Già fatto/verificato
+- I run JS più recenti per contratto, matrice e libri operativi risultano tutti success: 40126717048, 40126746115, 40126769370, 40126792227.
+- Riletti i file effettivi della branch bot assistant-conversation-photo-v1: runtime MultiVocale, store Redis, bridge testuale e test per lease, invio ambiguo e concorrenza.
+- Aggiunto report statico nel bot: docs/verification-idempotency-multivocale-2026-10-25.md, commit 547d34ad0464f67416be2ff614a2d297b668b6da.
+
+### Nuovo gate tecnico
+Le chiavi Redis active, last-audio e queued sono indicizzate principalmente dal mittente, non dall'account/canale. Non è provato che il deployment sia multi-account né che si sia verificata una collisione. Prima di modificare il runtime occorre confermare la topologia di deployment. Se Redis è condiviso fra account, introdurre namespace stabile account/canale e testare isolamento; prevedere migrazione compatibile delle chiavi per non perdere batch pendenti.
+
+### Attenzione alla CI Python
+Il workflow .github/workflows/test-multivocale-runtime-v2.yml ascolta i push sulla branch multivocale-runtime-v2 e workflow_dispatch. Non ascolta automaticamente assistant-conversation-photo-v1. Pertanto il commit documentale appena creato sul branch di lavoro non è una prova di test eseguiti: la suite va lanciata esplicitamente o il workflow va configurato in modo deliberato, senza modificare il deployment.
+
+### Prossime azioni
+1. Confermare single-account vs multi-account e condivisione Redis.
+2. Aggiungere test di collisione tra account/sender prima di correggere le chiavi, se pertinente.
+3. Eseguire suite completa Python e test isolati di restart/recovery; citare i run reali.
+4. Solo dopo riaprire il gate per l'integrazione audio Assistant API.
+
+Non completato: routing audio, E2E A01–A20, verifica live Meta, schema SQL autorevole, merge/deploy. Nessuna azione live è stata eseguita.
