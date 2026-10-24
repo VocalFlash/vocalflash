@@ -1,7 +1,7 @@
 # Owner Confirmation Atomicity Audit v1
 
 **Status:** audit only; no database or runtime behavior changed.  
-**Audited:** 2026-10-22  
+**Audited:** 2026-10-24 (rechecked)  
 **Scope:** owner-command runtime in this repository and the live Supabase RPC definitions in project `tkfyfqgtumoeywlqzmdt`.
 
 ## Verified current behavior
@@ -50,3 +50,10 @@ Implement and review a single transactional database operation (or a transaction
 - Do not deploy to production based only on unit tests or a green Preview.
 - Coordinate the JS Assistant API and Python WhatsApp bot releases; the bot PR depends on the companion Assistant API response contract.
 - Independently resolve the Meta webhook signature secret/configuration and validate signed/unsigned webhook behavior in staging before deployment.
+
+
+## Recheck 24 October 2026 — release decision unchanged
+
+The live RPC definitions were inspected again. The two commit RPCs still accept `p_confirmed boolean` and a proposal event ID without verifying, locking, expiring, and consuming the corresponding owner-confirmation event in the same transaction as the write. Existing advisory locks and write idempotency do not close that authorization gap.
+
+**Decision: keep `ATOMIC_CONFIRMATION_NOT_ENABLED`.** No SQL was applied and no live write behavior was changed. Do not implement a migration against the live schema or infer the missing table/column semantics from function names. Next implementation must be based on the recovered authoritative migration history and tested against an isolated database. Required tests include wrong business/member/proposal, absent confirmation, expired confirmation, replay/second consumption, concurrent duplicate commit, mismatched action/payload, and transaction rollback on any failed check. Verify grants remain restricted to trusted service execution and prove that invalid confirmation leaves no side effect.
