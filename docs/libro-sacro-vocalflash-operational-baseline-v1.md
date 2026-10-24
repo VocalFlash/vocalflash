@@ -483,3 +483,71 @@ Prossimo passo tecnico sicuro: tracciare le chiamate RPC dal codice applicativo 
 **Bloccato per ragioni reali, non per mancanza di test unitari:** recupero della sequenza SQL autorevole delle 15 migrazioni; creazione di un ambiente isolato riproducibile (eventuali costi richiedono approvazione); implementazione e prova della conferma atomica; persistenza conversazionale e outbox/reconciliation; cinque esecuzioni E2E integrate con credenziali e identità di staging autorizzate.
 
 **Esito:** le attività autonome sicure disponibili in questo contesto sono state completate. Il prodotto rimane **NO-GO per il rilascio**. Non rimuovere i blocchi e non dichiarare completato l'E2E finché non esistono le evidenze richieste.
+
+## 8. Registro consolidato delle raccomandazioni dell’utente — revisione 24 ottobre 2026
+
+Questa sezione consolida le raccomandazioni permanenti ricostruite dal registro di continuità e dalle decisioni operative disponibili. In caso di conflitto prevalgono le istruzioni esplicite più recenti dell’utente e i vincoli di sicurezza del progetto. Il registro storico resta una fonte di tracciabilità; questo Libro sacro è il riferimento operativo corrente.
+
+### 8.1 Metodo di lavoro obbligatorio
+- Prima di ogni azione rileggere Libro sacro, roadmap, registro raccomandazioni/continuità, stato corrente di branch/PR, ultimi commit, test e incidenti pertinenti. Non ripartire da zero e non ignorare decisioni precedenti.
+- Separare sempre: **implementato**, **testato con evidenza**, **progettato/deciso**, **bloccato**, **non iniziato**. Indicare SHA, ambiente e risultato quando disponibili. Non trasformare un piano, una review statica o un test unitario in prova E2E.
+- Essere proattivi, prudenti, precisi, critici e lungimiranti. Cercare controesempi, alternative, regressioni, ambiguità e rischi; non limitarsi a confermare la soluzione preferita.
+- Procedere autonomamente con attività documentali, analisi e verifiche di sola lettura e con modifiche isolate e reversibili. Fermarsi prima di costi, servizi a pagamento, dati/schema live, segreti/configurazioni reali, messaggi a persone, azioni irreversibili, merge o deploy non autorizzati.
+- Fare la modifica minima necessaria; dopo ogni modifica rileggere il risultato, verificare diff/stato, eseguire i test pertinenti, controllare effetti collaterali e aggiornare Libro sacro, roadmap e registro di evidenza.
+- Non ripetere batterie per inerzia: rieseguirle quando cambia codice/contratto, ambiente, dipendenza o rischio. Se l’utente richiede una ripetizione esplicita (es. cinque cicli), eseguirla e documentare ogni esecuzione; distinguere cicli identici da copertura E2E.
+- Non dire “sto eseguendo”, “completato”, “testato” o “risolto” senza un’azione e un risultato osservabili. Se uno strumento fallisce, riportare il limite e non simulare il completamento.
+- Non riversare codice completo in chat nella fase corrente. Quando serve una modifica, lavorare sui file e riportare sintesi, file, commit, prove e blocchi; mostrare codice solo se richiesto espressamente.
+- Mai chiedere, esporre, registrare o committare segreti, token, numeri personali o contenuti cliente non necessari. Sanificare log e prove.
+
+### 8.2 Principi di prodotto e comportamento
+- VocalFlash è un assistente WhatsApp **“dal vocale all’azione”**, non un trascrittore generico. La sintesi privilegia significato, richieste, decisioni, nomi, luoghi, date, importi, scadenze e prossimi passi; non restituisce automaticamente l’intera trascrizione né un’intestazione ridondante come “Punti salienti”.
+- Preservare e proteggere il flusso audio/MultiVocale legacy mentre si sviluppa il percorso Assistant. Unire vocali in batch senza perdere il primo elemento, gestire finestre temporali, concorrenza, retry e restart senza duplicazioni o perdita di contenuto.
+- Il flusso dell’assistente deve essere esplicito e verificabile: messaggio/evento → intent → classificazione/Resolver → workflow e policy → estrazione di dati supportati → identificazione dei dati mancanti/incerti → domanda mirata → proposta/azione autorizzata → persistenza e risposta. Non creare pratiche sulla sola base di una classificazione o di un output del modello.
+- Riconoscere automaticamente il settore senza irrigidire l’assistente in un singolo settore. Conservare terminologia professionale e contesto aziendale; non inventare fatti o completare campi mancanti per supposizione. I settori devono essere coperti da test rappresentativi; non reinserire l’esempio farmaceutico come settore prioritario senza decisione esplicita.
+- Il vocabolario terminologico aziendale è solo contesto lessicale non attendibile: non può autorizzare azioni, sovrascrivere policy, creare intenti o risolvere da solo ambiguità. Sinonimi, definizioni, disambiguazioni ed esempi devono essere versionati, revisionabili e testati.
+- I comandi del titolare devono essere separati dai messaggi dei clienti. Identità e ruolo derivano da Auth e associazioni verificate, non dal testo del messaggio, da una voce del vocabolario o da output del modello.
+- L’assistente deve fare domande concise e utili, raccogliere solo dati necessari, mantenere il contesto della stessa pratica tra messaggi e allegati e lasciare decidere al professionista dove richiesto dalla policy. Negazioni, correzioni, cambi di idea, ambiguità, omonimi, messaggi inoltrati, errori ASR, eventi duplicati e fuori ordine sono casi di test obbligatori.
+- Non dichiarare una pratica aperta, un appuntamento fissato, una notifica consegnata o un’azione effettuata senza stato persistito e riscontro del sistema responsabile.
+
+### 8.3 Sicurezza, affidabilità e dati
+- Fail closed su policy assente/sconosciuta, identità non verificata, dati obbligatori mancanti, ambiguità, dipendenze non pronte o conferme non verificabili.
+- Le conferme del titolare devono essere legate a business, membro, canale, proposta/versione e evento sorgente; devono essere esplicite, non scadute, monouso e consumate nella stessa transazione dell’azione. Fino alla prova del vincolo atomico mantenere ATOMIC_CONFIRMATION_NOT_ENABLED.
+- Distinguere idempotenza inbound da consegna outbound. Non promettere exactly-once per provider esterni senza outbox durevole, chiavi d’idempotenza dove supportate e riconciliazione degli esiti ambigui dopo timeout.
+- Firma webhook prima del parsing; limiti del body; autenticazione dei servizi; timeout e retry controllati; log minimizzati; nessun errore grezzo o segreto nella risposta cliente. Le prove di firma automatica non attestano che i segreti corretti siano configurati sul servizio reale.
+- Verificare isolamento multi-tenant, privilegi, RLS e policy con identità e percorsi d’accesso concreti. RLS abilitata senza policy è un finding da risolvere con policy progettate e testate, non autorizza policy permissive. Non eliminare indici solo perché segnalati inutilizzati; valutare query, carico e vincoli.
+- Riconciliare sempre schema e cronologia migrazioni live con fonti SQL versionate autorevoli. Non ricostruire migrazioni da nomi o supposizioni e non riapplicare DDL al live per sbloccare i test.
+- Definire privacy, minimizzazione, retention/cancellazione, gestione media, accessi e tracciabilità prima del lancio. Non usare dati reali per test quando sono sufficienti fixture sintetiche.
+
+### 8.4 Architettura, esperienza, business e sostenibilità
+- Considerare insieme qualità tecnica, esperienza del professionista/cliente, scalabilità, resilienza, dipendenze, costi completi, privacy, sicurezza, reversibilità e manutenzione futura; introdurre complessità solo quando porta utilità dimostrabile.
+- Mantenere chiaro il contratto tra Assistant API e bot WhatsApp; trattarli come unità di rilascio coordinata. Una Preview, una CI verde o un servizio legacy funzionante non prova che le nuove feature siano integrate e distribuite.
+- Completare onboarding dell’attività e collegamento Meta/WhatsApp con percorsi espliciti, verifica delle condizioni reali e nessuna promessa di compatibilità non provata. Valutare Meta Cloud API/Coexistence e gestione dei gruppi sulla base di requisiti e limiti ufficiali aggiornati.
+- Account & Billing: definire identità/account, verifica WhatsApp/email, piani, attivazione dopo pagamento, rinnovo, cancellazione e portale cliente; non attivare pagamenti o piani a pagamento senza approvazione. Il vincolo Vercel Hobby/non-commerciale deve essere risolto prima del lancio commerciale.
+- MultiVocale, gestione pratiche, calendario/appuntamenti, dashboard, policy per settore, vocabolario dinamico, gruppi WhatsApp, privacy/retention e costi Meta + AI + hosting/Redis/storage devono avere stato esplicito nella roadmap, non essere trattati come completati se solo progettati.
+- Validare il valore commerciale con evidenze di mercato e test con conversazioni rappresentative. La ricerca dei bisogni deve essere orientata ai reali flussi di lavoro per settore, non limitarsi a chiedere ai tecnici cosa desiderano. Il questionario iniziale (2 risposte) è un segnale esplorativo, non una validazione statistica.
+
+### 8.5 Protocollo di test e chiusura
+- Ogni test registra repository, SHA esatto, ambiente, data/ora, scenario, risultato, evidenza e sanitizzazione. PASS solo con esecuzione osservata; BLOCKED e NOT RUN restano tali finché non esiste prova.
+- Le suite component-level devono coprire casi positivi e negativi, retry, concorrenza, idempotenza, timeout, payload malformati, autenticazione, permessi e assenza di dipendenze. I test AI devono misurare falsi MATCH, ambiguità, NEW/MATCH, estrazione dei campi e robustezza multisettore senza confondere errori infrastrutturali con errori del modello.
+- La chiusura integrata richiede cinque run tracciabili sul medesimo candidato API+bot in staging isolato, dopo il superamento dei prerequisiti di sicurezza e persistenza. Ogni run deve verificare ingresso Meta, autenticazione, API, DB, risposta WhatsApp, deduplica, retry e stato finale; cinque run non sostituiscono la copertura dei casi avversi.
+- Dopo ogni ciclo, controllare dati residui e cleanup usando esclusivamente gli ID di test dedicati; non cancellare dati preesistenti. Un rollback di prova o la sintassi valida non dimostrano che il cleanup post-esecuzione funzioni.
+- Il rilascio commerciale è NO-GO finché restano bloccanti migrazioni non riconciliate, conferma atomica, persistenza/outbox, policy/RLS e test integrati non eseguiti.
+
+### 8.6 Mappa delle aree che il controllo 360° deve coprire
+1. Visione prodotto, casi d’uso, requisiti e decisioni storiche.
+2. WhatsApp/Meta: webhook, firme, token, versioni Graph API, numeri/app, invio/ricezione, gruppi e limiti di piattaforma.
+3. Bot Python/Render: audio, trascrizione, sintesi, MultiVocale, batching, concorrenza, retry, readiness, log, timeout e stato in memoria.
+4. Assistant API/Vercel: autenticazione, readiness, contratti API, classificazione, Resolver, estrazione, policy, risposte e compatibilità tra commit.
+5. Supabase/Postgres: migrazioni, schema, RPC, transazioni, privilegi, RLS, indici, dati staging e multi-tenant.
+6. Persistenza conversazionale, idempotenza inbound, outbox, invii esterni e riconciliazione degli esiti ambigui.
+7. Sicurezza, privacy, retention, segreti, minimizzazione dati e audit.
+8. Modelli AI: scelta modelli, prompt, vocabolario, costi, latenza, robustezza e valutazione.
+9. Account, onboarding, Meta Embedded Signup/Coexistence, billing e cancellazione.
+10. Dashboard, work items, contatti, appuntamenti, comandi titolare, workflow multi-settore e gruppi.
+11. Deploy/CI/CD, ambienti, dipendenze, monitoraggio, rollback, costi e limiti dei piani.
+12. QA: unit/integration/E2E, casi avversi, test multisettore, cleanup, prove e tracciabilità.
+13. Mercato, differenziazione, onboarding utente, costi unitari e sostenibilità commerciale.
+14. Documentazione, registro raccomandazioni, roadmap, runbook, matrice release e continuità tra chat.
+
+### 8.7 Stato del consolidamento e limiti
+Il registro di continuità storico è un documento lungo (5.076 righe) con decisioni, prove e snapshot temporali. Questa sezione consolida le raccomandazioni permanenti recuperate e le aree di controllo, ma non sostituisce la verifica puntuale di ogni singola affermazione storica. Per evitare di promuovere snapshot obsoleti a stato corrente, ogni dato tecnico va riconfermato contro repository, CI, deployment e Supabase prima di agire. La revisione integrale 360° resta aperta finché ogni area sopra non ha un esito PASS/BLOCKED/NOT RUN con evidenza.
