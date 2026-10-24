@@ -364,3 +364,10 @@ No live schema/data changes, no RLS policy creation, no index changes, no migrat
 7. **P1 — resolve commercial readiness**: hosting plan constraints, Meta eligibility, billing lifecycle, privacy/retention, support/monitoring and measured per-customer cost.
 
 This inspection was read-only. No application code, live data/schema, provider configuration, secret, deployment, PR state or paid resource was changed.
+
+
+### Read-only database privilege cross-check — 24 October 2026
+- Direct read-only catalog queries confirmed all 15 public base tables have RLS enabled and zero policies. A separate `information_schema.role_table_grants` aggregate returned 93 grant rows covering the 15 tables for `service_role` only; it returned no table-grant rows for `anon` or `authenticated`.
+- Direct function-privilege checks for `vf_resolve_owner_member_by_sender_v1`, `vf_record_owner_command_confirmation_v1`, `vf_commit_owner_note_v1`, `vf_commit_owner_schedule_action_v1`, and `vf_ingest_customer_whatsapp_event_v1` returned `EXECUTE=false` for `anon` and `authenticated`, `EXECUTE=true` for `service_role` and `postgres`.
+- This narrows the current observed exposure: the absence of RLS policies is a major future client-access/design blocker, but these specific checks did not show direct table grants to anon/authenticated or execute grants on the five RPCs to those roles. It does not replace a full privilege audit (views, sequences, default privileges, other functions, schema grants, PostgREST exposure, service-key handling, and application authorization still require review).
+- No SQL writes were performed. All queries were SELECT-only catalog inspections.
