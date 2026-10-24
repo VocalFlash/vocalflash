@@ -239,3 +239,22 @@ Non collegare i vocali all'Assistant API con una semplice sostituzione di `conte
 
 ### Criterio di accettazione
 La funzione può avanzare solo quando la sintesi rimane fedele e concisa, ogni affermazione è riconducibile al messaggio sorgente, non si creano doppie risposte o azioni non confermate, e la matrice di regressione viene eseguita con evidenze registrate.
+
+## 2026-10-24 — Aggiornamento successivo: CI completata e gate audio precisati
+
+### Già fatto e verificato
+- Il workflow `40126316962` sul commit `c45e01416cf8e0dfc959a6465d3bd26fac235bee` è terminato con **success**. Oltre a date impossibili, i test coprono orari fuori limite, offset non valido e un offset valido.
+- Il workflow che risultava in coda non era rimasto bloccato: GitHub Actions lo ha eseguito e concluso dopo circa un minuto. La precedente segnalazione era corretta per lo stato del momento, ma non più attuale.
+- Il contratto e la matrice sono stati aggiornati con regole conservative per batch parziali, idempotenza, concorrenza, timeout, restart e privacy. Commit documentale del contratto `91ba50641d546553d6e71ee267e0348a5162ad86`; matrice `cc6db9def4f4d6c012600b96cd1e5ebb6ec57833`.
+
+### Decisioni tecniche proposte, non autorizzazione al rilascio
+- Batch parziale ASR: fail closed, senza finalizzazione silenziosa.
+- Nessun retry cieco dopo timeout API o invio WhatsApp ambiguo; l'esito resta sconosciuto finché non riconciliato.
+- Dedup e finalizzazione devono essere atomiche e condivise tra istanze; lock locale e Redis dedup non dimostrano durabilità/outbox.
+- Nessuna migrazione live prima di riconciliare la fonte SQL autorevole.
+
+### Da fare
+- Attendere e verificare la CI dei due aggiornamenti documentali più recenti.
+- Preparare test isolati di replay/idempotenza, collisione multi-tenant, batch parziale, timeout e restart.
+- Non collegare ancora il routing audio: l'API non trasporta tuttora il payload canonico e la matrice A01–A20 non è stata eseguita end-to-end.
+- Nessun merge, deploy, invio reale o modifica al database live.
