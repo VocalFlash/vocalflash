@@ -370,3 +370,31 @@ Prossimo passo tecnico sicuro: tracciare le chiamate RPC dal codice applicativo 
 **Non dichiarato completato:** esecuzione verde dei nuovi test; verifica reale del Send SMS Hook; conferma atomica; migrazioni; persistenza/outbox; onboarding con identità reale; staging E2E; rilascio.
 
 **Prossimo passo autonomo e sicuro:** ottenere il risultato del workflow Deno sul branch `auth-bird-sms-hook-v1`, correggere eventuali errori e aggiornare le evidenze. Nessun merge, deploy, costo, SMS reale o modifica di schema senza le autorizzazioni previste.
+
+
+## Ciclo di recheck generale e hardening idempotenza Bird (24 ottobre 2026)
+
+### Recheck documentale e dei repository
+- Riletto il Libro delle raccomandazioni del titolare: sezione 16 “Riepilogo periodico VocalFlash” presente; restano vincolanti la distinzione fra implementato/testato/progettato/bloccato, il divieto di dichiarare test non eseguiti e i gate per costi/produzione.
+- Verificato il presente Libro sacro e lo stato delle PR principali: Assistant API PR #3 e bot WhatsApp PR #2 sono ancora aperte in Draft e non integrate. La Preview Vercel verde sulla PR #3 non prova l'E2E combinato; per il head della PR #2 il connector non ha restituito status checks.
+- PR #9 SMS/Bird è ancora aperta in Draft, non integrata. Il nuovo head contiene una modifica ulteriore descritta sotto; nessun deploy, configurazione Auth/Bird, SMS reale o modifica di produzione è stata eseguita.
+
+### Supabase — controllo live in sola lettura
+- Progetto `tkfyfqgtumoeywlqzmdt`: `ACTIVE_HEALTHY`, PostgreSQL 17.6.1.171.
+- Registro live: 15 migrazioni; riconciliazione con la sequenza SQL autorevole ancora aperta. Nessuna development branch Supabase presente.
+- Security advisor aggiornato il 24/10: 15 tabelle con RLS abilitata e senza policy. Questo normalmente nega l'accesso diretto ai ruoli non bypass-RLS, ma va verificato rispetto ai percorsi di accesso effettivi e ai privilegi; non aggiungere policy permissive per silenziare l'advisor.
+- Performance advisor: 18 foreign key senza indice di copertura e 26 indici segnalati come inutilizzati. Non eliminare gli indici inutilizzati automaticamente; valutare gli indici FK dopo la riconciliazione delle migrazioni e con workload misurabile.
+- Le RPC di commit continuano a non dimostrare un vincolo atomico fra conferma valida/non scaduta/consumata una sola volta e scrittura. Mantenere `ATOMIC_CONFIRMATION_NOT_ENABLED`; nessuna migrazione live applicata.
+
+### PR #9 — miglioramento anti-duplicazione SMS
+- Dopo aver verificato la documentazione ufficiale Bird, aggiunto alla richiesta SMS l'header `Idempotency-Key` derivato dal `webhook-id` Standard Webhooks firmato; aggiunto test unitario che verifica la propagazione della chiave e aggiornata la documentazione del flusso.
+- Razionale: Bird documenta la riproduzione della risposta originale per chiavi identiche entro una retention di 3 ore; l'ID del webhook resta stabile per i retry della stessa consegna. Questo riduce la possibilità di accettazioni SMS duplicate se lo stesso evento viene ritentato.
+- Limiti: non equivale a consegna exactly-once, non prova la consegna al telefono e non sostituisce outbox/reconciliation. Il handler continua a non effettuare retry ciechi dopo timeout.
+- Commit del codice: `623a961a158d6f1561217b549dee005b4bacb539`; commit test: `eee5443035427db12b74b6d65db5aa707db9424b`; commit documentazione SMS: `f95effedb8a5d000e70706d9b6fec87aafdce1ff`.
+- La review statica e la verifica documentale sono state eseguite; **i test Deno non sono stati eseguiti/verificati**. Il connector continua a restituire `workflow_runs: []`; il solo status disponibile sul nuovo head è Vercel `pending`, che non prova l'esecuzione o il successo dei test Deno. Non dichiarare il workflow passato.
+
+### Stato e prossimi passi
+1. Ottenere un risultato autorevole della workflow Deno sul head corrente e correggere eventuali fallimenti prima di qualunque deploy.
+2. Mantenere PR #9 Draft; verificare in staging non-prod soltanto dopo review, autorizzazione di costo e configurazione protetta.
+3. Proseguire in parallelo con riconciliazione migrazioni, conferma atomica, persistenza conversazioni e outbox/reconciliation; nessun GO-LIVE finché i gate della roadmap non sono soddisfatti.
+4. Nessuna development branch Supabase, costo aggiuntivo, segreto, utente Auth, business member o SMS reale è stato creato/inviato in questo ciclo.
