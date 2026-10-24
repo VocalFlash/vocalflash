@@ -230,3 +230,7 @@ CI run #330 (`40076914648`) completed successfully on `e00dd7f7dd585817011ab3ab2
 The read-only NEW work-creation policy gate was tightened: only rows with an explicit boolean `is_active === true` can participate in effective policy resolution. Missing/null activity flags can no longer make a permissive policy appear applicable. A regression test covers missing, null and false values with `autonomy_mode: auto`; the expected outcome is `CONFIG_REQUIRED`, with no authorization and no writes.
 
 This correction does not implement persistent multi-turn state, atomic owner confirmation, or work-item creation. CI run #341 (`40079074071`) was in progress when this note was written and must be checked on its exact test commit; subsequent documentation commits require their own CI/Preview status checks.
+
+## Policy resolution fail-closed hardening — 2026-10-24
+
+Policy evaluation now rejects malformed applicable rows rather than silently ignoring them and falling back to a more permissive business-level `auto` policy. Missing/null activity flags and unknown scopes fail closed; explicit `is_active: false` rows remain excluded. Valid workflow-level policies scoped to a different workflow are not applied to the current workflow. Regression tests cover the dangerous permissive-fallback cases. CI run #351 (`40079234377`) passed on test commit `9f0ebd3935349d7d481911309ce1923698c59000`; later documentation-only commits need their own status check. No work-item writes or owner confirmation were enabled.
