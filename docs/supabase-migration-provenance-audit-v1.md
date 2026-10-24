@@ -1,6 +1,6 @@
 # Supabase Migration Provenance Audit v1
 
-**Date:** 2026-10-22  
+**Date:** 2026-10-24 (rechecked)  
 **Mode:** read-only inspection. No migration was applied, no database data was changed, and no development branch was created.
 
 ## Why this audit exists
@@ -53,3 +53,12 @@ The signatures are inventory only, not proof that the intended safety invariants
 ## Release decision
 
 **Open release gate.** The live schema is inspectable, but the migration source-of-truth has not yet been reconciled end to end. No claim is made that all 15 migrations are absent from GitHub; only that their complete authoritative source sequence was not established during this audit.
+
+
+## Recheck 24 October 2026 — provenance still blocks safe DDL
+
+The live migration registry was queried again and returned the same 15 versions listed above. Repository search for the distinctive migration names and RPC names did not recover the authoritative SQL sequence in the inspected repository/organization results. This is not proof that no copy exists elsewhere; it means provenance is still unresolved from the accessible sources.
+
+The live schema inventory again showed the 15 public tables documented above; Supabase reports no deployed Edge Functions. No migration was applied, no database branch was created, and no schema/data was changed.
+
+**Required next step:** recover migration files from the original deployment repository/backup/CI artifact or another verified source, compare each file's version and checksum/DDL with the live schema and migration registry, then reconstruct a clean local/staging replay. Do not synthesize historical migrations or mark the live database as reconciled based only on table names and function signatures. Any new forward migration must be added only after the full baseline can be replayed in isolation.
