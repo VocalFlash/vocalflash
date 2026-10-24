@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - auth-bird-sms-hook-v1
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -15,7 +16,12 @@ concurrency:
 
 jobs:
   test:
+    name: Deno test pass ${{ matrix.pass }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pass: [1, 2, 3, 4, 5]
     steps:
       - name: Check out repository
         uses: actions/checkout@v5
@@ -23,5 +29,5 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
-      - name: Run isolated SMS hook tests
+      - name: Run isolated SMS hook tests (pass ${{ matrix.pass }}/5)
         run: deno test --allow-net supabase/functions/send-sms/index_test.ts
