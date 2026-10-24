@@ -336,3 +336,31 @@ This refresh is an evidence ledger, not a release approval. The recommendation r
 
 ### Explicit exclusions in this refresh
 No live schema/data changes, no RLS policy creation, no index changes, no migration application, no database branch, no secret changes, no Meta/Render/Vercel production changes, no real SMS, no paid service, no merge, and no production deployment.
+
+
+
+## Focused technical inspection — 24 October 2026 (read-only)
+
+### Terminology catalogue structural recheck
+- Source: `docs/professional-terminology-catalog-v1-draft.json`, blob `5aa93e3391c10db5b303249f0d4ba54d3aa8d34f`.
+- Parsed successfully as JSON. 699 entries; declared and observed sector counts agree: plumbing/maintenance 86, construction/site 105, real estate 102, financial intermediation 82, legal 102, medical 100, generic 122.
+- No duplicate `sector + normalized_term` pairs detected in this read-only scan; all entries include the required structural keys checked by the scan.
+- Only 120/699 entries currently have non-empty definition, disambiguation, and examples by the scan's basic completeness rule. All 699 entries have `review_status: draft`; catalogue remains NOT APPROVED and must not be treated as a curated, expert-reviewed runtime vocabulary. This is structural validation, not semantic/domain approval.
+
+### Source-level confirmation review
+- Current `lib/owner-command-runtime-v1.js` still returns `ATOMIC_CONFIRMATION_NOT_ENABLED` for explicit confirmation before persistence/context/interpretation. This is a safe fail-closed guard, not a completed confirmation workflow.
+- Current bot `app.py` on `multivocale-runtime-v2` declares the Meta Graph version `v26.0`, caps files at 12 MiB each / 25 MiB total and max 5 files, but explicitly retains `sessions`, `auto_batches`, `queued_batches`, and `last_audio` in process memory. The source itself says one Gunicorn worker is required until audio batches are durable. Restart resilience for queued audio is therefore not proven.
+- SMS Hook source on `auth-bird-sms-hook-v1` has a 20 KiB body limit, signature-based handler design, injected dependencies and 11 focused tests. This remains draft source; no Edge Function is deployed, and no Bird account/sender/configuration or live OTP delivery has been verified.
+- Pull request review and inline review-thread APIs returned no submitted reviews/threads for API PR #3, bot PR #2, or SMS PR #9 at the time checked. This means no GitHub review record was returned by those endpoints; it does not mean the changes are approved.
+- The latest inspected successful repeated suites remain bound to their recorded historical SHAs/runs. No fresh workflow run was found associated with the latest documentation-only commits; do not infer a new CI PASS for those commits. Re-run CI against exact code heads before release.
+
+### Additional findings and action order
+1. **P0 — recover authoritative migration SQL history** and reconcile live migration registry before any DDL or isolated schema reconstruction.
+2. **P0 — keep owner writes disabled** until confirmation event, expiry, one-time consumption and write are transactionally bound and tested in isolation.
+3. **P0 — implement durable conversation/audio state and outbound outbox/reconciliation** before claiming restart resilience or reliable delivery.
+4. **P0 — design/test tenant-specific RLS policies and service-role boundaries** from explicit role/tenant threat model; do not apply permissive policies just to clear advisor warnings.
+5. **P1 — establish reproducible staging** with dedicated Meta test app/number, safe credentials and a paired API+bot candidate; then run the release matrix and five integrated E2E passes plus adversarial tests.
+6. **P1 — complete vocabulary quality**: review remaining 579 entries for definitions/disambiguation/examples and obtain domain approval by sector; keep all entries draft until accepted.
+7. **P1 — resolve commercial readiness**: hosting plan constraints, Meta eligibility, billing lifecycle, privacy/retention, support/monitoring and measured per-customer cost.
+
+This inspection was read-only. No application code, live data/schema, provider configuration, secret, deployment, PR state or paid resource was changed.
