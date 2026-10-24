@@ -5,7 +5,7 @@
 - **Implemented on an isolated branch only:** `supabase/functions/send-sms/index.ts`.
 - **Not deployed:** no Edge Function is present in the Supabase project yet.
 - **Not configured:** no Bird credentials/sender and no Supabase Auth Send SMS Hook configured by this change.
-- **Automated tests added on the isolated branch:** `supabase/functions/send-sms/index_test.ts`, covering fail-closed configuration, valid/missing/tampered signatures, malformed event, provider rejection, timeout/no-blind-retry, provider acceptance, and stable Bird idempotency key. The dedicated workflow is `.github/workflows/bird-sms-hook-tests.yml`; its current-head result still needs authoritative confirmation.
+- **Automated tests added on the isolated branch:** `supabase/functions/send-sms/index_test.ts`, covering fail-closed configuration, valid/missing/tampered signatures, malformed event, provider rejection, timeout/no-blind-retry, provider acceptance, stable Bird idempotency key, and bounded request-body handling. The dedicated workflow is `.github/workflows/bird-sms-hook-tests.yml`; the current code revision completed five independent CI passes, each reporting 11 passed and 0 failed. The five-pass matrix is configured to run on pushes and pull requests.
 - **Not tested end to end:** no SMS has been sent; no user or business member has been created.
 - **No production data/schema was changed.**
 
@@ -25,7 +25,7 @@ The function deliberately fails closed if any secret or sender is missing. It do
 
 ## Controlled activation checklist
 
-1. **Review and test before deployment.** Confirm the isolated Deno tests pass for signature failure, malformed event, missing configuration, provider rejection, timeout and idempotency key propagation. Confirm the hook's maximum execution time remains within Supabase's HTTP-hook timeout.
+1. **Review and test before deployment.** Confirm the isolated Deno tests pass for signature failure, malformed event, missing configuration, oversized request bodies, provider rejection, timeout and idempotency key propagation. Current evidence: five independent passes, each 11 passed / 0 failed, on commit `8e5051d32dce1b92d2e5ef2d60257977333d260f`. Confirm the hook's maximum execution time remains within Supabase's HTTP-hook timeout.
 2. Confirm Bird account status, Italy destination allowlist, permitted sender, message category and current per-segment/registration/carrier charges. Do not buy credits or send messages until the owner has explicitly approved the cost.
 3. Deploy this Edge Function to the intended **non-production** Supabase project only after review. Because the function authenticates requests with the Supabase Auth Standard Webhooks signature rather than a user JWT, deploy with Supabase CLI's `--no-verify-jwt` option (or the equivalent reviewed function setting). Do not expose this endpoint as a general public SMS API; reject every request that fails signature verification.
 4. Add the function secrets in the Supabase dashboard; never commit them.
@@ -41,6 +41,6 @@ The function deliberately fails closed if any secret or sender is missing. It do
 - Bird's HTTP acceptance is not delivery confirmation.
 - The function passes the signed Standard Webhooks `webhook-id` as Bird's `Idempotency-Key`. This lets repeated deliveries of the same hook resolve to the same provider acceptance while Bird retains the key (documented retention: 3 hours). It does not make delivery exactly-once, prove handset delivery, or replace the durable application outbox.
 - Timeout/provider errors fail the hook; there is no blind retry inside this function because an uncertain provider outcome must not be mistaken for a confirmed send. If an external retry occurs, the stable idempotency key reduces duplicate provider acceptance within the retention window.
-- The current implementation has not yet been deployed or exercised against Bird. Unit tests have been added, but their latest CI result must be checked before treating them as passed.
+- The current implementation has not yet been deployed or exercised against Bird. The isolated Deno suite passed five independent CI runs (11 tests per run, 55 total successful test executions, zero failures) on commit `8e5051d32dce1b92d2e5ef2d60257977333d260f`. This is unit-test evidence only, not an end-to-end provider delivery test.
 - The Supabase project currently has zero Auth users and zero business members. This is an observed baseline, not a reason to bypass verification.
 - This function sends an OTP only; it does not create an account, establish an owner role, or write a business membership.
