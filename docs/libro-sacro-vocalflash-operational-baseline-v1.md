@@ -463,3 +463,23 @@ Prossimo passo tecnico sicuro: tracciare le chiamate RPC dal codice applicativo 
 3. Implementare e testare atomicamente il vincolo di conferma del titolare, mantenendo il blocco fail-closed finché la prova non è completa.
 4. Completare persistenza multi-turno, outbox durevole e riconciliazione degli esiti ambigui; poi eseguire il runbook E2E in staging con dati sintetici e ripeterlo cinque volte.
 5. Tenere tutte le PR in Draft fino alla revisione dei gate; nessuna modifica live, merge o deploy implicito.
+
+## Chiusura del ciclo autonomo di hardening documentale — 24 ottobre 2026
+
+### Nuove verifiche eseguite dopo il ciclo cinque-pass
+- Riletti dal repository gli audit di conferma atomica, provenienza migrazioni e stato conversazione multi-turno.
+- Interrogato nuovamente il registro live Supabase: le stesse 15 migrazioni risultano presenti; l'inventario schema resta coerente con le 15 tabelle public documentate; nessuna Edge Function risulta distribuita.
+- Rieseguiti gli advisor: 15 tabelle RLS-enabled senza policy, 18 FK senza indice di copertura e 26 indici segnalati come inutilizzati. Non sono state create policy, aggiunti/rimossi indici o applicate migrazioni.
+- Ricercati ulteriormente i nomi distintivi delle migrazioni e delle RPC nella repository/organizzazione accessibile. Non è stata recuperata una fonte SQL autorevole completa; ciò non dimostra che non esista in un backup o in un altro repository, ma impedisce di ricostruirla con sicurezza dai soli nomi.
+- Confermato che le RPC di commit non verificano e consumano atomicamente l'evento di conferma valido/non scaduto/monouso. Il runtime mantiene il blocco fail-closed.
+- Aggiornati gli audit `docs/owner-confirmation-atomicity-audit-v1.md` e `docs/supabase-migration-provenance-audit-v1.md`, la matrice `docs/cross-repository-assistant-release-verification-matrix-v1.md` e il runbook `docs/staging-end-to-end-release-runbook-v1.md` con gate e prove aggiornati.
+- Commit degli audit: `f24cb3c5ba9938eecb10cf2f7f8e03390fc1a1f0` e `34e9af7ff5bc64574ea0104beeb1c625a23efa80`. Commit della matrice: `d8563220ed0d4cf800a6f06aae31619346b8d004`. Commit del runbook: `d139e6710fc9cbcb7c265b3a8481afcccb8232a6`.
+- La Preview Vercel del commit di documentazione controllato era `pending` al momento dell'ultima lettura; non si assume un esito positivo da uno stato pendente. I workflow API/Bot/SMS già verificati restano evidenza delle rispettive suite sui commit indicati nelle sezioni precedenti, non dei commit documentali successivi.
+- Nessun merge, deploy, modifica DB/schema/dati live, branch Supabase a pagamento, credenziale, identità fittizia o invio SMS reale è stato eseguito.
+
+### Stato conclusivo del lavoro possibile senza autorizzazioni o prerequisiti ulteriori
+**Completato:** ciclo automatico a cinque passaggi per API, bot e SMS con log verificati; controlli live read-only; aggiornamento coordinato del Libro sacro, roadmap, matrice, runbook e audit specialistici; mantenimento dei guardrail fail-closed.
+
+**Bloccato per ragioni reali, non per mancanza di test unitari:** recupero della sequenza SQL autorevole delle 15 migrazioni; creazione di un ambiente isolato riproducibile (eventuali costi richiedono approvazione); implementazione e prova della conferma atomica; persistenza conversazionale e outbox/reconciliation; cinque esecuzioni E2E integrate con credenziali e identità di staging autorizzate.
+
+**Esito:** le attività autonome sicure disponibili in questo contesto sono state completate. Il prodotto rimane **NO-GO per il rilascio**. Non rimuovere i blocchi e non dichiarare completato l'E2E finché non esistono le evidenze richieste.
