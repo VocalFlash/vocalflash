@@ -591,3 +591,10 @@ Questa sezione registra le verifiche read-only successive al consolidamento dell
 
 ### Stato aggiornato
 **Controllo tecnico 360°: IN CORSO. Rilascio: NO-GO.** Questa tornata ha eseguito verifiche read-only e aggiornato la documentazione; non ha modificato codice applicativo, schema/dati live, segreti, provider, deployment, stato delle PR o risorse a pagamento.
+
+
+### Verifica read-only aggiuntiva dei privilegi Supabase — 24 ottobre 2026
+- Query catalogo: tutte le 15 tabelle base public hanno RLS abilitata e zero policy. Aggregato dei grant tabellari: 93 righe di privilegi su 15 tabelle per `service_role`; nessun grant tabellare risultante per `anon` o `authenticated`.
+- Per le cinque RPC esaminate (risoluzione titolare, registrazione conferma, commit nota, commit azione calendario, ingest evento WhatsApp), `EXECUTE` risulta negato a `anon` e `authenticated` e concesso a `service_role` e `postgres`.
+- Questo riduce il rischio di esposizione diretta tramite i grant controllati, ma non chiude l'audit completo: restano da esaminare grant di schema, viste, sequenze, default privileges, tutte le altre funzioni, esposizione PostgREST, gestione della service key e autorizzazione applicativa. Le tabelle senza policy rimangono un blocco per qualsiasi accesso client previsto.
+- Tutte le query eseguite sono state SELECT-only; nessuna scrittura SQL o modifica del database.
