@@ -258,3 +258,22 @@ La funzione può avanzare solo quando la sintesi rimane fedele e concisa, ogni a
 - Preparare test isolati di replay/idempotenza, collisione multi-tenant, batch parziale, timeout e restart.
 - Non collegare ancora il routing audio: l'API non trasporta tuttora il payload canonico e la matrice A01–A20 non è stata eseguita end-to-end.
 - Nessun merge, deploy, invio reale o modifica al database live.
+
+
+## 2026-10-25 — Audit bot: isolamento Redis da verificare prima del multi-account
+
+### Già fatto/verificato
+- Ricontrollati i run recenti del repository JS: i run 40126717048, 40126746115, 40126769370 e 40126792227 risultano tutti completati con success.
+- Riletto il codice del bot sulla branch assistant-conversation-photo-v1 e i test esistenti: sono presenti test per deduplicazione risposta, esito ambiguo dell'invio, lease di processamento, recupero di lease scadute e creazione concorrente di batch in coda.
+- Aggiunto il report di audit docs/verification-idempotency-multivocale-2026-10-25.md nel repository bot, commit 547d34ad0464f67416be2ff614a2d297b668b6da.
+
+### Rischio emerso dalla lettura statica
+Le chiavi Redis per batch attivo, ultimo audio e batch in coda sono costruite usando il mittente senza includere esplicitamente l'account/canale. Non è confermato che il deployment sia multi-account, quindi non si dichiara una collisione avvenuta; è però necessario chiarire il modello di deployment e aggiungere un test di isolamento prima di considerare risolto il multi-tenant. Non cambiare le chiavi senza piano di migrazione: potrebbero esserci batch pendenti.
+
+### Da fare
+1. Verificare se bot/Redis sono single-account o condivisi tra più numeri WhatsApp.
+2. Se multi-account, introdurre namespace account/canale stabile con test di collisione e transizione sicura delle chiavi esistenti.
+3. Eseguire la suite Python sulla branch effettiva: il workflow presente è configurato per push su multivocale-runtime-v2, non sulla branch assistant-conversation-photo-v1; non presumere che il nuovo commit documentale abbia eseguito test automatici.
+4. Eseguire test isolati di restart e recupero, poi aggiornare la matrice con run reali.
+
+Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL live o invio WhatsApp reale senza autorizzazione.
