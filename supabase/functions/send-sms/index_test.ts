@@ -27,7 +27,10 @@ function envReader(overrides: Record<string, string | undefined> = {}) {
 function postRequest(body = "{}") {
   return new Request("https://unit.test/send-sms", {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      "webhook-id": "msg_test",
+    },
     body,
   });
 }
@@ -53,7 +56,6 @@ Deno.test("fails closed when hook secret or Bird configuration is missing", asyn
   assertEquals((await response.json()).error, "sms_provider_not_configured");
   assertEquals(fetchCalled, false);
 });
-
 
 Deno.test("accepts a correctly signed Standard Webhooks payload", async () => {
   const payload = JSON.stringify({
@@ -189,6 +191,8 @@ Deno.test("forwards a valid verified event and reports provider acceptance only"
   assertEquals(await response.text(), "");
   assertEquals(capturedUrl, "https://eu1.platform.bird.com/v1/sms/messages");
   assertEquals(capturedInit?.method, "POST");
+  const headers = new Headers(capturedInit?.headers);
+  assertEquals(headers.get("Idempotency-Key"), "msg_test");
   const body = JSON.parse(String(capturedInit?.body));
   assertEquals(body.to, "+393331234567");
   assertEquals(body.from, "VocalFlash");
