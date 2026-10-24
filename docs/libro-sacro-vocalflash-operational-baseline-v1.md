@@ -391,10 +391,14 @@ Prossimo passo tecnico sicuro: tracciare le chiamate RPC dal codice applicativo 
 - Razionale: Bird documenta la riproduzione della risposta originale per chiavi identiche entro una retention di 3 ore; l'ID del webhook resta stabile per i retry della stessa consegna. Questo riduce la possibilità di accettazioni SMS duplicate se lo stesso evento viene ritentato.
 - Limiti: non equivale a consegna exactly-once, non prova la consegna al telefono e non sostituisce outbox/reconciliation. Il handler continua a non effettuare retry ciechi dopo timeout.
 - Commit del codice: `623a961a158d6f1561217b549dee005b4bacb539`; commit test: `eee5443035427db12b74b6d65db5aa707db9424b`; commit documentazione SMS: `f95effedb8a5d000e70706d9b6fec87aafdce1ff`.
-- La review statica e la verifica documentale sono state eseguite; **i test Deno non sono stati eseguiti/verificati**. Il connector continua a restituire `workflow_runs: []`; il solo status disponibile sul nuovo head è Vercel `pending`, che non prova l'esecuzione o il successo dei test Deno. Non dichiarare il workflow passato.
+- La review statica e la verifica documentale sono state eseguite; **i test Deno non sono stati eseguiti/verificati**. Il connector continua a restituire `workflow_runs: []`; sul head SMS `f95effedb8a5d000e70706d9b6fec87aafdce1ff` lo status disponibile è Vercel `success` (Preview), che non prova l'esecuzione o il successo dei test Deno. Non dichiarare il workflow passato.
 
 ### Stato e prossimi passi
 1. Ottenere un risultato autorevole della workflow Deno sul head corrente e correggere eventuali fallimenti prima di qualunque deploy.
 2. Mantenere PR #9 Draft; verificare in staging non-prod soltanto dopo review, autorizzazione di costo e configurazione protetta.
 3. Proseguire in parallelo con riconciliazione migrazioni, conferma atomica, persistenza conversazioni e outbox/reconciliation; nessun GO-LIVE finché i gate della roadmap non sono soddisfatti.
 4. Nessuna development branch Supabase, costo aggiuntivo, segreto, utente Auth, business member o SMS reale è stato creato/inviato in questo ciclo.
+
+
+### Nota di stato dopo l'aggiornamento della roadmap — 24 ottobre 2026
+- La roadmap è stata aggiornata sul branch `assistant-conversation-photo-v1`; lo status Vercel osservato sul commit documentale `9fe0064aef4711ba410fb22cf099eeb2a70351cc` era `pending` al momento del controllo. Questo status riguarda il branch documentale e non costituisce prova dei test Deno della PR #9 o di un test E2E.
