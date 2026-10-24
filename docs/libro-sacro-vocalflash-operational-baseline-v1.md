@@ -225,3 +225,15 @@ A read-only cost quote was retrieved again using the organization associated wit
 Correct conversions: 720 hours (30 days) = $9.6768 (~$9.68); 730 hours = $9.8112 (~$9.81). This is a quote for hourly branch compute, not a guarantee of the total bill.
 No branch was created and this check incurred no branch charge. Explicit owner approval is still required; recalculate immediately before creation.
 - Updated the validator minimum to 100 enriched entries after the second cross-sector enrichment batch. A new read-only content audit found 699 unique entries, 100 enriched entries with complete draft metadata, no duplicates, no non-draft statuses, and no pharmaceutical sector. CI status remains unconfirmed until the workflow result is available.
+
+
+## 14. Autenticazione titolare e SMS OTP — 24 ottobre 2026
+
+- Riconfermato in sola lettura il progetto Supabase `VocalFlash Assistant` (`tkfyfqgtumoeywlqzmdt`), stato `ACTIVE_HEALTHY`, database PostgreSQL 17.6.1.
+- Riconfermato: 15 migrazioni registrate; nessuna Edge Function presente al momento del controllo.
+- Riconfermato con query di sola lettura: `auth.users = 0`, `business_members = 0`. Non creare membri fittizi, UUID inventati o verifiche manuali.
+- Implementato su branch isolato `auth-bird-sms-hook-v1` il prototipo `supabase/functions/send-sms/index.ts`: verifica firma Standard Webhooks, valida telefono/OTP, inoltra a Bird EU come SMS di autenticazione, limita il payload e il timeout, non registra OTP/telefono/segreti e fallisce chiuso se la configurazione manca.
+- Aggiunta la guida `docs/auth-phone-verification-bird-v1.md` con i gate di attivazione controllata. PR Draft #9: https://github.com/VocalFlash/vocalflash/pull/9.
+- **Solo revisione statica contro la documentazione corrente:** non sono ancora stati aggiunti/eseguiti test automatizzati; nessun deploy, configurazione Auth Hook, segreto, account Bird, SMS reale o test OTP effettuato. Il codice non è pronto per attivazione.
+- Nessuna modifica a schema/dati live, nessuna chiave generata, nessun credito acquistato, nessuna risorsa a pagamento e nessun deploy in produzione.
+- Gate prima di procedere: aggiungere test automatici; verificare sender/allowlist Italia e costi Bird; ottenere approvazione esplicita per ogni costo e SMS fatturabile; distribuire solo in un ambiente non produttivo con JWT verification disabilitata per la funzione ma firma Standard Webhooks obbligatoria; completare il flusso OTP direttamente nell'interfaccia sicura e collegare il titolare solo dopo verifica Auth.
