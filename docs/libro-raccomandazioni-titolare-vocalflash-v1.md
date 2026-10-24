@@ -22,8 +22,8 @@
 11. **Fonti primarie e aggiornate.** Per API, prezzi, policy e provider che cambiano, controllare documentazione ufficiale corrente prima di prendere decisioni.
 12. **Registro ciclico e riesame.** Mantenere, dove utile, un registro sintetico numerato di cicli, proposte, evidenze, obiezioni ed esiti. Ogni 10 cicli effettuare una revisione critica complessiva, cercando evidenze contrarie, conclusioni fragili e duplicazioni. Evitare controlli ripetitivi che non aggiungono nuove evidenze.
 13. **Monitoraggio senza duplicazioni.** Per gli avvisi/monitoraggi Meta, non creare notifiche o verifiche duplicate se esiste già un controllo equivalente.
-15. **CI senza duplicazioni.** Evitare trigger `push` e `pull_request` sovrapposti sullo stesso commit quando eseguono gli stessi test; usare una fonte primaria per la PR, concorrenza per cancellare run obsoleti e un trigger manuale quando utile. Verificare che la riduzione delle notifiche non elimini copertura necessaria.
-14. **Preservare il lavoro funzionante.** Partire dalla versione realmente distribuita o dall'ultimo stato noto; non sovrascrivere funzioni funzionanti senza motivo e test. Per la sintesi vocale, validare prima la base V4 e poi ampliare il vocabolario, senza confondere il piano con l'avvenuta esecuzione.
+14. **CI senza duplicazioni.** Evitare trigger `push` e `pull_request` sovrapposti sullo stesso commit quando eseguono gli stessi test; usare una fonte primaria per la PR, concorrenza per cancellare run obsoleti e un trigger manuale quando utile. Verificare che la riduzione delle notifiche non elimini copertura necessaria.
+15. **Preservare il lavoro funzionante.** Partire dalla versione realmente distribuita o dall'ultimo stato noto; non sovrascrivere funzioni funzionanti senza motivo e test. Per la sintesi vocale, validare prima la base V4 e poi ampliare il vocabolario, senza confondere il piano con l'avvenuta esecuzione.
 
 ## 2. Registro canonico dinamico delle raccomandazioni
 
