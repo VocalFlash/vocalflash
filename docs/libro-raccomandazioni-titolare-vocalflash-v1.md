@@ -93,6 +93,7 @@ Dopo un avanzamento significativo aggiornare Libro sacro e roadmap; aggiornare q
 - Le policy assenti/sconosciute, le modalità di autonomia sconosciute e i campi mancanti devono fallire chiusi. Un livello di divieto prevale su un'autorizzazione più permissiva.
 - Una policy è applicabile soltanto se il suo stato è esplicitamente attivo (`is_active === true`); valori mancanti, nulli o falsi non devono essere interpretati come attivi.
 - Le righe di policy applicabili con scope o configurazione malformati devono bloccare la risoluzione; non vanno ignorate se ciò permetterebbe di ricadere su una policy più permissiva. Le policy esplicitamente inattive possono essere escluse; una policy valida di un workflow diverso non va applicata al workflow corrente.
+- Il gate di creazione deve validare anche la forma del piano dati: se lo stato dichiara che la raccolta è completa, `required_fields` deve essere un array valido e non deve contenere campi mancanti, incerti o malformati.
 - Se una scrittura ha esito incerto, non dichiarare successo; riconciliare prima di ripetere l'operazione.
 - Produzione, branch principale, questionari, token, dati reali e identità reali sono protetti da modifiche non autorizzate.
 
