@@ -1,9 +1,9 @@
 name: Assistant Customer Pipeline Tests
 
 on:
-  pull_request:
+  push:
     branches:
-      - assistant-auth-v1
+      - assistant-conversation-photo-v1
   workflow_dispatch:
 
 permissions:
