@@ -42,6 +42,40 @@ Deno.test("rejects methods other than POST", async () => {
   assertEquals((await response.json()).error, "method_not_allowed");
 });
 
+Deno.test("rejects oversized request from Content-Length before reading body", async () => {
+  const handler = createHandler({
+    getEnv: envReader(),
+    fetchImpl: async () => {
+      throw new Error("provider must not be called");
+    },
+  });
+  const response = await handler(new Request("https://unit.test/send-sms", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "content-length": "30000",
+    },
+    body: "{}",
+  }));
+  assertEquals(response.status, 413);
+  assertEquals((await response.json()).error, "payload_too_large");
+});
+
+Deno.test("bounds body reads when Content-Length is absent", async () => {
+  let fetchCalled = false;
+  const handler = createHandler({
+    getEnv: envReader(),
+    fetchImpl: async () => {
+      fetchCalled = true;
+      return new Response(null, { status: 202 });
+    },
+  });
+  const response = await handler(postRequest("x".repeat(21 * 1024)));
+  assertEquals(response.status, 413);
+  assertEquals((await response.json()).error, "payload_too_large");
+  assertEquals(fetchCalled, false);
+});
+
 Deno.test("fails closed when hook secret or Bird configuration is missing", async () => {
   let fetchCalled = false;
   const handler = createHandler({
