@@ -305,3 +305,35 @@ Implementation commit: `5f3f6a9003927ab490c3d906c5f1c4da800f84d5`; test commit: 
 La revisione statica del percorso `PersistentMultivocaleRuntime._process_batch()` ha individuato un rischio concreto da chiudere prima del rilascio: la sintesi viene salvata in `ready_answer`, ma se `safe_send()` fallisce o va in timeout il batch viene marcato `failed` e viene proposto `Riprova`. Se Meta avesse accettato il primo invio senza che il client ricevesse la risposta, il retry potrebbe spedire la stessa sintesi una seconda volta. È un rischio di percorso individuato tramite lettura del codice, non un incidente riprodotto in staging o produzione.
 
 Aperto bot issue #4: [Release blocker: reconcile ambiguous WhatsApp sends in MultiVocale](https://github.com/VocalFlash/vocalflash-bot/issues/4). È stato poi implementato sul ramo Draft un primo guard conservativo: marca durevolmente il confine del tentativo d'invio, registra gli stati `sending`/`sent`/`outcome_unknown`, blocca il recupero automatico dopo il confine d'invio e non propone `Riprova` quando l'esito è ambiguo. CI bot run [40081928311](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40081928311) è passato sul commit `1a717d314ab07ea670c4e20a0bb0dd8b676c469b`; la documentazione del design è stata aggiornata successivamente. Questo riduce il rischio ma non implementa ancora outbox durevole, correlazione del message ID Meta o riconciliazione dei callback. Non è stato fatto alcun deploy. PR #2 e PR #3 restano Draft; la consegna durevole rimane un release gate.
+
+
+## Verifica read-only RPC titolare — 24 ottobre 2026
+
+Verifica diretta in sola lettura eseguita sul progetto Supabase live `tkfyfqgtumoeywlqzmdt`. Nessuna funzione, schema, dato, grant o configurazione è stata modificata.
+
+### Firme effettivamente installate
+- `vf_resolve_owner_member_by_sender_v1(text, uuid)`: 2 parametri; il secondo, `p_business_id`, è opzionale.
+- `vf_record_owner_command_confirmation_v1(uuid, uuid, uuid, text, uuid, text, timestamptz, jsonb)`: 8 parametri, ultimo con default.
+- `vf_commit_owner_note_v1(uuid, uuid, uuid, uuid, text, boolean, uuid)`: 7 parametri, gli ultimi due con default.
+- `vf_commit_owner_schedule_action_v1(uuid, uuid, uuid, uuid, text, timestamptz, boolean, uuid)`: 8 parametri, gli ultimi due con default.
+
+Le firme live sono state lette da `pg_proc` e confrontate con le definizioni installate via `pg_get_functiondef`. Questo conferma le firme del database attuale, ma **non dimostra da solo** che ogni chiamante applicativo usi gli argomenti corretti: per chiudere quel punto occorre verificare il percorso chiamante sul commit corrente e i test pertinenti.
+
+### Conferma del titolare: gap ancora aperto
+La funzione di registrazione controlla membro attivo, canale attivo e proposta collegata, quindi registra un evento `owner_command_confirmation`. Le due funzioni di commit controllano `p_confirmed = true`, la proposta e la coerenza dei dati della nota/azione; nelle definizioni live ispezionate non verificano però la presenza di uno specifico evento di conferma valido, la sua scadenza o il suo consumo one-time nella stessa transazione della scrittura. I lock e l'idempotenza presenti non sostituiscono questo vincolo.
+
+### Privilegi e sicurezza
+La verifica dei privilegi effettivi ha restituito, per tutte e quattro le RPC:
+- `anon`: nessuna esecuzione;
+- `authenticated`: nessuna esecuzione;
+- `service_role`: esecuzione consentita.
+
+Tutte risultano `SECURITY DEFINER`, proprietario `postgres`, con `search_path` esplicitato. I privilegi riducono l'esposizione diretta agli utenti anonimi/autenticati, ma non eliminano la necessità di correggere il contratto tra chiamante server-side e database. Il chiamante privilegiato deve restare fail-closed.
+
+### Esito operativo
+- **VERIFICATO:** firme installate, definizioni live, privilegi sulle quattro RPC.
+- **CONFERMATO BLOCCANTE:** la conferma non è ancora vincolata e consumata atomicamente insieme all'effetto; mantenere `ATOMIC_CONFIRMATION_NOT_ENABLED`.
+- **NON VERIFICATO IN QUESTO ciclo:** corrispondenza di ogni chiamata applicativa alle firme, test di replay/concorrenza e percorso end-to-end.
+- **NON ESEGUITO:** modifiche SQL, migrazioni, scritture dati, creazione di branch Supabase, deploy o cambi in produzione.
+
+Prossimo passo tecnico sicuro: tracciare le chiamate RPC dal codice applicativo sul branch corrente e confrontare nome/ordine/numero degli argomenti con le firme sopra, senza eseguire scritture. La correzione della conferma atomica richiede prima un ambiente di sviluppo sicuro; la creazione della branch Supabase resta subordinata all'approvazione esplicita del costo.
