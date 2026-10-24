@@ -269,3 +269,8 @@ Tracking: [bot issue #4](https://github.com/VocalFlash/vocalflash-bot/issues/4).
 1. Verificare i test Deno sull'head attuale di PR #9.
 2. Riconciliare le 15 migrazioni live con la sequenza SQL autorevole senza modificare il database.
 3. Progettare e testare una scrittura atomica che vincoli conferma, scadenza, consumo one-time e commit; poi proseguire con persistenza conversazioni/outbox.
+
+
+### Snapshot CI dopo aggiornamento documentale — 24 ottobre 2026
+- Il commit documentale `9fe0064aef4711ba410fb22cf099eeb2a70351cc` aveva status Vercel `pending` al momento del controllo. È un controllo Preview e non dimostra il superamento dei test Deno né l'E2E.
+- Sul head SMS `f95effedb8a5d000e70706d9b6fec87aafdce1ff` lo status Vercel risultava `success`, ma il connector delle workflow run continuava a restituire una lista vuota; test Deno non dichiarati superati.
