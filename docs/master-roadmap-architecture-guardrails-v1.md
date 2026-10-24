@@ -174,3 +174,12 @@ The draft catalog now has 699 candidate entries, of which 100 have preliminary s
 - Before real customer use, the owner must identify the pilot activity and an authorized domain reviewer for the workflow, required fields, customer-facing copy and vocabulary.
 - Before paid launch, the owner must supply the real controller/legal identity and privacy contact, agree retention/deletion criteria, and arrange qualified review of the privacy notice, Article 28 DPA, B2B terms and international-transfer safeguards. Do not invent legal details or retention periods.
 - Detailed checklist: [Libro sacro, sections 10 and D7](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/libro-sacro-vocalflash-operational-baseline-v1.md).
+
+### Phone verification / Bird SMS hook — 2026-10-24
+
+- A separate Draft PR #9 was opened from the clean `main` base: https://github.com/VocalFlash/vocalflash/pull/9. It contains the isolated Supabase Auth Send SMS hook and its activation checklist; it is intentionally not merged.
+- Static source review only: hook signature verification, input validation, bounded request body/provider timeout, minimal non-sensitive error logging, and fail-closed behavior for missing configuration are present.
+- Automated tests are not yet added/run. The Edge Function is not deployed; Supabase Auth hook settings and secrets are not configured; Bird account/sender/Italy allowlist are not verified; no SMS or OTP test has been sent.
+- Current read-only Supabase check: project `VocalFlash Assistant` is `ACTIVE_HEALTHY`; 15 migrations recorded; zero Edge Functions; zero `auth.users`; zero `business_members`.
+- Next gates: add and run automated tests; confirm current Bird pricing, sender and destination eligibility; request explicit owner approval before creating credentials/paid setup or sending a billable SMS; deploy only to non-production; complete phone verification in the trusted UI; link the owner to the business only after Supabase Auth verification. Never create a fake user/member or mark a phone verified manually.
+- No live schema/data, production service, secrets, paid resource or deployment was changed by this work.
