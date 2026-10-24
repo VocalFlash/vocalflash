@@ -184,3 +184,12 @@ Questo documento consolida le raccomandazioni esplicite e le decisioni disponibi
 - Ogni azione “Riprova” deve sapere se ripete la generazione della sintesi o soltanto la consegna; non ricalcolare o reinviare implicitamente senza verificare lo stato.
 - Verificare retry, webhook duplicati, due worker concorrenti, restart e callback duplicate. Un test unitario non dimostra la consegna reale al destinatario.
 - Evidenza del rilievo statico 24/10/2026: [bot issue #4 — consegna MultiVocale ambigua](https://github.com/VocalFlash/vocalflash-bot/issues/4). È stato aggiunto un guard conservativo nel ramo Draft, con test CI superati sul commit `1a717d314ab07ea670c4e20a0bb0dd8b676c469b`: dopo il confine di invio non si offre retry cieco e il recovery è bloccato finché l'esito è da riconciliare. Il test non riproduce un invio reale Meta; il guard non equivale a outbox durevole o garanzia exactly-once. Nessun deploy, migrazione o modifica live.
+
+
+## 16. Riepilogo periodico VocalFlash
+
+- Preparare il riepilogo ricorrente del venerdì con avanzamenti verificati, blocchi, decisioni aperte e prossimi passi.
+- Coprire esplicitamente le aree: integrazioni Meta, MultiVocale, Account & Billing, privacy e sicurezza.
+- Indicare sempre le **tre priorità successive** e separare le decisioni che richiedono il titolare dalle attività che possono proseguire autonomamente.
+- Non presentare un riepilogo programmato come completato se il relativo controllo o aggiornamento non è stato effettivamente eseguito.
+- Usare lo stato dei repository, dei test, dei provider e dei documenti aggiornati; evitare di ripetere verifiche senza nuove evidenze.
