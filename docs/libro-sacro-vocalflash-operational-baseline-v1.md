@@ -1,6 +1,6 @@
 # VocalFlash — Libro sacro operativo v1
 
-**Data di riferimento:** 2026-10-23  
+**Data di riferimento:** 2026-10-24  
 **Stato:** fonte di verità operativa per roadmap, guardrail, risultati verificati e release gate.  
 **Repository:** VocalFlash/vocalflash, branch isolato `assistant-conversation-photo-v1`.  
 **Vincolo:** questo documento non autorizza merge, deploy in produzione, acquisti o modifiche di schema.
