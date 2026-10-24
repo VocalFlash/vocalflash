@@ -213,3 +213,5 @@ The draft catalog now has 699 candidate entries, of which 100 have preliminary s
 
 - Verification checkpoint: GitHub Actions run #324 (`40076814169`) passed on commit `d4cea0a6829d97555d581d0e6aad0c5185b33e46`, including catalog validation and focused assistant tests. This is evidence for that exact commit only; re-check CI after the current documentation updates produce a new head.
 - Vercel Preview for that commit was still pending at the last status query. Do not report it as ready until the status is terminal.
+
+- Latest re-check: GitHub Actions run #328 (`40076877316`) passed on branch head `6dba0c0a0345c6b975c424fed7ee30c3cd164ad2`, including draft catalog validation and focused Assistant tests. The Vercel status for that commit was still pending at the time of the check. The next docs-only commit will trigger another CI run; do not extrapolate the current result to a newer SHA.
