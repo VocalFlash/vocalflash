@@ -86,3 +86,17 @@ The Meta POST signature verification code and tests are present only in the Pyth
 
 - [Supabase migration provenance audit](supabase-migration-provenance-audit-v1.md) records the 15 migrations in the live registry. The authoritative source sequence has not yet been reconciled end to end; this is a release gate, not proof that migration files are absent from every branch/repository.
 - The latest required-data guardrail change and its tests passed focused GitHub Actions run [#39827480693](https://github.com/VocalFlash/vocalflash/actions/runs/39827480693). No database or production change was made.
+
+
+## Read-only configuration refresh — 24 October 2026
+
+The earlier snapshot above is historical; the current counts differ. Direct SELECT-only queries against the live project now return:
+- `businesses`: 1; active business sector is `plumbing_maintenance` / staging-labelled.
+- `business_channels`: 1; active WhatsApp channel; external account ID is present, channel address is not populated. The value itself was not exposed in this audit.
+- `business_members`: 0. No verified owner/member row exists, so owner-command execution and pilot authorization remain blocked.
+- `workflows`: 2 total; `generic_request_test` is inactive with an empty required-data object; `maintenance_request` is active and has one required-data field.
+- `assistant_policies`: 1 active policy, scope `workflow`, key `create_work_item`, autonomy mode `confirm`, sensitivity `standard`, bound to a workflow.
+- `business_vocabulary`: 14 active rows (6 component, 1 equipment, 4 symptom, 1 system, 2 work_action). These are staging-scoped terms, not the 699-entry draft catalog.
+- Existing counts for `work_items` (1), `work_events` (4), and `event_routing_decisions` (2) remain as observed by the same count query.
+
+No row content containing names, phone numbers, customer messages, or external account identifiers was retrieved. No data was inserted, updated, or deleted. The staging workflow/policy setup is more complete than the 22 October snapshot, but **zero business members** remains a decisive blocker; do not fabricate one or run a real owner flow without a verified Auth identity and explicit pilot authorization. The active policy's `confirm` mode does not override the runtime's `ATOMIC_CONFIRMATION_NOT_ENABLED` guard.
