@@ -10,16 +10,20 @@ function json(status: number, body: Record<string, unknown> = {}) {
   });
 }
 
-function hookSecrets(): string[] {
-  const configured = Deno.env.get("SEND_SMS_HOOK_SECRETS") ?? "";
+function hookSecrets(getEnv: (name: string) => string | undefined): string[] {
+  const configured = getEnv("SEND_SMS_HOOK_SECRETS") ?? "";
   return configured
     .split("|")
     .map((item) => item.trim().replace(/^v1,whsec_/, ""))
     .filter(Boolean);
 }
 
-function verifyHook(payload: string, headers: Headers): unknown | null {
-  const secrets = hookSecrets();
+export function verifyHook(
+  payload: string,
+  headers: Headers,
+  getEnv: (name: string) => string | undefined,
+): unknown | null {
+  const secrets = hookSecrets(getEnv);
   if (secrets.length === 0) return null;
 
   const normalizedHeaders = Object.fromEntries(headers.entries());
@@ -33,7 +37,22 @@ function verifyHook(payload: string, headers: Headers): unknown | null {
   return null;
 }
 
-Deno.serve(async (req: Request) => {
+type HandlerDependencies = {
+  getEnv?: (name: string) => string | undefined;
+  fetchImpl?: typeof fetch;
+  verify?: (
+    payload: string,
+    headers: Headers,
+    getEnv: (name: string) => string | undefined,
+  ) => unknown | null;
+};
+
+export function createHandler(dependencies: HandlerDependencies = {}) {
+  const getEnv = dependencies.getEnv ?? ((name: string) => Deno.env.get(name));
+  const fetchImpl = dependencies.fetchImpl ?? fetch;
+  const verify = dependencies.verify ?? verifyHook;
+
+  return async (req: Request): Promise<Response> => {
   if (req.method !== "POST") return json(405, { error: "method_not_allowed" });
 
   const contentLength = Number(req.headers.get("content-length") ?? "0");
@@ -41,9 +60,9 @@ Deno.serve(async (req: Request) => {
     return json(413, { error: "payload_too_large" });
   }
 
-  const hookSecretList = hookSecrets();
-  const birdApiKey = Deno.env.get("BIRD_API_KEY");
-  const birdSender = Deno.env.get("BIRD_SMS_SENDER");
+  const hookSecretList = hookSecrets(getEnv);
+  const birdApiKey = getEnv("BIRD_API_KEY");
+  const birdSender = getEnv("BIRD_SMS_SENDER");
 
   // Fail closed before processing an authentication event if configuration is incomplete.
   if (hookSecretList.length === 0 || !birdApiKey || !birdSender) {
@@ -62,7 +81,7 @@ Deno.serve(async (req: Request) => {
     return json(413, { error: "payload_too_large" });
   }
 
-  const event = verifyHook(payload, req.headers) as
+  const event = verify(payload, req.headers, getEnv) as
     | { user?: { phone?: unknown }; sms?: { otp?: unknown } }
     | null;
 
@@ -85,7 +104,7 @@ Deno.serve(async (req: Request) => {
   // Leave headroom for cold start and response handling inside the Auth hook's time budget.
   const timeout = setTimeout(() => controller.abort(), 3000);
   try {
-    const response = await fetch(BIRD_SEND_URL, {
+    const response = await fetchImpl(BIRD_SEND_URL, {
       method: "POST",
       headers: {
         authorization: `Bearer ${birdApiKey}`,
@@ -115,4 +134,9 @@ Deno.serve(async (req: Request) => {
   } finally {
     clearTimeout(timeout);
   }
-});
+  };
+}
+
+if (import.meta.main) {
+  Deno.serve(createHandler());
+}
