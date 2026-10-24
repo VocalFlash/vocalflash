@@ -286,3 +286,12 @@ Tracking: [bot issue #4](https://github.com/VocalFlash/vocalflash-bot/issues/4).
 
 ### Non sbloccato dai test unitari
 Rimangono NO-GO: conferma titolare atomica, riconciliazione della fonte SQL delle 15 migrazioni, persistenza conversazioni multi-turno, outbox WhatsApp durevole/reconciliation, staging E2E, verifica delle configurazioni Meta/Render e revisione dei rilievi Supabase. Nessuna modifica live, deploy o SMS reale è stato effettuato. Le PR #2, #3 e #9 restano Draft.
+
+## Verification refresh — 24 October 2026
+
+- The latest Assistant API five-pass workflow on the documentation-final candidate `56ef6a85a96325f5a82ffc975de23104c871d9f4` is run [#40114332345](https://github.com/VocalFlash/vocalflash/actions/runs/40114332345): all five job logs explicitly report 89 tests, 89 passed, 0 failed. Earlier code-head run [#40114128653](https://github.com/VocalFlash/vocalflash/actions/runs/40114128653) also completed 5/5.
+- Bot CI run [#40113909039](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40113909039): five successful jobs, 35 tests per pass (175 executions).
+- SMS/Bird CI run [#40113926527](https://github.com/VocalFlash/vocalflash/actions/runs/40113926527): five successful jobs, 11/11 tests per pass (55 executions). Main matrix total: 675 successful test executions. A second API five-pass run and a second SMS five-pass run bring the total of cited successful executions to 1,175.
+- These are repeated automated suites, **not** five full end-to-end staging runs. The live Supabase audit still finds 15 registered migrations without a reconciled authoritative source sequence, no deployed Edge Functions, 15 RLS-enabled tables without policies, 18 foreign keys without covering indexes, and 26 indexes flagged as unused. The owner confirmation/commit RPC path still lacks verified atomic binding of a valid, unexpired, one-time confirmation to the write.
+- Persistent multi-turn conversation state, durable outbound outbox/reconciliation, correct Meta staging secret verification, authorized real test member, and integrated staging E2E remain release gates. Keep PR #3, PR #2, and PR #9 Draft. **NO-GO for production release remains unchanged.** No live schema/data mutation, merge, production deployment, real SMS, or paid resource was performed in this refresh.
+- Canonical detailed evidence and ordered next steps are recorded in the [Libro sacro operativo](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/libro-sacro-vocalflash-operational-baseline-v1.md).
