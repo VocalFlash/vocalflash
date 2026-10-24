@@ -234,3 +234,7 @@ This correction does not implement persistent multi-turn state, atomic owner con
 ## Policy resolution fail-closed hardening — 2026-10-24
 
 Policy evaluation now rejects malformed applicable rows rather than silently ignoring them and falling back to a more permissive business-level `auto` policy. Missing/null activity flags and unknown scopes fail closed; explicit `is_active: false` rows remain excluded. Valid workflow-level policies scoped to a different workflow are not applied to the current workflow. Regression tests cover the dangerous permissive-fallback cases. CI run #351 (`40079234377`) passed on test commit `9f0ebd3935349d7d481911309ce1923698c59000`; later documentation-only commits need their own status check. No work-item writes or owner confirmation were enabled.
+
+## CI signal/noise correction — 2026-10-24
+
+The Assistant and bot workflows previously listened to both `push` on the PR head branch and `pull_request` against the PR base, producing two runs for the same commit. Both workflows now rely on `pull_request` plus manual `workflow_dispatch`, and use per-PR concurrency to cancel stale runs. This reduces duplicate CI activity and notifications; it does not establish the cause of any unrelated failed job/email. The updated workflows still require validation on their new commits, and PRs remain Draft.
