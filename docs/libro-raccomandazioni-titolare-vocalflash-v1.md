@@ -1,0 +1,195 @@
+# VocalFlash — Libro canonico delle raccomandazioni del titolare v2
+
+**Aggiornato:** 24 ottobre 2026  
+**Branch:** `assistant-conversation-photo-v1`  
+**Stato:** registro vivo delle raccomandazioni, decisioni di prodotto, vincoli di collaborazione e release guardrail raccolti dalle conversazioni disponibili.  
+**Scopo:** preservare le indicazioni del titolare attraverso le chat, impedire regressioni e separare sempre decisioni, progetti e fatti verificati.
+
+> Questo registro non è una prova di implementazione né un'autorizzazione operativa. Se due indicazioni sembrano in conflitto, applicare la decisione esplicita più recente e conservare il contesto della decisione precedente. Non trasformare mai un “procedi” generale in autorizzazione a costi, produzione, contatti esterni o cambiamenti irreversibili.
+
+## 1. Regole canoniche di collaborazione
+
+1. **Prima leggere, poi agire.** Prima di ogni intervento rileggere Libro sacro, roadmap master, questo registro, PR/issue, stato del branch e risultati dei test pertinenti.
+2. **Distinguere gli stati.** Ogni aggiornamento deve separare: **Già fatto/testato**, **Progettato**, **Da fare/bloccato**, **Prossimo passo**. Quando serve, distinguere anche implementato, testato, non iniziato e non verificabile.
+3. **Nessuna affermazione senza evidenza.** Non dire “testato”, “risolto”, “pronto” o “completato” senza prova sul commit e sull'ambiente pertinenti. Una review statica non è un test; CI verde non prova l'E2E; Preview READY non prova la correttezza semantica né la produzione.
+4. **Lavorare in autonomia sui task sicuri.** Continuare analisi, verifiche read-only, test senza impatto esterno e documentazione già autorizzati, senza attendere inutilmente il titolare. Se un'attività è bloccata da costo, credenziali, identità reale o rischio esterno, continuare sulle altre attività indipendenti.
+5. **Autorizzazione esplicita per le azioni protette.** Fermarsi prima di merge, deploy in produzione, cambi di schema o dati live, modifiche a segreti/env, configurazioni Meta/Render reali, acquisti, risorse a pagamento o ricorrenti, SMS fatturabili, contatti/test con clienti reali e altre azioni esterne irreversibili.
+6. **Non esporre il codice completo in chat nella fase corrente.** Dare aggiornamenti e risultati, non blocchi di codice integrali, salvo richiesta esplicita successiva. Non usare file scaricabili come sostituto di una verifica tecnica.
+7. **Precisione e critica costruttiva.** Verificare prima e dopo le modifiche, cercare controprove, assunzioni fragili, regressioni, duplicazioni e complessità inutile. Non assecondare un'ipotesi se i dati la contraddicono.
+8. **Risposte efficienti.** Preferire spiegazioni concise e comprensibili, ma abbastanza complete da chiarire stato, evidenza, rischio e decisione richiesta. Spiegare perché un passo è necessario e proporre un passo alla volta quando l'utente deve intervenire.
+9. **Niente identità o dati inventati.** Non inventare UUID, account, membri aziendali, numeri, autorizzazioni, risultati, migrazioni, record, conferme o dati originali.
+10. **Non rivolgersi al titolare per nome.**
+11. **Fonti primarie e aggiornate.** Per API, prezzi, policy e provider che cambiano, controllare documentazione ufficiale corrente prima di prendere decisioni.
+12. **Registro ciclico e riesame.** Mantenere, dove utile, un registro sintetico numerato di cicli, proposte, evidenze, obiezioni ed esiti. Ogni 10 cicli effettuare una revisione critica complessiva, cercando evidenze contrarie, conclusioni fragili e duplicazioni. Evitare controlli ripetitivi che non aggiungono nuove evidenze.
+13. **Monitoraggio senza duplicazioni.** Per gli avvisi/monitoraggi Meta, non creare notifiche o verifiche duplicate se esiste già un controllo equivalente.
+14. **CI senza duplicazioni.** Evitare trigger `push` e `pull_request` sovrapposti sullo stesso commit quando eseguono gli stessi test; usare una fonte primaria per la PR, concorrenza per cancellare run obsoleti e un trigger manuale quando utile. Verificare che la riduzione delle notifiche non elimini copertura necessaria.
+15. **Preservare il lavoro funzionante.** Partire dalla versione realmente distribuita o dall'ultimo stato noto; non sovrascrivere funzioni funzionanti senza motivo e test. Per la sintesi vocale, validare prima la base V4 e poi ampliare il vocabolario, senza confondere il piano con l'avvenuta esecuzione.
+
+## 2. Registro canonico dinamico delle raccomandazioni
+
+Questo elenco è **dinamico**, non una checklist immutabile:
+- rimuovere dal registro operativo i punti effettivamente chiusi, conservando la loro evidenza nello storico/Libro sacro;
+- aggiungere nuove raccomandazioni quando emergono;
+- marcare esplicitamente come **sospesi** i punti non attivi o in attesa di una decisione;
+- non mantenere punti chiusi solo per abitudine e non dichiarare chiuso un punto sulla base di un piano;
+- quando una raccomandazione viene modificata, registrare l'override più recente senza cancellare il motivo storico della decisione precedente.
+
+## 3. Gerarchia documentale
+
+- **Libro sacro operativo:** fonte di verità su stato tecnico, decisioni, guardrail, prove e risultati verificati.
+- **Roadmap master:** architettura, priorità, dipendenze, rischi, milestone e gate.
+- **Questo Libro delle raccomandazioni:** indicazioni del titolare, metodo di lavoro, preferenze, vincoli e override nel tempo.
+- **Issue e PR:** lavoro tracciabile, motivazioni, test, blocchi e decisioni puntuali.
+
+Dopo un avanzamento significativo aggiornare Libro sacro e roadmap; aggiornare questo registro quando emerge una nuova raccomandazione o un override. Ogni aggiornamento documentale deve riportare data e riferimenti pertinenti. La documentazione non sostituisce una prova di esecuzione.
+
+## 4. Visione e requisiti del prodotto
+
+1. VocalFlash è un **assistente WhatsApp “dal vocale all'azione”**, non un semplice servizio di trascrizione.
+2. Il valore principale è capire la richiesta, sintetizzare i punti salienti, conservare i dettagli utili, individuare ciò che manca o è ambiguo e proporre il passo operativo successivo.
+3. Non inviare automaticamente la trascrizione completa se non richiesta: la sintesi utile e i punti operativi sono il risultato primario.
+4. Supportare messaggi testuali, vocali e, quando il percorso è progettato e implementato, foto/media. Non inventare dettagli che non siano supportati dalle fonti.
+5. L'assistente deve aiutare sia chi scrive (cliente/contatto) sia il titolare dell'attività. Deve raccogliere le informazioni necessarie, porre domande mirate e consentire al titolare di impartire comandi e mantenere il controllo.
+6. Individuare esigenze di business reali per settore, non limitarsi a demo tecniche o questionari. Usare ricerca e casi operativi per capire dove l'assistente risparmia tempo, evita perdite di informazioni e rende più affidabile il seguito delle richieste.
+7. Mantenere una visione **multi-settore**: manutenzione/idraulica, edilizia/cantiere, immobiliare, mediazione finanziaria, legale, medico e generico sono esempi già discussi. **Escludere il settore farmaceutico dal catalogo iniziale concordato**; non reintrodurlo come esempio iniziale senza una nuova decisione.
+8. Riconoscere il settore dal contesto, ma chiedere chiarimenti quando non è possibile classificarlo in modo affidabile.
+9. Una richiesta ordinaria di guasto/intervento deve aprire una pratica solo quando workflow, campi obbligatori, policy, autorizzazione e scrittura persistente lo consentono.
+10. Non dichiarare una pratica aperta, un intervento assegnato, un messaggio consegnato o un'azione completata finché l'esito non è confermato dallo stato persistente o dal provider autorevole appropriato.
+11. Separare consumi, account e percorsi commerciali di VocalFlash WhatsApp da quelli di VocalFlash API.
+
+## 5. Qualità della sintesi e conservazione delle informazioni
+
+- La sintesi deve essere utile, fedele, concisa e orientata alle azioni, senza perdere elementi operativi importanti.
+- Preservare i dati originali e la loro provenienza; non sovrascrivere o “normalizzare” silenziosamente il contenuto originario. Distinguere dato esplicito, dato normalizzato, proposta, inferenza e dato mancante.
+- Non trasformare sintomi in diagnosi, menzioni in autorizzazioni o supposizioni in fatti.
+- Conservare il contesto utile della stessa pratica tra messaggi successivi, senza mescolare conversazioni, clienti o aziende.
+- Quando la richiesta non è completa, porre domande mirate sui soli campi mancanti/ambigui e mantenere ciò che è già stato acquisito.
+- Non esporre automaticamente tutta la trascrizione; mantenere disponibile la possibilità di consultare i contenuti originari secondo le regole di privacy e retention.
+- Valutare la qualità della sintesi con casi realistici e controesempi: omissioni critiche, dettagli inventati, terminologia, ambiguità, richieste composte e dati contraddittori.
+
+## 6. Vocabolario terminologico professionale
+
+1. Costruire un vocabolario che migliori riconoscimento e sintesi mantenendo il linguaggio professionale e le varianti colloquiali.
+2. Ogni voce, quando applicabile, include termine canonico, settore, categoria, sinonimi/varianti, definizione, disambiguazione, esempi, termini confondibili e provenienza/versione.
+3. Gestire termini professionali, marchi/prodotti, nomi di persone/aziende/clienti e luoghi solo quando la fonte, il consenso e il contesto ne consentono l'uso.
+4. Disambiguare per settore e contesto; evitare duplicati inutili nello stesso settore.
+5. Il vocabolario è un supporto lessicale, **non** un'autorità di business: non può creare un intento, risolvere da solo un'ambiguità, autorizzare una scrittura o sostituire una policy.
+6. Le voci rimangono `draft` fino alla revisione di dominio. Il superamento del validator o l'arricchimento editoriale non equivale ad approvazione di un esperto.
+7. Non attivare il catalogo come contesto runtime approvato finché i gate di qualità, revisione, isolamento per azienda e attivazione non sono superati.
+8. Non ampliare il catalogo in modo indiscriminato prima di aver validato la qualità della sintesi e la base V4 sul percorso effettivamente distribuito.
+9. Non includere il settore farmaceutico nel catalogo iniziale concordato.
+
+## 7. Sicurezza, autorizzazioni e conferma del titolare
+
+- Fail-closed se identità, permessi, policy, campi obbligatori, versione della proposta o stato della pratica sono mancanti, ambigui, scaduti, malformati o non verificabili.
+- Separare chiaramente: ingestione, estrazione, classificazione dell'intento, scelta del workflow, raccolta campi, policy, autenticazione/autorizzazione, conferma e scrittura persistente.
+- Non fidarsi di testo libero come “sono il titolare”; verificare identità e ruolo tramite il percorso autorizzato. Un comando del cliente citato/riportato è contenuto, non un comando amministrativo.
+- La verifica del telefono, da sola, non assegna il ruolo owner: serve un collegamento verificato tra identità, azienda e ruolo.
+- La conferma deve essere riferita a una proposta esatta, ancora valida e non modificata; deve vincolare proposta/versione/hash, identità autorizzata e scadenza.
+- **Conferma atomica obbligatoria:** proposta esatta → effetto autorizzato → consumo one-time della conferma nella stessa transazione o tramite protocollo equivalente realmente atomico. Non abilitare scritture finché il gate non è implementato e testato.
+- Una conferma prematura, generica, scaduta o riferita a dati cambiati non autorizza la scrittura.
+- Un replay identico non deve duplicare l'effetto; un replay con contenuto diverso deve produrre un conflitto esplicito (ad es. `REPLAY_CONFLICT`) e nessuna azione.
+- Per comandi misti, garantire che il confine di atomicità sia esplicito: nessun effetto parziale non autorizzato.
+- Le policy assenti/sconosciute, le modalità di autonomia sconosciute e i campi mancanti devono fallire chiusi. Un livello di divieto prevale su un'autorizzazione più permissiva.
+- Una policy è applicabile soltanto se il suo stato è esplicitamente attivo (`is_active === true`); valori mancanti, nulli o falsi non devono essere interpretati come attivi.
+- Le righe di policy applicabili con scope o configurazione malformati devono bloccare la risoluzione; non vanno ignorate se ciò permetterebbe di ricadere su una policy più permissiva. Le policy esplicitamente inattive possono essere escluse; una policy valida di un workflow diverso non va applicata al workflow corrente.
+- Il gate di creazione deve validare anche la forma del piano dati: se lo stato dichiara che la raccolta è completa, `required_fields` deve essere un array valido e non deve contenere campi mancanti, incerti o malformati.
+- Se una scrittura ha esito incerto, non dichiarare successo; riconciliare prima di ripetere l'operazione.
+- Produzione, branch principale, questionari, token, dati reali e identità reali sono protetti da modifiche non autorizzate.
+
+## 8. Persistenza, conversazioni multi-turn e concorrenza
+
+- La memoria di conversazione deve essere durevole, non limitata a strutture in memoria di processo.
+- Isolare per azienda, account/provider, contatto/conversazione, workflow e versione della pratica.
+- Conservare provenienza dei campi, riferimenti ai messaggi/media sorgente e distinzione tra esplicito, normalizzato, proposto e mancante.
+- Proteggere aggiornamenti concorrenti con versioning/compare-and-set e, dove necessario, lease/fencing token; un lock locale non protegge da side effect esterni.
+- Gestire restart, deployment, timeout, messaggi duplicati e fuori ordine, scadenze e recovery senza perdere o mischiare contesto.
+- MultiVocale deve accumulare i vocali consecutivi nel batch previsto e produrre **un'unica sintesi finale che includa il contenuto di tutti i vocali**. Due sintesi separate non soddisfano il requisito.
+- Il timer di raggruppamento di 5 secondi era inteso a evitare risposte separate; non sostituirlo con l'obbligo per l'utente di distanziare i messaggi di 1–2 secondi.
+- Quando si usa “Riepiloga più vocali”, conservare il primo vocale e aggiungere quelli successivi, senza sovrascriverlo.
+- Gestire eventi quasi simultanei e concorrenza senza perdere contenuti, duplicare risposte o inviare un riepilogo incompleto.
+- Preservare il percorso audio funzionante e introdurre cambiamenti minimi con regressioni mirate.
+
+## 9. Outbox WhatsApp, delivery e recovery
+
+- Gli invii esterni devono usare una outbox durevole con attempt e stato persistente; non basarsi soltanto sul successo della richiesta HTTP o su memoria volatile.
+- Correlare callback Meta autenticati con l'ID del messaggio del provider e gestire duplicati/fuori ordine in modo idempotente.
+- Distinguere gli stati **accepted**, **delivered**, **read**, **failed definitive** e **outcome unknown**; non considerarli sinonimi.
+- Se il processo si interrompe dopo l'invio ma prima della persistenza della risposta, l'esito può essere sconosciuto. Non effettuare retry ciechi in `outcome_unknown` senza idempotenza provider documentata o riconciliazione autorevole.
+- Non promettere exactly-once se non è dimostrabile ai confini tra database e provider. Dichiarare con precisione la garanzia effettiva (ad es. at-most-once o consegna best-effort).
+- Testare crash, timeout, risposta persa, retry, webhook duplicati/fuori ordine, due worker concorrenti, lease scaduta e status callback tardivi.
+- La firma webhook implementata nel branch non equivale a verifica end-to-end sul servizio Render reale.
+
+## 10. Costi, account, onboarding e privacy
+
+1. Prima di risorse a pagamento presentare costo unitario, frequenza, stima sul periodo, voci escluse e possibili costi aggiuntivi; attendere conferma esplicita.
+2. Ricalcolare prezzi correnti prima di acquistare o creare risorse. Un preventivo precedente non è automaticamente attuale.
+3. Nessun database branch, risorsa compute, SMS, provider o servizio a pagamento senza approvazione.
+4. Non incollare né chiedere in chat password, OTP, token o chiavi API; non scriverli in issue, log o documenti versionati.
+5. Non creare identità, utenti Auth o membri aziendali fittizi per superare un blocco.
+6. L'onboarding deve collegare un'identità verificata al business tramite un percorso autorizzato; OTP/telefono non basta per attribuire il ruolo owner.
+7. Per Supabase, Bird, Stripe, Meta, Vercel, Render e altri provider, controllare documentazione ufficiale e costi attuali prima di scegliere o configurare.
+8. Privacy/GDPR prima del lancio: informativa, ruoli, basi giuridiche, minimizzazione, retention/cancellazione, accesso, log, responsabili/sub-responsabili, trasferimenti, sicurezza e obblighi contrattuali; ottenere revisione qualificata quando necessaria.
+9. Non esporre al cliente segreti, dati personali non necessari, stack trace, eccezioni grezze o URL sensibili.
+10. Vercel Hobby non-commercial limitation, billing e condizioni di lancio devono essere risolti prima del GO-LIVE.
+11. Tenere distinti pricing e consumi dell'assistente WhatsApp e della VocalFlash API.
+12. Decisioni di pricing/pagamento (piani, prezzi, mensile/annuale, trial, metodi di pagamento, fallimenti, cancellazioni/rimborsi) restano decisioni del titolare finché non esplicitamente deliberate.
+
+## 11. Test, rilascio e pilot
+
+- Ogni modifica deve avere test mirati proporzionati al rischio e verifica degli effetti collaterali.
+- Prima di intervenire verificare il commit effettivo, l'ambiente, la configurazione e le funzioni esistenti.
+- Controllare CI e Preview sull'head esatto. Un run verde su un commit precedente non dimostra che l'head corrente sia verde.
+- Un test unitario non prova un'integrazione; CI non prova Meta/Render/Supabase E2E; Preview READY non prova produzione.
+- Verificare casi positivi, negativi, ambigui e avversariali: policy assente, campi mancanti, conferma prematura, scadenza, replay identico/diverso, due conferme concorrenti, duplicati, timeout, restart, provider irraggiungibile e risposta persa.
+- Non usare clienti reali o inviare loro messaggi senza approvazione esplicita.
+- Pilot iniziale controllato con **3–5 potenziali clienti** prima di ampliare prematuramente l'architettura multi-azienda.
+- Conservare evidenza verificabile: commit SHA, run/job, ambiente, casi coperti, risultati e limiti.
+- Non ripetere controlli identici se non vi sono nuove evidenze; usare il tempo per chiudere il prossimo blocco autonomo.
+- Quando si dichiara “completato”, includere le verifiche effettivamente eseguite e le attività ancora non eseguibili per mancanza di autorizzazioni o ambiente.
+
+## 12. Direzione di prodotto e apprendimento dal mercato
+
+- Usare i risultati già raccolti senza gonfiare il campione: il questionario VocalFlash disponibile aveva 2 risposte. Entrambe usavano WhatsApp ogni giorno, indicavano 0–5 vocali al giorno, riferivano di voler una sintesi e di capire/riassumere la richiesta; il campione è troppo piccolo per conclusioni di mercato robuste.
+- Valutare i bisogni reali per settore con casi d'uso, flussi e costi/benefici concreti; non inviare questionari o messaggi a persone senza approvazione.
+- L'esempio idraulico/manutenzione deve mostrare concretamente come l'assistente raccoglie zona/indirizzo, descrizione del problema, foto quando utili e disponibilità, riprende la stessa pratica e lascia al titolare la decisione quando richiesta dalla policy.
+- L'assistente non deve limitarsi a riassumere: deve evidenziare cosa manca, proporre domande e un'azione successiva, mantenendo il controllo umano dove necessario.
+- Non usare il caso idraulico come unico modello di prodotto: l'architettura deve permettere più settori e vocabolari separati senza confondere terminologia o policy.
+
+## 13. Checklist prima di una modifica significativa
+
+- [ ] Ho consultato lo stato corrente, questo libro, Libro sacro, roadmap, PR/issue e test pertinenti?
+- [ ] Ho verificato quale commit/ambiente è realmente attivo?
+- [ ] Ho separato già fatto/testato, progettato e da fare?
+- [ ] Ho identificato la modifica minima e protetto le funzioni esistenti?
+- [ ] Ho preservato dati originali e provenienza, senza inferenze non supportate?
+- [ ] Ho verificato tenant isolation, identità, policy, fail-closed e conferma atomica?
+- [ ] Ho considerato concorrenza, restart, timeout, retry, replay e duplicati?
+- [ ] Ho controllato privacy e possibili effetti esterni?
+- [ ] Ho evitato costi, segreti, dati live e produzione senza autorizzazione?
+- [ ] Ho eseguito davvero i test dichiarati sul commit pertinente?
+- [ ] Ho aggiornato Libro sacro e roadmap dopo il progresso significativo?
+- [ ] Ho aggiornato questo registro se è emersa una nuova raccomandazione o un override?
+- [ ] Ho rimosso dal registro operativo i punti chiusi, mantenendo evidenza nello storico, e marcato esplicitamente i sospesi?
+
+## 14. Stato e limiti della raccolta
+
+Questo documento consolida le raccomandazioni esplicite e le decisioni disponibili nelle conversazioni e nei registri di progetto recuperati. Non afferma che ogni conversazione storica sia stata recuperata integralmente se non accessibile nei risultati disponibili. È un registro vivo: quando emerge una nuova indicazione, va aggiunta; se un'indicazione precedente è superata, va marcata come override e non applicata in conflitto con la decisione più recente.
+
+## 15. Consegna WhatsApp: esiti ambigui e retry
+
+- Non confondere il completamento dell'elaborazione con la consegna della risposta: sono due stati distinti.
+- Un timeout del client non prova che Meta abbia rifiutato il messaggio. Se l'accettazione è ambigua, non offrire un reinvio cieco che possa duplicare la risposta.
+- Persistire l'intento outbound con chiave idempotente, identificativo provider quando disponibile, stato `outcome_unknown` e procedura di riconciliazione; distinguere errori definitivi da errori transitori e timeout ambigui.
+- Ogni azione “Riprova” deve sapere se ripete la generazione della sintesi o soltanto la consegna; non ricalcolare o reinviare implicitamente senza verificare lo stato.
+- Verificare retry, webhook duplicati, due worker concorrenti, restart e callback duplicate. Un test unitario non dimostra la consegna reale al destinatario.
+- Evidenza del rilievo statico 24/10/2026: [bot issue #4 — consegna MultiVocale ambigua](https://github.com/VocalFlash/vocalflash-bot/issues/4). È stato aggiunto un guard conservativo nel ramo Draft, con test CI superati sul commit `1a717d314ab07ea670c4e20a0bb0dd8b676c469b`: dopo il confine di invio non si offre retry cieco e il recovery è bloccato finché l'esito è da riconciliare. Il test non riproduce un invio reale Meta; il guard non equivale a outbox durevole o garanzia exactly-once. Nessun deploy, migrazione o modifica live.
+
+
+## 16. Riepilogo periodico VocalFlash
+
+- Preparare il riepilogo ricorrente del venerdì con avanzamenti verificati, blocchi, decisioni aperte e prossimi passi.
+- Coprire esplicitamente le aree: integrazioni Meta, MultiVocale, Account & Billing, privacy e sicurezza.
+- Indicare sempre le **tre priorità successive** e separare le decisioni che richiedono il titolare dalle attività che possono proseguire autonomamente.
+- Non presentare un riepilogo programmato come completato se il relativo controllo o aggiornamento non è stato effettivamente eseguito.
+- Usare lo stato dei repository, dei test, dei provider e dei documenti aggiornati; evitare di ripetere verifiche senza nuove evidenze.
