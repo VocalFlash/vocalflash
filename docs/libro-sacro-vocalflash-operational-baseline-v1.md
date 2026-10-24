@@ -551,3 +551,18 @@ Questa sezione consolida le raccomandazioni permanenti ricostruite dal registro 
 
 ### 8.7 Stato del consolidamento e limiti
 Il registro di continuità storico è un documento lungo (5.076 righe) con decisioni, prove e snapshot temporali. Questa sezione consolida le raccomandazioni permanenti recuperate e le aree di controllo, ma non sostituisce la verifica puntuale di ogni singola affermazione storica. Per evitare di promuovere snapshot obsoleti a stato corrente, ogni dato tecnico va riconfermato contro repository, CI, deployment e Supabase prima di agire. La revisione integrale 360° resta aperta finché ogni area sopra non ha un esito PASS/BLOCKED/NOT RUN con evidenza.
+
+
+
+## 9. Verifica di controllo del Libro sacro e stato 360° — 24 ottobre 2026
+
+### Verifiche di questo aggiornamento
+- Il presente Libro sacro è stato aggiornato e riletto dopo il consolidamento della sezione 8. Commit di consolidamento: b2e14a32ddc9d838498dddd1bc44a58a0940a325.
+- La roadmap master è stata aggiornata con la matrice 360° e la data corretta al 24 ottobre 2026. Commit più recente della roadmap: 1e9a294f4790562d444d2eec55761aca8cd07ba8.
+- La lettura read-only del progetto Supabase ha confermato stato ACTIVE_HEALTHY, 15 migrazioni registrate, 15 tabelle pubbliche, zero Edge Functions distribuite, 15 finding RLS-enabled/no-policy e 18 foreign key senza indice di copertura. Non è stato modificato il database.
+- La lettura del bot Python ha confermato che sessions, auto_batches, queued_batches e last_audio sono strutture in memoria; Redis coordina deduplica/lock ma non rende durevole il contenuto audio durante restart. Il vincolo single-worker resta finché tale architettura non viene sostituita.
+- Le PR #3 (Assistant API), #2 (bot) e #9 (SMS Hook/Bird) restano Draft. La PR #9 non prova una configurazione o un invio SMS reale.
+- Le interrogazioni workflow associate ai due commit documentali più recenti non hanno restituito run: pertanto non si attribuisce loro un nuovo PASS CI. I risultati positivi precedenti restano legati ai rispettivi SHA, non vengono trasferiti automaticamente a questi commit documentali.
+
+### Esito
+**Libro raccomandazioni: consolidamento aggiornato; audit tecnico 360°: IN CORSO, non chiuso.** La copertura e le raccomandazioni sono state registrate, ma varie aree restano BLOCKED/NOT RUN e richiedono prove concrete. In particolare: riconciliazione delle migrazioni; disegno e test delle policy RLS; conferma atomica; stato conversazionale durevole; outbox e riconciliazione degli invii; verifica di configurazione staging; E2E integrato ripetuto cinque volte; privacy/retention; onboarding, billing, gruppi e costi. Non considerare il progetto pronto al lancio.
