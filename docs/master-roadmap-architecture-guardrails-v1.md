@@ -373,3 +373,13 @@ This inspection was read-only. No application code, live data/schema, provider c
 - No SQL writes were performed. All queries were SELECT-only catalog inspections.
 
 - Full catalog sweep of all functions in schema `public` returned no functions executable by `anon` or `authenticated`. Schema privilege checks show `USAGE=true`, `CREATE=false` for both roles and `service_role`. An attempted lookup through `information_schema.schema_privileges` failed because that relation is not present in this Postgres catalog; the equivalent `has_schema_privilege` check succeeded. The sweep is limited to the public schema and does not cover extension schemas or external application behavior.
+
+
+### Open pull request inventory refresh — 24 October 2026
+A fresh open-PR search found three open PRs in `VocalFlash/vocalflash` and one in `VocalFlash/vocalflash-bot`:
+- `VocalFlash/vocalflash` PR #1, “Harden fresh Vercel deployments for ES modules”: open; proposes only `package.json` module-mode fix and records isolated Preview route checks. It also records a separate Preview questionnaire environment secret returning HTTP 401. Treat that as an unresolved diagnostic for that environment; do not assume it is the Assistant API credential or change secrets without tracing the exact deployment/project.
+- `VocalFlash/vocalflash` PR #3: Assistant API/customer workflow, open Draft; must ship paired with bot PR #2.
+- `VocalFlash/vocalflash` PR #9: SMS Hook/Bird, open Draft; optional independent integration, not deployed.
+- `VocalFlash/vocalflash-bot` PR #2: WhatsApp bot, open Draft; coupled to PR #3.
+
+The PR search result does not provide a complete merge-readiness verdict, and the review APIs returned no submitted review records for these PRs. Before any release, recheck each PR's exact head/base SHA, checks, conflicts, and whether PR #1 is already subsumed by PR #3's branch. Do not merge PR #1 separately merely to resolve the module-mode concern without checking dependency order.
