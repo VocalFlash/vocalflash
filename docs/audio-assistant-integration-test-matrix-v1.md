@@ -1,6 +1,6 @@
 # VocalFlash — matrice di accettazione audio → Assistant workflow v1
 
-**Stato:** specifica di test/design; non è prova di implementazione o di esecuzione dei test.  
+**Stato:** matrice di accettazione; il sottoinsieme di normalizzazione pura è implementato e coperto da test CI, ma la matrice completa non è stata eseguita end-to-end.  
 **Branch di lavoro:** `assistant-conversation-photo-v1`.  
 **Scope:** progettare l'ingresso dei vocali nel workflow customer dell'Assistant API senza alterare il comportamento MultiVocale esistente.  
 **Vincoli:** nessun merge, deploy, invio WhatsApp reale, modifica al database live o spesa. Le PR API e bot restano Draft.
