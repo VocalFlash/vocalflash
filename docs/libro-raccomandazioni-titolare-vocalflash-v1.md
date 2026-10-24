@@ -175,3 +175,12 @@ Dopo un avanzamento significativo aggiornare Libro sacro e roadmap; aggiornare q
 ## 14. Stato e limiti della raccolta
 
 Questo documento consolida le raccomandazioni esplicite e le decisioni disponibili nelle conversazioni e nei registri di progetto recuperati. Non afferma che ogni conversazione storica sia stata recuperata integralmente se non accessibile nei risultati disponibili. È un registro vivo: quando emerge una nuova indicazione, va aggiunta; se un'indicazione precedente è superata, va marcata come override e non applicata in conflitto con la decisione più recente.
+
+## 15. Consegna WhatsApp: esiti ambigui e retry
+
+- Non confondere il completamento dell'elaborazione con la consegna della risposta: sono due stati distinti.
+- Un timeout del client non prova che Meta abbia rifiutato il messaggio. Se l'accettazione è ambigua, non offrire un reinvio cieco che possa duplicare la risposta.
+- Persistire l'intento outbound con chiave idempotente, identificativo provider quando disponibile, stato `outcome_unknown` e procedura di riconciliazione; distinguere errori definitivi da errori transitori e timeout ambigui.
+- Ogni azione “Riprova” deve sapere se ripete la generazione della sintesi o soltanto la consegna; non ricalcolare o reinviare implicitamente senza verificare lo stato.
+- Verificare retry, webhook duplicati, due worker concorrenti, restart e callback duplicate. Un test unitario non dimostra la consegna reale al destinatario.
+- Evidenza del rilievo statico 24/10/2026: [bot issue #4 — consegna MultiVocale ambigua](https://github.com/VocalFlash/vocalflash-bot/issues/4). Rischio individuato da lettura del codice, non incidente riprodotto. Nessun deploy o modifica runtime autorizzata da questa evidenza.
