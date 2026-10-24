@@ -215,3 +215,12 @@ The draft catalog now has 699 candidate entries, of which 100 have preliminary s
 - Vercel Preview for that commit was still pending at the last status query. Do not report it as ready until the status is terminal.
 
 - Latest re-check: GitHub Actions run #328 (`40076877316`) passed on branch head `6dba0c0a0345c6b975c424fed7ee30c3cd164ad2`, including draft catalog validation and focused Assistant tests. The Vercel status for that commit was still pending at the time of the check. The next docs-only commit will trigger another CI run; do not extrapolate the current result to a newer SHA.
+
+
+## Owner recommendations register — 2026-10-24
+
+The canonical owner recommendations register was consolidated at `docs/libro-raccomandazioni-titolare-vocalflash-v1.md`. It now explicitly records the dynamic-register rule: remove closed items from the active list while retaining evidence in history, add new recommendations, and mark paused items as paused. A plan or documentation entry is not proof of implementation.
+
+The register also consolidates the latest overrides and product/engineering constraints for concise but evidence-based reporting, preserving the working deployed path, validating V4 before expanding terminology, single unified MultiVocale summaries, source-data provenance, fail-closed behavior, atomic owner confirmation, durable multi-turn state, concurrency/replay protection, WhatsApp outbox reconciliation, no invented identities, privacy/cost approvals, and evidence tied to the exact commit.
+
+CI run #330 (`40076914648`) completed successfully on `e00dd7f7dd585817011ab3ab28b33ea0173ee840`. Since this roadmap update creates a newer head, do not treat that run as validation of the current head; re-check CI and Preview on the latest revision.
