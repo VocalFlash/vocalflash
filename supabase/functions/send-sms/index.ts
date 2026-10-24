@@ -82,7 +82,8 @@ Deno.serve(async (req: Request) => {
   }
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 4000);
+  // Leave headroom for cold start and response handling inside the Auth hook's time budget.
+  const timeout = setTimeout(() => controller.abort(), 3000);
   try {
     const response = await fetch(BIRD_SEND_URL, {
       method: "POST",
