@@ -9,10 +9,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: assistant-customer-pipeline-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
   customer-pipeline-tests:
     name: Assistant API pass ${{ matrix.pass }}
