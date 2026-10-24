@@ -295,3 +295,44 @@ Rimangono NO-GO: conferma titolare atomica, riconciliazione della fonte SQL dell
 - These are repeated automated suites, **not** five full end-to-end staging runs. The live Supabase audit still finds 15 registered migrations without a reconciled authoritative source sequence, no deployed Edge Functions, 15 RLS-enabled tables without policies, 18 foreign keys without covering indexes, and 26 indexes flagged as unused. The owner confirmation/commit RPC path still lacks verified atomic binding of a valid, unexpired, one-time confirmation to the write.
 - Persistent multi-turn conversation state, durable outbound outbox/reconciliation, correct Meta staging secret verification, authorized real test member, and integrated staging E2E remain release gates. Keep PR #3, PR #2, and PR #9 Draft. **NO-GO for production release remains unchanged.** No live schema/data mutation, merge, production deployment, real SMS, or paid resource was performed in this refresh.
 - Canonical detailed evidence and ordered next steps are recorded in the [Libro sacro operativo](https://github.com/VocalFlash/vocalflash/blob/assistant-conversation-photo-v1/docs/libro-sacro-vocalflash-operational-baseline-v1.md).
+
+
+
+## 360-degree verification refresh — 24 October 2026
+
+This refresh is an evidence ledger, not a release approval. The recommendation register and the current Libro sacro section 8 govern all subsequent work.
+
+### Confirmed during this refresh
+- The live Supabase migration registry currently returns 15 versions, from 20261001181622 through 20261004213059. The source SQL provenance is still unresolved; do not apply/reconstruct migrations from names.
+- The live public schema returns 15 tables. Supabase Security Advisor currently reports 15 RLS-enabled tables without policies; Performance Advisor reports 18 foreign keys without covering indexes. These are actionable findings, not proof that public access is currently granted. No permissive policy or index changes were applied.
+- Supabase reports zero deployed Edge Functions for this project. This is relevant to any proposed Auth SMS Hook/Bird integration: PR #9 is draft code only; no hook deployment, Bird configuration, or real SMS has been performed.
+- The inspected bot source still holds audio/session/batch state in process memory (sessions, auto_batches, queued_batches, last_audio); Redis is used for deduplication/locks but does not make those audio batches restart-durable. Keep the single-worker constraint until that architecture changes.
+- PR #3 (Assistant API), PR #2 (bot), and PR #9 (SMS Hook/Bird) remain Draft release units. PR #3 and #2 must be reviewed and staged together due to the assistant_message contract. PR #9 is an independent optional integration and must not be merged/deployed without its own owner/cost and staging gates.
+- Existing component CI reports are not a substitute for integrated Meta → bot → Assistant API → Supabase → WhatsApp runs. The five-run staging release matrix remains NOT RUN/BLOCKED until prerequisites pass.
+- Owner-command confirmation stays disabled with ATOMIC_CONFIRMATION_NOT_ENABLED. Atomic binding, expiry, one-time consumption, and write must be verified in one transaction before any enablement.
+
+### 360-degree review matrix (current disposition)
+| Area | Current disposition | Evidence / next gate |
+|---|---|---|
+| Product vision and collaboration guardrails | Documented; recommendations consolidated in Libro sacro §8 | Keep status labels and change-control rules current |
+| Legacy audio/transcription/MultiVocale | Historical end-to-end flow existed; current full regression not established | Verify exact current Render deployment and test audio/MultiVocale without disrupting production |
+| Python bot/Render | Code inspected; state partly in memory | Durable state/outbox and staging readiness checks |
+| Assistant API/Vercel | Draft code and focused CI exist; not a complete release | Re-run CI and Preview for exact current PR head; verify auth/readiness and API contract |
+| Cross-repository contract | API/bot are coupled | Test together against same staging candidate |
+| Supabase migration provenance | BLOCKED | Recover authoritative SQL source and reconcile all 15 migrations |
+| Supabase RLS/policies | BLOCKED / requires policy design | Model roles and tenant access; add least-privilege policies only after review; test anon/authenticated/service_role paths |
+| FK indexes/performance | REVIEW REQUIRED | Check actual query patterns and constraints before adding indexes |
+| Owner confirmations | BLOCKED; fail-closed runtime retained | Atomic confirmation validation/consumption/write tests |
+| Conversation persistence | NOT COMPLETE | Durable multi-turn state across restart, workers, and duplicate/out-of-order events |
+| Outbound delivery | NOT COMPLETE for durable reconciliation | Durable outbox and ambiguous provider outcome reconciliation |
+| Meta webhook/signature | Unit implementation exists; live configuration unverified | Staging app/number/secrets, signed/invalid payload tests |
+| SMS Hook/Bird | Draft implementation only | Owner approval, current provider costs/sender availability, isolated deploy and OTP tests |
+| Privacy/retention | Design/release gate remains open | Data inventory, retention/deletion, media lifecycle, logs and access review |
+| Account/onboarding/billing | Not production-ready | Identity model, verification, plan lifecycle, cancellation and commercial hosting decision |
+| Group WhatsApp | Research/design pending | Verify current Meta API eligibility and constraints before promising feature |
+| Cost/latency/observability | Incomplete | Measure Meta, model, Render, Redis, storage and SMS costs with real workload assumptions |
+| Integrated QA | NOT RUN / BLOCKED | Run five documented E2E passes only after all prerequisites; include adversarial cases and cleanup |
+| Commercial readiness | NO-GO | Resolve all release blockers and review evidence before launch |
+
+### Explicit exclusions in this refresh
+No live schema/data changes, no RLS policy creation, no index changes, no migration application, no database branch, no secret changes, no Meta/Render/Vercel production changes, no real SMS, no paid service, no merge, and no production deployment.
