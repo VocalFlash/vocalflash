@@ -210,3 +210,6 @@ The draft catalog now has 699 candidate entries, of which 100 have preliminary s
 - No new database schema, migration, secret, environment setting, paid resource, SMS, production deployment or live data change.
 - Current head CI after the latest catalog/docs commits is not yet confirmed. Do not infer current CI success from earlier runs or from a Vercel Preview result.
 - Continue autonomous code review, test design/implementation and documentation. Before activating Bird SMS, first add automated tests and obtain explicit cost approval for any billable provider setup or real SMS.
+
+- Verification checkpoint: GitHub Actions run #324 (`40076814169`) passed on commit `d4cea0a6829d97555d581d0e6aad0c5185b33e46`, including catalog validation and focused assistant tests. This is evidence for that exact commit only; re-check CI after the current documentation updates produce a new head.
+- Vercel Preview for that commit was still pending at the last status query. Do not report it as ready until the status is terminal.
