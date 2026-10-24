@@ -212,3 +212,30 @@ Il caso in cui l'Assistant API dichiara successo ma non fornisce `assistant_mess
 La CI dell'ultimo aggiornamento documentale precedente (`bb800588d079f4920c19b96cc87e8ffe9e64d0dd`) è stata verificata: 5/5 job success. Sul bot è stato rafforzato il test del caso risposta mancante, verificando anche il rilascio effettivo della deduplicazione inbound; commit `28f381aec6635197b67d010bc7308902c7fa2b7a`, CI 5/5 success.
 
 Non è stata trovata la fonte SQL autorevole delle 15 migrazioni live. Non ricostruire schema o policy a intuito. I vocali restano sul percorso MultiVocale/legacy: non modificare il routing finché non esiste una matrice di accettazione che protegga sintesi unica, deduplica, contesto, timeout e assenza di doppie risposte.
+
+## 2026-10-24 — Audio Assistant: normalizzazione pura verificata, routing ancora bloccato
+
+### Raccomandazione operativa consolidata
+Non collegare i vocali all'Assistant API con una semplice sostituzione di `content_type`. Il contratto deve preservare trascrizione come evidenza, provenienza per ogni messaggio, ordine dei segmenti, stato ASR e idempotenza. Nessun dato mancante va inventato; un batch parziale non deve essere presentato come completo.
+
+### Già fatto e verificato
+- Aggiunti `docs/audio-assistant-api-contract-proposal-v1.md` e `docs/audio-assistant-integration-test-matrix-v1.md`.
+- Aggiunto `lib/audio-assistant-event-normalizer-v1.js` con test dedicati.
+- Il normalizzatore verifica gli identificativi, i tipi evento ammessi, il successo della trascrizione, timestamp ISO con offset, duplicati/ordine dei segmenti, e rifiuta batch incompleti.
+- Il testo aggregato del batch è generato deterministicamente dai segmenti ordinati; i campi payload non autorizzati sono esclusi.
+- CI del branch per il normalizzatore e i test: workflow run `40125843761` concluso con successo. La CI è prova dei test automatici nel repository, non di un E2E WhatsApp.
+
+### Progettato, non ancora integrato
+- Contratto canonico per `text`, `audio_transcription` e `audio_transcription_batch`.
+- Trasferimento dei segmenti e della provenienza fino al workflow Assistant.
+- Matrice di 20 scenari di accettazione.
+
+### Da fare / bloccato
+- Il normalizzatore non è ancora collegato al webhook bot né a `api/v1/assistant.js`.
+- Non sono stati verificati end-to-end Meta → ASR → MultiVocale → Assistant API → risposta.
+- Restano aperte la politica sui batch parziali, la retention, l'idempotenza persistente e il comportamento in caso di timeout/restart.
+- Prima di persistere nuovi campi occorre riconciliare le migrazioni SQL autorevoli.
+- Nessun merge, deploy, modifica al database live o invio WhatsApp reale autorizzato.
+
+### Criterio di accettazione
+La funzione può avanzare solo quando la sintesi rimane fedele e concisa, ogni affermazione è riconducibile al messaggio sorgente, non si creano doppie risposte o azioni non confermate, e la matrice di regressione viene eseguita con evidenze registrate.
