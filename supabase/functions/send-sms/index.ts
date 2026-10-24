@@ -18,6 +18,35 @@ function hookSecrets(getEnv: (name: string) => string | undefined): string[] {
     .filter(Boolean);
 }
 
+async function readBoundedBody(req: Request, maxBytes: number): Promise<string> {
+  if (!req.body) return "";
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        await reader.cancel();
+        throw new RangeError("request body exceeds limit");
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const body = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(body);
+}
+
 export function verifyHook(
   payload: string,
   headers: Headers,
@@ -72,13 +101,10 @@ export function createHandler(dependencies: HandlerDependencies = {}) {
 
     let payload: string;
     try {
-      payload = await req.text();
-    } catch {
+      payload = await readBoundedBody(req, MAX_BODY_BYTES);
+    } catch (error) {
+      if (error instanceof RangeError) return json(413, { error: "payload_too_large" });
       return json(400, { error: "invalid_request_body" });
-    }
-
-    if (new TextEncoder().encode(payload).byteLength > MAX_BODY_BYTES) {
-      return json(413, { error: "payload_too_large" });
     }
 
     const event = verify(payload, req.headers, getEnv) as
