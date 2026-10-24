@@ -383,3 +383,10 @@ A fresh open-PR search found three open PRs in `VocalFlash/vocalflash` and one i
 - `VocalFlash/vocalflash-bot` PR #2: WhatsApp bot, open Draft; coupled to PR #3.
 
 The PR search result does not provide a complete merge-readiness verdict, and the review APIs returned no submitted review records for these PRs. Before any release, recheck each PR's exact head/base SHA, checks, conflicts, and whether PR #1 is already subsumed by PR #3's branch. Do not merge PR #1 separately merely to resolve the module-mode concern without checking dependency order.
+
+
+### Staging configuration and SECURITY DEFINER refresh — 24 October 2026
+- Current SELECT-only row counts differ from the 22 October pre-launch snapshot: one staging-labelled plumbing/maintenance business, one active WhatsApp channel (external account identifier present but not disclosed; channel address absent), zero business members, two workflows (one inactive generic test workflow and one active maintenance request workflow with one required field), one active workflow-level `create_work_item` policy in `confirm` mode, 14 active business vocabulary rows, one work item, four work events, and two routing decisions.
+- The empty business-member table is the decisive onboarding/auth blocker: there is no verified owner/member binding. Do not create a placeholder member. The configured policy's `confirm` mode does not supersede the runtime's atomic confirmation guard.
+- Full public-schema SECURITY DEFINER function inspection found nine functions; all have explicit function `search_path` settings. None is executable by `anon` or `authenticated`; application RPCs are executable by `service_role` and `postgres`. `rls_auto_enable` is not executable by those application roles in the privilege check, consistent with its use as a trigger helper.
+- No personal row values, WhatsApp IDs, phone numbers, or customer message text were selected. All queries were read-only.
