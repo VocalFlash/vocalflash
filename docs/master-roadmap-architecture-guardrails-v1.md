@@ -242,3 +242,9 @@ The Assistant and bot workflows previously listened to both `push` on the PR hea
 ## Data collection plan validation — 2026-10-24
 
 The NEW work-creation policy evaluator now validates the completed data plan's shape at its trust boundary: `CREATION_POLICY_REQUIRED` requires an array `required_fields`, and any listed field must be explicitly `PROVIDED`. Missing arrays, malformed rows, and missing/uncertain statuses fail closed as `DATA_PLAN_NOT_READY`; no write path is enabled. Focused CI run #368 (`40079606945`) passed on test commit `0f6208e2c304fb8b3cf8962eab3147218819ef67`. Later documentation commits require fresh status checks.
+
+## Audit consegna MultiVocale — 24 ottobre 2026
+
+La revisione statica del bot ha rilevato un rischio specifico in `PersistentMultivocaleRuntime._process_batch()`: dopo un esito ambiguo dell'invio WhatsApp, il batch può essere marcato `failed` e l'azione `Riprova` può reinviare la risposta già memorizzata. Questo può duplicare una sintesi se Meta l'ha accettata ma la risposta HTTP si è persa. È un rischio di codice individuato staticamente, non un incidente riprodotto.
+
+Tracking: [bot issue #4](https://github.com/VocalFlash/vocalflash-bot/issues/4). Richiesti intenti outbound durevoli, stati di consegna separati da quelli di elaborazione, gestione distinta degli errori definitivi e ambigui, riconciliazione e test su timeout/restart/replay/concorrenza. Nessuna modifica runtime, migrazione, configurazione a pagamento, merge o deploy eseguito. PR #2 e #3 restano Draft.
