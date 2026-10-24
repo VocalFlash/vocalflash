@@ -90,6 +90,7 @@ Dopo un avanzamento significativo aggiornare Libro sacro e roadmap; aggiornare q
 - Un replay identico non deve duplicare l'effetto; un replay con contenuto diverso deve produrre un conflitto esplicito (ad es. `REPLAY_CONFLICT`) e nessuna azione.
 - Per comandi misti, garantire che il confine di atomicità sia esplicito: nessun effetto parziale non autorizzato.
 - Le policy assenti/sconosciute, le modalità di autonomia sconosciute e i campi mancanti devono fallire chiusi. Un livello di divieto prevale su un'autorizzazione più permissiva.
+- Una policy è applicabile soltanto se il suo stato è esplicitamente attivo (`is_active === true`); valori mancanti, nulli o falsi non devono essere interpretati come attivi.
 - Se una scrittura ha esito incerto, non dichiarare successo; riconciliare prima di ripetere l'operazione.
 - Produzione, branch principale, questionari, token, dati reali e identità reali sono protetti da modifiche non autorizzate.
 
