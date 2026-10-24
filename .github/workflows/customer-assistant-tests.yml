@@ -17,8 +17,10 @@ jobs:
   customer-pipeline-tests:
     name: Assistant API pass ${{ matrix.pass }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         pass: [1, 2, 3, 4, 5]
     steps:
