@@ -1,6 +1,6 @@
 # VocalFlash — master roadmap and architecture guardrails v1
 
-**Updated:** 2026-10-23  
+**Updated:** 2026-10-24  
 **Status:** planning/engineering record on the isolated development branch. This document does not authorize database changes, merges, purchases, or deployments.
 
 ## Product definition
