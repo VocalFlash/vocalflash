@@ -160,3 +160,7 @@ Prima del test storage end-to-end, leggere il log di readiness solo come `storag
 ## Stato CI — aggiornamento finale del ciclo, 25 ottobre 2026
 
 La CI bot run `40235440651` sul commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274` è `success`. La CI API run `40235503317` sul commit documentale `2fb250205556ae967195b08197c618464184b624` è `success`, con tutti e cinque i job riusciti. La Preview Vercel associata a quest'ultimo commit è `READY`. Prima di dichiarare il rilascio pronto rimangono obbligatori i test E2E in staging: upload/download/delete reale, restart e recupero, isolamento delle chiavi, controllo env e prova coordinata API-bot-Meta. Nessun deploy produzione o test WhatsApp reale eseguito in questo ciclo.
+
+## Gate di routing aggiunto — 25 ottobre 2026
+
+Prima del rilascio, verificare la CI del branch bot dopo la correzione che impedisce il fallback legacy per audio e comandi MultiVocale non gestiti da V2. Commit codice `d5e75a618d48a17a1f120153213167134bebe52f`; test aggiunti nel commit `ee9127f480746f83cb301822be153ddbfb993244`. Al momento dell'annotazione non è stata confermata una run CI verde per il nuovo head. Se la CI non parte automaticamente, il gate resta aperto: eseguire il workflow appropriato o correggere il trigger, poi verificare i job. Non testare con messaggi WhatsApp reali finché non è autorizzato il test staging controllato.
