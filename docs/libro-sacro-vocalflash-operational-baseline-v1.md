@@ -818,3 +818,11 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 - Run finale sul workflow così corretto: [#40208821196](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40208821196), commit `e584da1452b37a6552f6f824fc1ec6824b2fac1e`; log letto: **47 test, OK**.
 - Il test del fallimento del thread di rinnovo durante elaborazione lunga con recupero concorrente resta da aggiungere/eseguire; i test fake non provano Redis reale o recovery end-to-end.
 - Gate e checklist: [issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5). Release gate ancora aperto; nessun deploy/merge o modifica live.
+
+
+## Verifica Preview corrente — 25 ottobre 2026
+
+- Verificata in sola lettura la Preview Vercel del branch `assistant-conversation-photo-v1` sul commit documentale corrente `082f1e7ac99cea0bbca80b8aa1beb1aa92ff7167`: stato `READY`, deployment `dpl_8yxnr8L7cXmpi22EzPF57LhkMGDq`.
+- Il build log riporta `Build Completed` e `Deployment completed`. Il commit è documentale; lo stato READY dimostra che la build Preview si è conclusa, non che il contratto Assistant API → bot sia corretto né che l'E2E funzioni.
+- PR bot #2 e PR API #3 restano Draft; il gate di verifica congiunta resta aperto. Nessun merge o deploy di produzione.
+- Registro completo dei gate: [bot issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5).
