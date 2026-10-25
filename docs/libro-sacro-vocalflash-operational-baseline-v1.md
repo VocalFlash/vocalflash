@@ -1043,3 +1043,8 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 
 - Follow-up CI bot verificata dopo la correzione readiness: run `40235440651` (`Test MultiVocale Runtime V2`) conclusa `success` sul commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274`; il job `test` è completato senza fallimenti. È una verifica CI del branch bot, non una prova di Render, Supabase storage o Meta E2E.
 - La CI API sul commit documentale `2fb250205556ae967195b08197c618464184b624` era ancora in esecuzione al controllo; il codice applicativo API non è cambiato rispetto al head `c348cc0d6d1ba5b8334328570aaeb904cb9aa581` con CI verde. La Preview del commit documentale è in build; la Preview precedente `d4aa72c01e2495829fea20daae5cf357d2097529` è `READY`.
+
+
+## Correzione di stato e fonte prevalente — 25 ottobre 2026
+
+Questa nota prevale sulle frasi precedenti di questo documento che indicavano come non ancora verificata la CI bot sul commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274`: la verifica successiva ha confermato la run `40235440651` conclusa `success`. Prevale inoltre sullo stato provvisorio della CI API: la run `40235503317` sul commit documentale API `2fb250205556ae967195b08197c618464184b624` è conclusa `success`, con tutti e cinque i job della matrice riusciti. Il codice applicativo API testato è rimasto quello già verificato; il nuovo commit è documentale. La Preview Vercel per il commit documentale `2fb250205556ae967195b08197c618464184b624` è ora `READY`; è una Preview, non produzione. Nessuna di queste evidenze equivale a un test storage E2E o a un riavvio Render.
