@@ -153,3 +153,5 @@ Il totale dei tre test matrix principali è 675 esecuzioni riuscite (API 445 + b
 ## Aggiornamento runbook — 25 ottobre 2026
 
 Prima del test storage end-to-end, leggere il log di readiness solo come `storage_control`: conferma che il bot raggiunge l'endpoint di controllo e che la health action crea una signed-upload URL. Non prova che upload, download o delete funzionino realmente. Il bot commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274` contiene questa correzione; verificare CI sul commit prima di procedere. Il test E2E resta un gate separato e va eseguito soltanto in staging autorizzato, con oggetto sintetico e verifica esplicita della cancellazione. Nessun test live è stato eseguito in questo ciclo.
+
+- Gate CI del bot: completato con successo nella run `40235440651` sul commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274`. Questo non sostituisce il test staging E2E. La CI API sul più recente commit documentale risultava ancora in corso al controllo; non usare il suo stato come indicatore di storage live.
