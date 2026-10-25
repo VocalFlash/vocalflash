@@ -468,3 +468,10 @@ Verification update 2026-10-24:
 - Deployment Preview `dpl_8yxnr8L7cXmpi22EzPF57LhkMGDq` sul commit documentale `082f1e7ac99cea0bbca80b8aa1beb1aa92ff7167` verificato `READY`; il log contiene `Build Completed` e `Deployment completed`.
 - Questa è una verifica di build Preview, non test semantico o end-to-end. Il contratto tra PR bot #2 e PR API #3 resta da validare congiuntamente; entrambe le PR restano Draft.
 - Nessun merge/deploy di produzione. Gate tracciati nell'[issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5).
+
+
+## Release-gate update — lease renewal failure under long processing (2026-10-25)
+- Added a fail-closed guard in the MultiVocale runtime: when processing fails after the worker has lost its fencing token, the stale worker checks persisted state and suppresses customer-facing failure/retry messages if another worker owns or has completed the batch.
+- Added a deterministic concurrency regression test: long-running first worker, renewal-thread failure, lease expiry, second-worker recovery and successful delivery, then late return of the stale worker. Acceptance checks cover no stale summary, no stale retry message, exactly one successful follow-up, and final batch state remains completed.
+- CI run [#40209993482](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40209993482), commit `d31878080a94975a605b39b74c90790bf2fc9180`: **48 tests, OK**, including the new regression.
+- The test uses FakeRedis and deterministic orchestration. Real Redis concurrency and end-to-end restart/recovery remain open. No merge, Render deployment, production change or real WhatsApp send.
