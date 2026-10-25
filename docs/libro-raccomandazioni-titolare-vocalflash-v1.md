@@ -459,3 +459,19 @@ Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL li
 3. La review della API storage ha confermato un gap di isolamento: l'endpoint autentica con una chiave Assistant condivisa e convalida la forma di `object_key`, ma non dimostra che quell'oggetto appartenga al bot/ambiente che effettua la richiesta. Prima di E2E/release progettare un'associazione server-side tra credenziale e scope; potrebbe richiedere credenziali distinte per staging e produzione o una mappatura equivalente. **Non ruotare, creare o sostituire segreti live senza un piano approvato e senza coordinare Vercel e Render.**
 4. La CI del bot sul commit `cb1d7a7483f41e51f5cbf82c73ccee486b373e8e` è verde: 60 test. Questo conferma solo test automatizzati, non restart effettivo Render/Redis, storage reale o flusso WhatsApp.
 5. Mantenere il rilascio **NO-GO** finché non siano verificati durabilità/recovery, storage e signed URL reali, isolamento della credenziale storage, variabili Preview corrette, firma webhook Meta e test integrato controllato.
+
+
+## Addendum — audit sicurezza storage API, binding Preview e percorsi legacy (2026-10-25)
+
+### Evidenze verificate in sola lettura
+- La funzione `api/v1/multivocale-storage.js` autentica con `VOCALFLASH_ASSISTANT_API_KEYS` come lista di chiavi condivise; non ricava da tale autenticazione uno scope server-side distinto per ambiente/servizio/account.
+- La validazione di `object_key` controlla il formato `tmp/<UUID>/<sha256>.<estensione>`, ma non prova che l'oggetto appartenga al chiamante autenticato. Le azioni `prepare_download` e `delete` non effettuano una verifica di ownership persistente prima di firmare il download o rimuovere l'oggetto. È un gap di isolamento da chiudere prima del pilota.
+- L'inventario Vercel con valori non decifrati restituisce **zero variabili** associate al branch Preview `assistant-conversation-photo-v1`. Le variabili Assistant/storage risultano invece legate a Preview `assistant-auth-v1`. Non sono stati letti né copiati valori segreti. Quindi la Preview verde non dimostra che il branch corrente abbia le variabili necessarie a runtime.
+- Nel bot, `app_customer.py` importa il modulo legacy `app.py` e mantiene l'handler originale come fallback/compatibilità; il runtime V2 viene istanziato e alcune rotte vengono intercettate. `app.py` dichiara ancora `sessions`, `auto_batches`, `queued_batches` e `last_audio` in memoria. L'ispezione statica non dimostra che ogni percorso legacy sia irraggiungibile né che il comportamento sia sicuro dopo un riavvio.
+- L'API storage offre un'azione `health` che crea un URL di upload firmato per una chiave casuale; non è stata eseguita una prova reale di upload/download né un test dopo un riavvio effettivo del processo Render.
+
+### Decisione tecnica / gate
+- Non ruotare o sostituire ancora alcuna chiave live e non copiare una chiave tra ambienti. Prima definire un contratto autenticato che leghi credenziale a scope (almeno ambiente/servizio), includa lo scope nella chiave oggetto e verifichi ownership per upload/download/delete; aggiungere test positivi e negativi per accesso incrociato.
+- Coordinare in seguito il nome/target delle variabili Vercel Preview e Render; verificare soltanto la presenza/target senza leggere i valori. Il cambio sarà richiesto solo dopo aver definito il contratto e preparato un piano di transizione/rollback.
+- Auditare e testare i rami di fallback legacy per testo, vocali, comandi MultiVocale, errori storage e riavvio. Non dichiarare chiusa la persistenza finché non è stata provata su un servizio staging isolato.
+- Nessun segreto o variabile è stato modificato; nessun deploy, restart, scrittura DB, invio WhatsApp reale o merge è stato eseguito. Release **NO-GO** invariato.
