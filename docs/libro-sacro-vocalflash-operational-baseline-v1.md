@@ -1055,3 +1055,7 @@ Durante la revisione del percorso del bot è stato confermato un rischio concret
 - commit applicativo `d5e75a618d48a17a1f120153213167134bebe52f`: blocca il fallback legacy per audio non gestito;
 - commit test `ee9127f480746f83cb301822be153ddbfb993244`: aggiunge test per audio e comando MultiVocale non gestiti.
 **Stato test:** al momento della nota non è ancora stata verificata una run CI associata al nuovo head; quindi la correzione è modificata ma non dichiarata validata. Il controllo resta aperto finché la CI non termina verde e i gate infrastrutturali non sono chiusi.
+
+### Esito CI della correzione routing — 25 ottobre 2026
+
+La CI bot run `40237092071` sul commit test `ee9127f480746f83cb301822be153ddbfb993244` è terminata `success`; il job `test` è completato senza step falliti. Sono quindi validati dalla suite automatizzata i nuovi casi che bloccano il fallback legacy per audio e comando MultiVocale non gestiti. Questo chiude il gate CI della modifica, non i gate di infrastruttura o rilascio.
