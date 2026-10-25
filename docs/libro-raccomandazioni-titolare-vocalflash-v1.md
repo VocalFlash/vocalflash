@@ -514,3 +514,7 @@ La revisione incrociata API e bot ha trovato un'etichetta di readiness troppo am
 ## Correzione di stato — 25 ottobre 2026
 
 Questa nota prevale sulle righe precedenti che dicevano che la CI bot/API fosse ancora da verificare: bot commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274`, run `40235440651`, `success`; API commit documentale `2fb250205556ae967195b08197c618464184b624`, run `40235503317`, `success` con tutti e cinque i job riusciti. La Preview del commit API documentale è `READY`. Rimangono non dimostrati storage E2E, restart Render e integrazione Meta reale.
+
+## Controllo di regressione routing — 25 ottobre 2026
+
+È stato corretto sul branch bot il fallback da MultiVocale V2 al gestore legacy quando V2 non riconosce un messaggio audio o un comando testuale MultiVocale. Sono stati aggiunti test mirati per entrambi i casi. Commit codice `d5e75a618d48a17a1f120153213167134bebe52f`; commit test `ee9127f480746f83cb301822be153ddbfb993244`. La CI del nuovo head deve ancora essere verificata: non considerare chiusa la correzione finché il workflow non è verde. Questa modifica non prova né sostituisce storage reale, restart/recovery, configurazione Meta o test end-to-end.
