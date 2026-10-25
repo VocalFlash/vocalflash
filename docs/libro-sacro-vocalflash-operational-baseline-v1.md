@@ -1048,3 +1048,10 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 ## Correzione di stato e fonte prevalente — 25 ottobre 2026
 
 Questa nota prevale sulle frasi precedenti di questo documento che indicavano come non ancora verificata la CI bot sul commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274`: la verifica successiva ha confermato la run `40235440651` conclusa `success`. Prevale inoltre sullo stato provvisorio della CI API: la run `40235503317` sul commit documentale API `2fb250205556ae967195b08197c618464184b624` è conclusa `success`, con tutti e cinque i job della matrice riusciti. Il codice applicativo API testato è rimasto quello già verificato; il nuovo commit è documentale. La Preview Vercel per il commit documentale `2fb250205556ae967195b08197c618464184b624` è ora `READY`; è una Preview, non produzione. Nessuna di queste evidenze equivale a un test storage E2E o a un riavvio Render.
+
+## Verifica aggiuntiva di routing fail-closed — 25 ottobre 2026
+
+Durante la revisione del percorso del bot è stato confermato un rischio concreto nel codice: se il runtime MultiVocale V2 restituiva `False` per un messaggio audio, il wrapper poteva inoltrarlo al gestore legacy basato su stato in memoria. Lo stesso rischio esisteva per comandi testuali MultiVocale non gestiti da V2. È stata applicata una correzione sul branch bot `assistant-conversation-photo-v1`:
+- commit applicativo `d5e75a618d48a17a1f120153213167134bebe52f`: blocca il fallback legacy per audio non gestito;
+- commit test `ee9127f480746f83cb301822be153ddbfb993244`: aggiunge test per audio e comando MultiVocale non gestiti.
+**Stato test:** al momento della nota non è ancora stata verificata una run CI associata al nuovo head; quindi la correzione è modificata ma non dichiarata validata. Il controllo resta aperto finché la CI non termina verde e i gate infrastrutturali non sono chiusi.
