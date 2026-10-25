@@ -571,3 +571,12 @@ Verification update 2026-10-24:
 
 ### Stato release
 **NO-GO** invariato. La Preview corrente READY chiude solo il build per quel commit. Nessuna delle verifiche read-only autorizza merge, deploy, modifiche live o messaggi reali.
+
+
+## Addendum — esito audit cleanup Redis e gate chiavi storage (2026-10-25)
+
+- **Fix verificato nel ramo candidato bot:** rimosso l'uso residuo della costante statica `CLEANUP_KEY` dai percorsi operativi di cleanup; tutte le operazioni usano ora `_cleanup_key(config)`. Aggiunti test per isolamento delle cleanup queue tra namespace e fail-closed se su Render manca il helper di namespace.
+- **CI bot:** run #40222372611, head `cb1d7a7483f41e51f5cbf82c73ccee486b373e8e`, esito success, **60 test passati**. Include test Redis reale in CI per concorrenza/fencing e ricostruzione client/store; non simula il riavvio del server Redis/Render e non verifica il provider storage reale.
+- **Redis namespace:** viene derivato dal codice da `RENDER_SERVICE_ID` + `WA_PHONE_ID`; non richiede un cambio manuale del Redis URL. La migrazione dal namespace legacy non è automatica: inventario e drain/rollback prima di qualunque merge/deploy.
+- **Nuovo gate storage P0:** la API storage usa una credenziale Assistant condivisa e valida il formato di `object_key`, ma non lega ancora in modo server-side ogni oggetto al bot/ambiente autenticato. Progettare scope per credenziale (per ambiente/account) prima dell'E2E; eventuali nuove variabili/segreti vanno introdotti coordinando Vercel e Render, senza valori nei documenti.
+- **Stato:** PR bot #2 e PR API #3 restano Draft/non unite. Nessun merge, deploy, modifica live, migrazione DB o invio WhatsApp reale. **NO-GO** invariato.
