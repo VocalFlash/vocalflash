@@ -52,6 +52,12 @@ test("storage fails closed when authenticated key has no server-side scope mappi
   assert.match(result.body.error,/Scope credenziale/);
 });
 
+test("storage fails closed when multiple credentials share one scope",async t=>{
+  configure(t,{"staging-test-key":"shared-scope","production-test-key":"shared-scope"});
+  const result=await call("prepare_download","tmp/00000000-0000-4000-a000-000000000000/11111111-1111-4111-a111-111111111111/"+"a".repeat(64)+".ogg");
+  assert.equal(result.status,503);
+});
+
 test("storage denies cross-scope download before any storage request",async t=>{
   configure(t);
   const foreignKey="tmp/"+scopeSegment("production-bot")+"/11111111-1111-4111-a111-111111111111/"+ "a".repeat(64)+".ogg";
