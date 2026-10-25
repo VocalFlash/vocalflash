@@ -640,3 +640,11 @@ Verification update 2026-10-24:
 - Gate prioritari invariati: upload/download reale, restart e recovery, env staging verificate, isolamento e pulizia oggetti legacy, integrazione API-bot-Meta. PR #3 e #2 restano Draft e non unite.
 
 - Nuova evidenza: bot CI run `40235440651` completata con successo sul commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274`. La CI API sul commit documentale più recente risultava in corso al controllo; il codice applicativo API verificato resta quello del commit `c348cc0d6d1ba5b8334328570aaeb904cb9aa581`, CI verde e Preview READY.
+
+
+## Stato verifiche — aggiornamento finale del ciclo, 25 ottobre 2026
+
+- CI bot: run `40235440651` verde sul commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274`.
+- CI API: run `40235503317` verde sul commit documentale `2fb250205556ae967195b08197c618464184b624`, tutti e cinque i job riusciti.
+- Vercel Preview del commit `2fb250205556ae967195b08197c618464184b624`: `READY` al controllo successivo. La produzione non è stata toccata.
+- Questi esiti chiudono il controllo CI dei commit citati, non i gate di storage reale, restart/recovery, env staging, migrazione legacy e E2E Meta.
