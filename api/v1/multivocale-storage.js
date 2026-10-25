@@ -68,7 +68,7 @@ export default async function handler(req,res){
 
   try{
     if(action==="health"){
-      const healthKey=`health/${crypto.randomUUID()}.ogg`;
+      const healthKey=`health/${scopeId}/${crypto.randomUUID()}.ogg`;
       const {data,error}=await store.createSignedUploadUrl(healthKey,{upsert:false});
       if(error)throw error;
       if(!data?.signedUrl)throw new Error("Signed upload health incompleto");
@@ -86,7 +86,7 @@ export default async function handler(req,res){
       if(!UUID_RE.test(batchId)||!messageId){
         return res.status(400).json({error:"batch_id/message_id non validi"});
       }
-      const objectKey=makeObjectKey(batchId,messageId,mimeType);
+      const objectKey=`tmp/${scopeId}/${makeObjectKey(batchId,messageId,mimeType).split("/").slice(1).join("/")}`;
       const {data,error}=await store.createSignedUploadUrl(objectKey,{upsert:false});
       if(error)throw error;
       return res.status(200).json({
