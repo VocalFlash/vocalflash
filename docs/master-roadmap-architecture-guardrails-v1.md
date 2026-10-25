@@ -451,3 +451,13 @@ Verification update 2026-10-24:
 - Run [GitHub Actions #40208605377](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40208605377) sul branch candidato: completato con successo; log verificato, **46 test eseguiti, OK**.
 - La suite è una verifica deterministica/unitaria; non certifica Redis reale, concorrenza distribuita, restart/recovery E2E, Meta/WhatsApp live o durabilità Redis.
 - Gate rimanenti tracciati nell'[issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5). Nessun merge o deploy autorizzato da questo risultato.
+
+
+## CI finale — 47 test e controllo dei trigger duplicati (25 ottobre 2026)
+
+- Il test aggiunto sul confine pre-consegna verifica che un fallimento della lease impedisca l'invio della sintesi e del prompt MultiVocale.
+- Run [#40208741560](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40208741560): 47 test, OK.
+- Per rispettare la regola canonica anti-duplicazione CI, il workflow usa push sul branch base `multivocale-runtime-v2`, pull request verso il branch base e dispatch manuale. Il branch candidato non ha più anche un trigger push concorrente con il trigger PR.
+- Run finale dopo la modifica: [#40208821196](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40208821196), **47 test, OK**.
+- Non ancora dimostrati: rinnovo lease che fallisce durante elaborazione lunga con secondo worker concorrente, Redis reale, restart/recovery end-to-end, migrazione del vecchio namespace e Meta/WhatsApp live.
+- Tracciamento: [issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5). Nessun rilascio autorizzato.
