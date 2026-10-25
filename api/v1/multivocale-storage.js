@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import {createClient} from "@supabase/supabase-js";
 
-const OBJECT_RE=/^tmp\/[0-9a-f-]{36}\/[0-9a-f]{64}\.(ogg|mp3|m4a|wav|webm|flac)$/i;
+const OBJECT_RE=/^tmp\\/[0-9a-f-]{36}\\/[0-9a-f-]{36}\\/[0-9a-f]{64}\\.(ogg|mp3|m4a|wav|webm|flac)$/i;
 const UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function assistantKeys(){
@@ -127,6 +127,9 @@ export default async function handler(req,res){
       if(!ownsObjectKey(objectKey)){
         return res.status(403).json({error:"Oggetto non appartenente allo scope autenticato"});
       }
+      if(!ownsObjectKey(objectKey)){
+        return res.status(403).json({error:"Oggetto non appartenente allo scope autenticato"});
+      }
       const {data,error}=await store.createSignedUrl(objectKey,300,{download:false});
       if(error)throw error;
       return res.status(200).json({
@@ -142,6 +145,9 @@ export default async function handler(req,res){
       const objectKey=clean(req.body?.object_key,512);
       if(!validObjectKey(objectKey)){
         return res.status(400).json({error:"object_key non valida"});
+      }
+      if(!ownsObjectKey(objectKey)){
+        return res.status(403).json({error:"Oggetto non appartenente allo scope autenticato"});
       }
       const {error}=await store.remove([objectKey]);
       if(error)throw error;
