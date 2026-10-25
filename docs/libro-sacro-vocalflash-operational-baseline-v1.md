@@ -799,3 +799,12 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 - La lease predefinita è 120 s e viene rinnovata da un thread; se il rinnovo fallisce, il thread termina mentre il processing può proseguire fino al successivo controllo/fencing. Aggiungere un test mirato per impedire invio/finalizzazione con lease persa. Non classificare questo rischio come bug riprodotto: è un gate di verifica.
 - Verificare il percorso audio attivo e il ruolo residuo delle strutture legacy in memoria; non fare inferenze basate solo sulla loro dichiarazione in `app.py`.
 - Nessun merge/deploy, modifica Render, invio Meta reale o scrittura database live. Il namespace candidato resta non rilasciato finché non si ottengono suite verde sull'head, test di lease/recovery e piano verificato di drain/migrazione delle chiavi precedenti.
+
+
+## CI verde verificata — 25 ottobre 2026
+
+- Corretto il workflow MultiVocale perché esegua la suite anche su pull request verso `multivocale-runtime-v2`, oltre ai trigger push e manuale.
+- GitHub Actions run [#40208605377](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40208605377), commit `93b4f41697c8da0c4b52761dcd4011603b8bb324`: job completato con esito `success`; log letto e verificato: **Ran 46 tests — OK**.
+- La suite copre test deterministici, inclusi isolamento servizio/account, chiavi di scheduling namespaced e fencing su lease stale. Non dimostra concorrenza su Redis reale, recovery end-to-end, configurazione Render o consegna WhatsApp reale.
+- Checklist persistente dei gate aperti: [vocalflash-bot issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5).
+- Stato: suite deterministica sul commit del workflow **PASS**; release gate **ANCORA APERTO** fino a test lease-renewal failure, Redis reale, restart/recovery, drain/migrazione vecchio namespace e controlli integrazione. Nessun deploy/merge o modifica live.
