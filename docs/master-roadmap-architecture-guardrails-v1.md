@@ -502,3 +502,12 @@ Verification update 2026-10-24:
 - Security review item added: storage endpoint validates object-key shape but does not take a distinct service/account identity or explicitly bind object ownership to that identity. Internal Assistant-key authentication is present, but must not be treated as an object-level ownership policy. Resolve before GO-LIVE.
 - Redis legacy-keyspace inventory is blocked: available Render connector actions expose resource metadata/logs, not a safe read-only Redis key enumeration. No live keyspace was read, no namespace emptiness assumed, and no `FLUSHDB` used.
 - No runtime code changes or live operations in this review. Real storage + process restart, ownership isolation, legacy-path regression, old namespace drain/migration, and Redis durability remain release gates.
+
+
+## Stato aggiornato CI/API/Preview — 25 ottobre 2026
+
+- Bot head documentale `d8f8c6c9c1a3de53af44e182c88580a740745832`: run [#40215503185](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40215503185) success, **59 test OK**.
+- API head documentale `99ad18b738c1cd50225176138319d601ff89aa78`: run [#40215818314](https://github.com/VocalFlash/vocalflash/actions/runs/40215818314) success; 5/5 job riusciti; log letto: **98 test, 0 fallimenti**.
+- Preview Vercel sullo SHA API `99ad18b...` = `READY` (`dpl_Bc9B9HaHhTqTaobQWAFN2xYpcjpL`); non equivale a E2E integrato.
+- I test del bot includono isolamento delle chiavi V2 per namespace e casi di perdita lease/delivery ambiguo. Le chiavi V2 incorporano un digest derivato da service ID e WhatsApp phone ID. La review statica non certifica il keyspace legacy né il provider storage reale.
+- Release NO-GO fino a storage/restart E2E, ownership oggetti, audit legacy, inventario e drain del namespace precedente, durabilità Redis e staging Meta/Assistant.
