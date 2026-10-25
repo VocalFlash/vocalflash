@@ -389,3 +389,15 @@ Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL li
 - Bot commit documentale `5d80b3802b1184cad4b9fd2b03894b39c6d9fa42`: [run #40217101979](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40217101979) = `success`; log letto: **59 test, OK**.
 - Questi commit sono documentali, non modificano il runtime; CI/Preview positivi non sostituiscono i gate E2E.
 - PR #2 e #3 ancora Draft/non unite. Release ancora NO-GO: storage reale + restart; ownership object; audit legacy; inventario e drain namespace; durabilità Redis; verifica staging Meta/Assistant.
+
+
+## Raccomandazione operativa aggiunta — audit read-only del 25 ottobre 2026
+
+- Usare My Workspace per verifiche read-only di Render, GitHub, Vercel e Supabase, senza trattare l'accesso come autorizzazione a modifiche live.
+- Quando log o metriche sono vuoti, riportare **copertura non conclusiva** e non interpretare l'assenza di dati come assenza di errori o traffico.
+- Tenere distinti stato CI del job, conteggio test letto nel log, stato Preview e prova E2E. I due PR restano Draft e non uniti.
+- Prima di qualsiasi deploy MultiVocale, richiedere un piano verificabile per il namespace Redis precedente: il tool Render non consente l'inventario del keyspace; non presumere che sia vuoto e non usare FLUSHDB.
+- Considerare la Redis condivisa tra staging e produzione, Free/Oregon e senza persistenza su disco come gate architetturale da risolvere; non creare risorse o costi ricorrenti senza consenso esplicito.
+- Per Supabase, 0 utenti Auth e 0 membri business significano che non va inventata un'identità owner. Le 15 tabelle con RLS attivo ma senza policy vanno valutate rispetto al modello di accesso previsto, senza aggiungere policy permissive alla cieca.
+- Le segnalazioni performance su foreign key/indici sono INFO: esaminare query e workload prima di intervenire.
+- Se un provider nega l'accesso (Vercel runtime errors: 403), registrare il limite e non dichiarare il controllo completato.
