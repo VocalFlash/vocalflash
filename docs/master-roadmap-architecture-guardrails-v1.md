@@ -424,3 +424,22 @@ Verification update 2026-10-24:
 - Deploy: staging ancora su multivocale-runtime-v2; produzione ancora su main. Nessuna modifica live.
 - Gate immediati: (1) eseguire la suite Python sull'head esatto; (2) validare test di isolamento stesso mittente tra servizi/account; (3) definire drain/migrazione dei vecchi batch e della cleanup queue prima di qualsiasi deploy del nuovo namespace; (4) test restart/recovery.
 - Rischio separato: Redis è condiviso tra staging e produzione e la persistenza su disco è disattivata. Il namespace affronta collisioni di chiavi ma non la perdita completa dello stato Redis. Nessun GO-LIVE finché entrambi i rischi non hanno un trattamento verificato.
+
+
+## Gate aggiuntivi — MultiVocale namespace e lease (25 ottobre 2026)
+
+### Confermato staticamente
+- Il sottotipo timing effettivamente importato usa la chiave `due` namespaced; la correzione è presente nel commit `9997affa1b4d1afe4f0eaa17a1345af071020284`, con test aggiornati nel commit `3e80f7034205ad6271b411e9394ebabea258f740`.
+- Il workflow Python include il branch `assistant-conversation-photo-v1` nel trigger push e offre `workflow_dispatch`.
+
+### Non verificato
+- Nessun status check né workflow run è stato restituito per il commit candidato `3e80f7034205ad6271b411e9394ebabea258f740`. Il clone locale non è riuscito perché l'ambiente non risolve `github.com`. Non attribuire un esito verde al nuovo head.
+- La lease di 120 secondi viene rinnovata periodicamente; il ramo di errore interrompe il rinnovo ma il processing continua fino al successivo controllo. Serve un test di fencing dopo perdita del rinnovo prima di promuovere il branch.
+- La presenza delle strutture legacy in memoria va valutata seguendo il routing effettivo, senza presumere che siano attive o inattive in base alla sola dichiarazione.
+
+### Gate invariati
+1. Suite Python verde sul commit esatto e risultati verificati.
+2. Test di isolamento account/servizio, lease persa, concorrenza e restart/recovery.
+3. Inventario e procedura di drain/migrazione del vecchio namespace prima di staging.
+4. Trattamento separato della perdita totale Redis: persistenza su disco disattivata.
+5. Nessun merge/deploy o modifica live senza i gate e l'autorizzazione separata.
