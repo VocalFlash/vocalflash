@@ -277,3 +277,12 @@ Le chiavi Redis per batch attivo, ultimo audio e batch in coda sono costruite us
 4. Eseguire test isolati di restart e recupero, poi aggiornare la matrice con run reali.
 
 Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL live o invio WhatsApp reale senza autorizzazione.
+
+## 2026-10-25 — Aggiornamento raccomandazioni: isolamento Redis
+
+- L'utente ha confermato il workspace Render My Workspace e ha chiesto di proseguire dopo la rilettura dei libri canonici.
+- È stato implementato un candidato di namespace Redis nel branch Draft assistant-conversation-photo-v1, separando chiavi per servizio Render e account WhatsApp configurato. Sono stati aggiunti test di isolamento e il workflow è stato aggiornato per includere il branch.
+- Non considerarlo testato: il controllo GitHub non ha restituito un run/status riferito all'head candidato. Non dichiarare la modifica chiusa finché non esiste evidenza CI sul commit esatto.
+- Il Redis è condiviso tra staging e produzione e non ha persistenza su disco. Il namespace non risolve la durabilità; non cambiare configurazioni Render, non distribuire e non toccare produzione senza autorizzazione separata.
+- Prima di un deploy staging va predisposto un drain/migrazione verificato del vecchio namespace per evitare di rendere inaccessibili batch e cleanup pendenti.
+- Restano vincolanti le raccomandazioni canoniche: modifiche minime, test pertinenti prima di dichiarare conclusioni, nessuna affermazione oltre l'evidenza, produzione protetta e documentazione aggiornata dopo ogni avanzamento.
