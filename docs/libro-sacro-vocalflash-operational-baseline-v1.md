@@ -5,6 +5,14 @@
 **Repository:** VocalFlash/vocalflash, branch isolato `assistant-conversation-photo-v1`.  
 **Vincolo:** questo documento non autorizza merge, deploy in produzione, acquisti o modifiche di schema.
 
+
+## Registro di verifica — 25 ottobre 2026
+
+- Revisione statica del ramo `assistant-conversation-photo-v1`: rimosso un controllo duplicato identico di appartenenza scope in `api/v1/multivocale-storage.js`; il controllo effettivo resta presente prima della generazione del signed URL.
+- Commit della sola pulizia: `ab627a35072c38bc15f3fe419080fd012f7ce96f`.
+- La verifica GitHub Actions tramite endpoint disponibile non ha restituito run associati al commit; pertanto questa pulizia è **non ancora confermata da CI** in questo registro. Non dichiarare il commit testato finché non è visibile un esito sul commit/branch corrente.
+- Nessun deploy, merge, modifica di configurazioni/secret o operazione storage live eseguita.
+
 ## 1. Regole inderogabili di collaborazione e rilascio
 
 1. Prima di ogni intervento rileggere questo documento, la roadmap master, le decisioni precedenti, le PR e i test più recenti.
