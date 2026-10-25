@@ -844,3 +844,12 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 - Limite: è un test di integrazione Redis su servizio effimero CI; il test di restart ricrea client/store ma non riavvia Redis/Render e non verifica lo storage audio reale. Il gate E2E completo resta aperto.
 - Il workflow diagnostico con cinque passaggi identici è stato reso manual-only; la suite primaria PR include anche i test firma webhook e heartbeat lease. Il fixture FakeStore è stato aggiornato per rappresentare il fencing token e la pulizia terminale.
 - Nessun merge, deploy Render, modifica live o invio WhatsApp reale.
+
+
+## Aggiornamento verificato — run #40215225458 (25 ottobre 2026)
+
+- Head bot candidato `74806b1bac489279b247bebb1600f99194f5a6cf`: GitHub Actions run [#40215225458](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40215225458) conclusa con esito `success`; log letto: **59 test, OK**.
+- La suite contro Redis reale effimero include concorrenza dei claim e fencing del token obsoleto. Dopo ricreazione del client/store, il test verifica anche il recupero del riferimento audio persistito (`status=ready`, `object_key=test-object/audio.ogg`), recupera la lease scaduta e finalizza con il nuovo token.
+- **Precisazione:** l'object key è fittizio e il servizio Redis è temporaneo di CI. Il risultato prova persistenza del riferimento in Redis, non l'esistenza dell'oggetto nel provider storage, la generazione/download di URL firmati dopo restart, né un restart effettivo di Redis o Render.
+- Restano NO-GO: restart E2E con storage audio reale; inventario read-only e drain/migrazione del namespace precedente; strategia di durabilità Redis; verifica staging Meta/App Secret/firma/Assistant API; review congiunta del contratto tra PR bot #2 e API #3.
+- Nessun merge, deploy staging/produzione, modifica di dati/configurazione live o invio WhatsApp reale.
