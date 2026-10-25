@@ -638,3 +638,5 @@ Verification update 2026-10-24:
 - Readiness: distinguere esplicitamente `storage_control` da storage E2E. La health action crea una signed-upload URL ma non esegue round-trip. Correzione nel bot commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274`; CI su tale commit ancora da verificare.
 - API head `c348cc0d6d1ba5b8334328570aaeb904cb9aa581`: CI run `40234931191` verde, cinque job; Vercel Preview `READY`. Nessuna evidenza di test E2E storage o produzione.
 - Gate prioritari invariati: upload/download reale, restart e recovery, env staging verificate, isolamento e pulizia oggetti legacy, integrazione API-bot-Meta. PR #3 e #2 restano Draft e non unite.
+
+- Nuova evidenza: bot CI run `40235440651` completata con successo sul commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274`. La CI API sul commit documentale più recente risultava in corso al controllo; il codice applicativo API verificato resta quello del commit `c348cc0d6d1ba5b8334328570aaeb904cb9aa581`, CI verde e Preview READY.
