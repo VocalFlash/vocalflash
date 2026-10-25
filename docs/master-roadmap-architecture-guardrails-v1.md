@@ -511,3 +511,22 @@ Verification update 2026-10-24:
 - Preview Vercel sullo SHA API `99ad18b...` = `READY` (`dpl_Bc9B9HaHhTqTaobQWAFN2xYpcjpL`); non equivale a E2E integrato.
 - I test del bot includono isolamento delle chiavi V2 per namespace e casi di perdita lease/delivery ambiguo. Le chiavi V2 incorporano un digest derivato da service ID e WhatsApp phone ID. La review statica non certifica il keyspace legacy né il provider storage reale.
 - Release NO-GO fino a storage/restart E2E, ownership oggetti, audit legacy, inventario e drain del namespace precedente, durabilità Redis e staging Meta/Assistant.
+
+
+## System audit checkpoint — 2026-10-25 (read-only)
+
+### Verified
+- Render staging live commit: `34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5` (4 Oct); production live commit: `788eecf280e0bb6eb22424669b89ed7ad0abc432` (3 Oct). Staging auto-deploy off; production auto-deploy on.
+- Both services use the same Render Key Value `vocalflash-redis`, Free/Oregon, persistence off.
+- Render error/warning and request log queries for 24 Oct 00:00–25 Oct 16:00 UTC returned no rows; staging HTTP metrics were empty and production HTTP metrics were not returned. These observations do not certify service health or absence of errors.
+- Supabase active project is healthy; 15 live migrations are listed through `customer_whatsapp_replay_conflict_v1`. Auth users=0, business_members=0; counts: 1 business, 2 workflows, 1 policy, 14 vocabulary entries, 1 business channel.
+- Supabase advisors report 15 public tables with RLS enabled but no policies; 18 foreign keys without covering indexes; 26 indexes marked unused. Findings need context-specific review; no DB changes made.
+- PR #2 bot and PR #3 API remain Draft/open/unmerged. Their latest referenced CI jobs succeeded; API Preview for head `34664de90acf860cb11b8b0a04bc54b5e90adb28` is READY, which is build evidence only.
+- Vercel runtime-error query returned 403; runtime-error check is not verified.
+
+### Release blockers unchanged / clarified
+- No safe Render tool for enumerating Redis keys: old namespace, pending batches and cleanup references are unknown. No FLUSHDB.
+- Real storage upload/download and signed URL after actual Render process restart not tested.
+- Object ownership binding, legacy path reachability, Redis durability/recovery, Meta App Secret/signature in staging, bot/API contract E2E and migration-source reconciliation remain open.
+- RLS policy/privilege model must be reviewed before exposing user-facing DB access; do not add permissive policies without ownership tests.
+- **NO-GO:** no merge, deploy, live configuration/data change, or real WhatsApp E2E authorized/performed.
