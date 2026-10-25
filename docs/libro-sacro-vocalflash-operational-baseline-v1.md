@@ -997,3 +997,19 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 - Coordinare in seguito il nome/target delle variabili Vercel Preview e Render; verificare soltanto la presenza/target senza leggere i valori. Il cambio sarà richiesto solo dopo aver definito il contratto e preparato un piano di transizione/rollback.
 - Auditare e testare i rami di fallback legacy per testo, vocali, comandi MultiVocale, errori storage e riavvio. Non dichiarare chiusa la persistenza finché non è stata provata su un servizio staging isolato.
 - Nessun segreto o variabile è stato modificato; nessun deploy, restart, scrittura DB, invio WhatsApp reale o merge è stato eseguito. Release **NO-GO** invariato.
+
+
+## Addendum — storage scope enforcement implementation (2026-10-25, CI pending)
+
+### Implementato nel branch candidato
+- `api/v1/multivocale-storage.js` ora richiede una mappatura server-side `VOCALFLASH_ASSISTANT_API_KEY_SCOPES` in JSON. La chiave della mappatura è il digest SHA-256 della chiave API effettiva; il valore è uno scope stabile, ad esempio `staging-bot` o `production-bot`. I valori delle API key non vanno inseriti nella mappatura né nella documentazione.
+- La mappatura mancante/malformata per una chiave autenticata fallisce chiuso con HTTP 503; credenziali non valide continuano a ricevere HTTP 401.
+- Il percorso degli oggetti è stato versionato implicitamente come `tmp/<scope-uuid>/<batch-uuid>/<sha256>.<ext>`. Download e cancellazione rifiutano oggetti appartenenti a un altro scope (HTTP 403) e rifiutano il vecchio formato non scoped (HTTP 400). L'upload firmato usa lo stesso scope server-side.
+- Aggiunto `api/v1/multivocale-storage.test.js` con casi per mapping assente, download/cancellazione cross-scope e rifiuto del formato legacy; la suite CI è stata aggiornata per eseguire questi test.
+
+### Stato delle prove e impatto di compatibilità
+- I cambiamenti sono stati registrati nel branch `assistant-conversation-photo-v1`; non sono state modificate variabili Vercel/Render e non sono stati letti valori segreti.
+- **CI per i nuovi test: in attesa di run verificabile; non dichiarare i test superati finché il run non è visibile e verde.**
+- Il nuovo formato non è retrocompatibile con object key già presenti nel formato `tmp/<batch-uuid>/<sha256>.<ext>`. Prima del deploy bisogna drenare le raccolte attive e pianificare una migrazione/bonifica controllata del vecchio stato e degli oggetti; non aggiungere un bypass legacy cross-scope e non cancellare oggetti senza inventario. Nessuna migrazione è stata eseguita.
+- Configurare la nuova variabile scope solo dopo aver preparato mapping distinti per staging e produzione e un piano di rollback. Le variabili richieste non risultano associate al branch Preview corrente; nessun cambio env è autorizzato/eseguito.
+- Nessun deploy, merge, modifica live, restart Render, invio WhatsApp reale o scrittura DB è stato effettuato. Release **NO-GO** invariato.
