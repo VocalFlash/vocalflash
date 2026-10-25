@@ -1013,3 +1013,10 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 - Il nuovo formato non è retrocompatibile con object key già presenti nel formato `tmp/<batch-uuid>/<sha256>.<ext>`. Prima del deploy bisogna drenare le raccolte attive e pianificare una migrazione/bonifica controllata del vecchio stato e degli oggetti; non aggiungere un bypass legacy cross-scope e non cancellare oggetti senza inventario. Nessuna migrazione è stata eseguita.
 - Configurare la nuova variabile scope solo dopo aver preparato mapping distinti per staging e produzione e un piano di rollback. Le variabili richieste non risultano associate al branch Preview corrente; nessun cambio env è autorizzato/eseguito.
 - Nessun deploy, merge, modifica live, restart Render, invio WhatsApp reale o scrittura DB è stato effettuato. Release **NO-GO** invariato.
+
+
+### Addendum di verifica — scope duplicati e trigger CI (2026-10-25)
+- Rafforzato il fail-closed: se due credenziali hanno lo stesso scope, l'endpoint rifiuta la mappatura. Aggiunto test per questo caso.
+- Il workflow dei test ora include il file di regressione storage e un trigger `pull_request` oltre al push sul branch candidato.
+- Il connettore GitHub disponibile non ha restituito un run verificabile per i commit più recenti. Pertanto l'esito dei nuovi test resta **NON VERIFICATO**; non inferire che il CI sia passato.
+- Il contratto richiede credenziali distinte per staging e produzione e scope distinti; il mapping usa SHA-256 della chiave come chiave JSON. La nuova variabile `VOCALFLASH_ASSISTANT_API_KEY_SCOPES` va configurata solo quando saranno autorizzate e pianificate le modifiche env. Nessuna chiave è stata generata, ruotata o cambiata.
