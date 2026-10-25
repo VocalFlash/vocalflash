@@ -443,3 +443,11 @@ Verification update 2026-10-24:
 3. Inventario e procedura di drain/migrazione del vecchio namespace prima di staging.
 4. Trattamento separato della perdita totale Redis: persistenza su disco disattivata.
 5. Nessun merge/deploy o modifica live senza i gate e l'autorizzazione separata.
+
+
+## Evidenza CI aggiornata — run MultiVocale 40208605377 (25 ottobre 2026)
+
+- Il workflow è stato aggiornato per attivare la suite anche sulle pull request verso `multivocale-runtime-v2`.
+- Run [GitHub Actions #40208605377](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40208605377) sul branch candidato: completato con successo; log verificato, **46 test eseguiti, OK**.
+- La suite è una verifica deterministica/unitaria; non certifica Redis reale, concorrenza distribuita, restart/recovery E2E, Meta/WhatsApp live o durabilità Redis.
+- Gate rimanenti tracciati nell'[issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5). Nessun merge o deploy autorizzato da questo risultato.
