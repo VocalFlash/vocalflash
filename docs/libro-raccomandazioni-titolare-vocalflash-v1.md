@@ -286,3 +286,12 @@ Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL li
 - Il Redis è condiviso tra staging e produzione e non ha persistenza su disco. Il namespace non risolve la durabilità; non cambiare configurazioni Render, non distribuire e non toccare produzione senza autorizzazione separata.
 - Prima di un deploy staging va predisposto un drain/migrazione verificato del vecchio namespace per evitare di rendere inaccessibili batch e cleanup pendenti.
 - Restano vincolanti le raccomandazioni canoniche: modifiche minime, test pertinenti prima di dichiarare conclusioni, nessuna affermazione oltre l'evidenza, produzione protetta e documentazione aggiornata dopo ogni avanzamento.
+
+
+## 2026-10-25 — Raccomandazione aggiornata: chiudere il gate CI prima di proseguire
+
+- Ho ricontrollato il workflow Python: è configurato per eseguire la suite anche sul branch `assistant-conversation-photo-v1`, ma non ho evidenza che il workflow sia stato eseguito sul commit candidato `3e80f7034205ad6271b411e9394ebabea258f740` (status vuoti; nessun run recuperato).
+- Il tentativo di esecuzione locale non è riuscito perché l'ambiente non risolve `github.com`. Di conseguenza, non considero testata la correzione del timing sul nuovo head.
+- La revisione statica ha confermato la correzione della chiave globale residua nel sottotipo timing. È emerso inoltre un caso da testare: se il rinnovo della lease fallisce, il thread di rinnovo termina e il processing continua; verificare che un worker con lease persa non possa inviare o finalizzare il batch.
+- Prima di qualsiasi deploy staging: suite verde sul commit esatto, test lease/fencing e restart, inventario/drain o migrazione dei batch e cleanup pendenti nel vecchio namespace, verifica del percorso audio effettivo. Il Redis senza persistenza su disco è un rischio separato.
+- Nessun merge/deploy, cambiamento di configurazione Render, invio WhatsApp reale o modifica live è stato effettuato. Non trasformare questa raccomandazione in autorizzazione al rilascio.
