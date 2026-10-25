@@ -155,3 +155,8 @@ Il totale dei tre test matrix principali è 675 esecuzioni riuscite (API 445 + b
 Prima del test storage end-to-end, leggere il log di readiness solo come `storage_control`: conferma che il bot raggiunge l'endpoint di controllo e che la health action crea una signed-upload URL. Non prova che upload, download o delete funzionino realmente. Il bot commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274` contiene questa correzione; verificare CI sul commit prima di procedere. Il test E2E resta un gate separato e va eseguito soltanto in staging autorizzato, con oggetto sintetico e verifica esplicita della cancellazione. Nessun test live è stato eseguito in questo ciclo.
 
 - Gate CI del bot: completato con successo nella run `40235440651` sul commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274`. Questo non sostituisce il test staging E2E. La CI API sul più recente commit documentale risultava ancora in corso al controllo; non usare il suo stato come indicatore di storage live.
+
+
+## Stato CI — aggiornamento finale del ciclo, 25 ottobre 2026
+
+La CI bot run `40235440651` sul commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274` è `success`. La CI API run `40235503317` sul commit documentale `2fb250205556ae967195b08197c618464184b624` è `success`, con tutti e cinque i job riusciti. La Preview Vercel associata a quest'ultimo commit è `READY`. Prima di dichiarare il rilascio pronto rimangono obbligatori i test E2E in staging: upload/download/delete reale, restart e recupero, isolamento delle chiavi, controllo env e prova coordinata API-bot-Meta. Nessun deploy produzione o test WhatsApp reale eseguito in questo ciclo.
