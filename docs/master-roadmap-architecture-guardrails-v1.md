@@ -11,6 +11,10 @@
 - La verifica GitHub Actions tramite endpoint disponibile non ha restituito run associati al commit; pertanto questa pulizia è **non ancora confermata da CI** in questo registro. Non dichiarare il commit testato finché non è visibile un esito sul commit/branch corrente.
 - Nessun deploy, merge, modifica di configurazioni/secret o operazione storage live eseguita.
 
+
+
+- Revisione statica storage: l'azione `health` prima restituiva `storage:true` dopo la sola creazione di una signed-upload URL, senza eseguire upload/download reali. La risposta è stata resa più precisa (`storage_control:true`, `signed_upload_url_creation:true`) nel commit `6b9cb7c8c38f51c4b22baf00f8ccaace05509ccb`. Questo non dimostra un round-trip Supabase reale e il commit resta in attesa di CI; non considerare chiuso il gate storage E2E.
+
 ## Product definition
 
 VocalFlash is an assistant operating through WhatsApp, not merely a transcription utility. Its job is to turn voice notes, customer messages, and (later) media into a clear, safe next step: understand intent, preserve important details, identify missing or uncertain data, ask targeted follow-up questions, prepare an actionable request, and perform only actions permitted by the configured business policy.
