@@ -415,3 +415,12 @@ Verification update 2026-10-24:
 - Bot test commit `28f381aec6635197b67d010bc7308902c7fa2b7a` passed run 40121561641, 5/5 jobs. The missing-reply test now explicitly verifies inbound dedup release in Redis and local state.
 - No authoritative source for the 15 live SQL migrations was found in accessible repositories; keep all database-write and owner-action gates closed.
 - Audio-to-operational-assistant integration remains a design/test task, not implemented. Preserve the MultiVocale single-summary behavior and do not reroute audio until its acceptance matrix covers batching, duplicate webhooks, ambiguous sends, transcription failures, missing data, and reply idempotency.
+
+
+## Aggiornamento 25 ottobre 2026 — Redis isolation gate
+
+- Implementato sul branch Draft bot, non rilasciato: namespace Redis opaco derivato dal servizio Render e dal WA_PHONE_ID; applicato a chiavi MultiVocale, deduplica webhook, lock mittente e marker risposta.
+- Test sul nuovo head: NOT VERIFIED. Il controllo GitHub non ha restituito un run CI/status associato al commit candidato 197f610d271b92374566080e4f748bdae7fde06c.
+- Deploy: staging ancora su multivocale-runtime-v2; produzione ancora su main. Nessuna modifica live.
+- Gate immediati: (1) eseguire la suite Python sull'head esatto; (2) validare test di isolamento stesso mittente tra servizi/account; (3) definire drain/migrazione dei vecchi batch e della cleanup queue prima di qualsiasi deploy del nuovo namespace; (4) test restart/recovery.
+- Rischio separato: Redis è condiviso tra staging e produzione e la persistenza su disco è disattivata. Il namespace affronta collisioni di chiavi ma non la perdita completa dello stato Redis. Nessun GO-LIVE finché entrambi i rischi non hanno un trattamento verificato.
