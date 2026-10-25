@@ -337,3 +337,12 @@ Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL li
 - Limiti: non è stato riavviato il server Redis né il servizio Render; lo storage audio reale, la durabilità in caso di perdita Redis e l'E2E Meta restano non verificati.
 - CI: la suite primaria PR include ora i test firma webhook, lease e Redis reale; il workflow diagnostico duplicato è manual-only. Nessun merge/deploy o modifica live.
 - Prossimo gate: test isolato che coinvolga storage audio effettivo e restart del processo, poi piano read-only di drain/migrazione del vecchio namespace prima di qualsiasi deploy staging.
+
+
+### Addendum — CI object reference after client/store recovery (2026-10-25)
+
+- Exact candidate commit `74806b1bac489279b247bebb1600f99194f5a6cf`: GitHub Actions [run #40215225458](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40215225458), job `test` = `success`; log read: **59 tests, OK**.
+- The real-Redis CI test now asserts that after closing and recreating the Redis client/store, the persisted batch still contains exactly one file reference with `status=ready` and `object_key=test-object/audio.ogg`; the lease is then recovered and finalized with the new fencing token.
+- Scope: this verifies Redis serialization/recovery of the object reference against an ephemeral Redis 7 service. The object key is a test fixture, so this is **not** proof of a real storage object, signed download URL after restart, Redis server restart, or Render process restart.
+- Still open: actual audio-storage + process-restart E2E; read-only inventory and verified drain/migration of the old namespace; Redis durability/recovery; staging Meta signature and Assistant API integration; joint bot/API contract review.
+- No merge, deployment, live configuration/database mutation, or real WhatsApp send.
