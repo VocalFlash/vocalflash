@@ -808,3 +808,13 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 - La suite copre test deterministici, inclusi isolamento servizio/account, chiavi di scheduling namespaced e fencing su lease stale. Non dimostra concorrenza su Redis reale, recovery end-to-end, configurazione Render o consegna WhatsApp reale.
 - Checklist persistente dei gate aperti: [vocalflash-bot issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5).
 - Stato: suite deterministica sul commit del workflow **PASS**; release gate **ANCORA APERTO** fino a test lease-renewal failure, Redis reale, restart/recovery, drain/migrazione vecchio namespace e controlli integrazione. Nessun deploy/merge o modifica live.
+
+
+## Verifica finale — CI 47/47 e trigger non duplicati (25 ottobre 2026)
+
+- Aggiunto un test runtime che verifica che il fallimento del controllo/rinnovo lease immediatamente prima dell'invio blocchi l'invio della sintesi e del prompt MultiVocale.
+- Run [#40208741560](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40208741560): **47 test, OK**.
+- Riletto il Libro delle raccomandazioni: la regola canonica richiede di evitare trigger CI duplicati sullo stesso commit. Per rispettarla, il push è mantenuto sul branch base `multivocale-runtime-v2`, mentre il branch candidato è verificato tramite `pull_request` e dispatch manuale.
+- Run finale sul workflow così corretto: [#40208821196](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40208821196), commit `e584da1452b37a6552f6f824fc1ec6824b2fac1e`; log letto: **47 test, OK**.
+- Il test del fallimento del thread di rinnovo durante elaborazione lunga con recupero concorrente resta da aggiungere/eseguire; i test fake non provano Redis reale o recovery end-to-end.
+- Gate e checklist: [issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5). Release gate ancora aperto; nessun deploy/merge o modifica live.
