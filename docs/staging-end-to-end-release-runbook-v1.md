@@ -164,3 +164,7 @@ La CI bot run `40235440651` sul commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274
 ## Gate di routing aggiunto — 25 ottobre 2026
 
 Prima del rilascio, verificare la CI del branch bot dopo la correzione che impedisce il fallback legacy per audio e comandi MultiVocale non gestiti da V2. Commit codice `d5e75a618d48a17a1f120153213167134bebe52f`; test aggiunti nel commit `ee9127f480746f83cb301822be153ddbfb993244`. Al momento dell'annotazione non è stata confermata una run CI verde per il nuovo head. Se la CI non parte automaticamente, il gate resta aperto: eseguire il workflow appropriato o correggere il trigger, poi verificare i job. Non testare con messaggi WhatsApp reali finché non è autorizzato il test staging controllato.
+
+### Esito CI routing — 25 ottobre 2026
+
+La run bot `40237092071` sul commit `ee9127f480746f83cb301822be153ddbfb993244` è verde; il job `test` è completato senza fallimenti. Questo gate CI è chiuso. Procedere comunque ai test staging solo dopo che l'ambiente e le credenziali saranno verificate e il test live sarà autorizzato; non interpretare il verde CI come prova E2E.
