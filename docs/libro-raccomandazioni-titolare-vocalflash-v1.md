@@ -362,3 +362,12 @@ Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL li
 - Test reale del provider storage, download firmato dopo restart effettivo, isolamento ownership dell'oggetto e verifica di tutti i percorsi legacy: **NON ESEGUITI / gate aperti**.
 - Nessuna lettura o scrittura di chiavi Redis live; l'inventario del vecchio namespace non è eseguibile con gli strumenti read-only disponibili, che espongono metadati Render ma non il keyspace Redis. Non usare FLUSHDB né inventare che il namespace sia vuoto.
 - Nessuna modifica di codice, segreti, configurazione, schema, deploy o invio WhatsApp in questo ciclo di review.
+
+
+## Verifica esatta head API/Preview — 25 ottobre 2026
+
+- Head del branch al momento del controllo: `15959d5ea30e2d35acf5b8e9210e5ec5146f2ffd` (solo documentazione rispetto al codice esaminato).
+- GitHub Actions run [#40215662915](https://github.com/VocalFlash/vocalflash/actions/runs/40215662915): conclusa `success`; tutti e 5 i job sono riusciti. Log del quinto pass letto: **98 test superati, 0 falliti**; gli altri quattro job hanno anch'essi `success`.
+- Vercel Preview per lo stesso SHA: deployment `dpl_A6q4UqnpkccNDMMuvfn8X93pECzr`, stato `READY`. Preview/build soltanto; non prova il comportamento semantico o un E2E con bot, Supabase, storage e Meta.
+- PR API #3 e bot #2 sono ancora Draft, aperte e non unite. Nessun merge o deploy di produzione.
+- Il risultato CI riguarda il branch API prima di questo aggiornamento documentale; eventuali commit successivi dei libri devono essere trattati come head nuovi e verificati separatamente.
