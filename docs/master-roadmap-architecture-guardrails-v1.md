@@ -461,3 +461,10 @@ Verification update 2026-10-24:
 - Run finale dopo la modifica: [#40208821196](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40208821196), **47 test, OK**.
 - Non ancora dimostrati: rinnovo lease che fallisce durante elaborazione lunga con secondo worker concorrente, Redis reale, restart/recovery end-to-end, migrazione del vecchio namespace e Meta/WhatsApp live.
 - Tracciamento: [issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5). Nessun rilascio autorizzato.
+
+
+## Preview Vercel — stato read-only del branch candidato (25 ottobre 2026)
+
+- Deployment Preview `dpl_8yxnr8L7cXmpi22EzPF57LhkMGDq` sul commit documentale `082f1e7ac99cea0bbca80b8aa1beb1aa92ff7167` verificato `READY`; il log contiene `Build Completed` e `Deployment completed`.
+- Questa è una verifica di build Preview, non test semantico o end-to-end. Il contratto tra PR bot #2 e PR API #3 resta da validare congiuntamente; entrambe le PR restano Draft.
+- Nessun merge/deploy di produzione. Gate tracciati nell'[issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5).
