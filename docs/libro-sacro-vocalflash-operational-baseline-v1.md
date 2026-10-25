@@ -882,3 +882,11 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 - Vercel Preview per `99ad18b...`: deployment `dpl_Bc9B9HaHhTqTaobQWAFN2xYpcjpL` = `READY`. È una prova di build Preview, non di integrazione E2E.
 - Il namespace V2 include un digest derivato da `RENDER_SERVICE_ID` e `WA_PHONE_ID`; l'isolamento delle nuove chiavi dipende dalla corretta presenza di entrambi. Nessun inventario del vecchio namespace è stato eseguito.
 - Gate aperti: storage reale e URL firmato dopo restart; ownership degli oggetti; verifica percorsi legacy; inventario e piano drain/migrazione; durabilità Redis; staging Meta/Assistant; contratto congiunto bot/API. Nessuna operazione live e nessun rilascio autorizzato.
+
+
+## Follow-up CI verificato — 25 ottobre 2026
+
+- API head `74f60fe3114aaf026a3d5c10666403072340334d`: run [#40217077754](https://github.com/VocalFlash/vocalflash/actions/runs/40217077754) conclusa `success`; 5/5 job riusciti e ogni log riporta **98 test passati, 0 falliti**. Preview per lo SHA = `READY`.
+- Bot head `5d80b3802b1184cad4b9fd2b03894b39c6d9fa42`: run [#40217101979](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40217101979) `success`, **59 test OK**.
+- Sono commit documentali; i risultati non chiudono l'E2E di storage/restart, ownership object, audit legacy, inventario/drain namespace Redis, durabilità o staging Meta/Assistant.
+- Nessun merge, deploy produzione o azione WhatsApp reale; release resta NO-GO.
