@@ -518,3 +518,7 @@ Questa nota prevale sulle righe precedenti che dicevano che la CI bot/API fosse 
 ## Controllo di regressione routing — 25 ottobre 2026
 
 È stato corretto sul branch bot il fallback da MultiVocale V2 al gestore legacy quando V2 non riconosce un messaggio audio o un comando testuale MultiVocale. Sono stati aggiunti test mirati per entrambi i casi. Commit codice `d5e75a618d48a17a1f120153213167134bebe52f`; commit test `ee9127f480746f83cb301822be153ddbfb993244`. La CI del nuovo head deve ancora essere verificata: non considerare chiusa la correzione finché il workflow non è verde. Questa modifica non prova né sostituisce storage reale, restart/recovery, configurazione Meta o test end-to-end.
+
+### Esito verifica routing — 25 ottobre 2026
+
+Confermata verde la CI bot run `40237092071` sul commit `ee9127f480746f83cb301822be153ddbfb993244`; job `test` completato senza fallimenti. La correzione fail-closed per audio/comandi MultiVocale non gestiti è validata a livello automatizzato. Non è una prova di comportamento su Render, Meta o storage live.
