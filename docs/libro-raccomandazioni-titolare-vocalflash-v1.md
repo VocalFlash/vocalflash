@@ -313,3 +313,10 @@ Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL li
 - Verifica finale dopo la correzione dei trigger: [#40208821196](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40208821196), 47 test, OK.
 - Distinzione obbligatoria: il test aggiunto non copre ancora la perdita del rinnovo in background durante un'elaborazione lunga con recupero da un secondo worker. Restano inoltre Redis reale, restart/recovery, drain/migrazione, Vercel Preview e E2E controllato.
 - Tutti i gate aperti sono tracciati nell'[issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5). Nessun merge/deploy o cambiamento live senza i gate e l'autorizzazione pertinente.
+
+
+## 2026-10-25 — verifica Preview senza sovrastimare l'evidenza
+
+- Verificata in sola lettura la Preview Vercel del branch candidato: deployment `dpl_8yxnr8L7cXmpi22EzPF57LhkMGDq`, commit documentale `082f1e7ac99cea0bbca80b8aa1beb1aa92ff7167`, stato `READY`; log di build concluso.
+- Applicando la regola canonica, `READY` significa soltanto che quella Preview è stata costruita. Non certifica il contratto bot/API né un E2E Meta/WhatsApp.
+- PR #2 e PR #3 restano Draft. Non unirle separatamente né rilasciare finché il contratto congiunto e i gate dell'[issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5) non sono verificati.
