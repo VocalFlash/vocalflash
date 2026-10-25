@@ -747,3 +747,32 @@ Il workflow .github/workflows/test-multivocale-runtime-v2.yml ascolta i push sul
 4. Solo dopo riaprire il gate per l'integrazione audio Assistant API.
 
 Non completato: routing audio, E2E A01–A20, verifica live Meta, schema SQL autorevole, merge/deploy. Nessuna azione live è stata eseguita.
+
+## Aggiornamento operativo — 25 ottobre 2026: namespace Redis candidato, verifica ancora aperta
+
+### Implementato sul branch bot isolato
+- Head candidato bot: 197f610d271b92374566080e4f748bdae7fde06c, branch assistant-conversation-photo-v1.
+- Scope Redis opaco basato su RENDER_SERVICE_ID + WA_PHONE_ID.
+- Applicato al runtime MultiVocale: batch attivo, ultimo audio, batch in coda, due/cleanup queue e coordinator lock.
+- Applicato anche a deduplica webhook, lock mittente e marker di tentativo risposta Assistant sul branch isolato.
+- Aggiunti test di isolamento e aggiornato il workflow per includere assistant-conversation-photo-v1.
+
+### Non ancora verificato
+- Per l'head candidato non è stato reperito un run CI associato né uno status check; non dichiaro eseguita o superata la nuova suite.
+- Nessuna prova E2E, test locale, test Meta reale o verifica di restart è stata eseguita in questo passaggio.
+- Nessun merge o deploy è stato effettuato.
+
+### Stato live riconfermato in sola lettura
+- Render staging vocalflash-bot-staging: branch multivocale-runtime-v2, deploy live 34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5.
+- Render produzione vocalflash-bot: branch main, deploy live 788eecf280e0bb6eb22424669b89ed7ad0abc432.
+- Entrambi continuano a puntare allo stesso Redis vocalflash-redis; l'utente ha confermato che REDIS_URL è identica nei due servizi. Il Key Value è Free/Oregon e ha persistenza su disco disattivata.
+- Le modifiche di namespace sono solo nel branch Draft; il comportamento live non è cambiato.
+
+### Gate prima di un deploy staging
+1. Eseguire e verificare la suite Python sul commit candidato esatto.
+2. Prima di passare al nuovo prefisso, drenare o migrare con procedura verificata gli eventuali batch e riferimenti cleanup nel vecchio namespace. Non presumere che non ci siano batch pendenti.
+3. Testare isolamento per stesso mittente tra servizi/account e testare recovery dopo restart.
+4. Tenere separato il tema della durabilità: namespace distinti riducono le collisioni, ma non proteggono da perdita totale del Redis senza persistenza.
+5. Mantenere produzione invariata finché staging non supera i gate.
+
+Classificazione attuale: implementazione candidata presente; test sul nuovo head NOT VERIFIED; deploy staging e produzione NON ESEGUITI.
