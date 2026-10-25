@@ -148,3 +148,8 @@ Il totale dei tre test matrix principali è 675 esecuzioni riuscite (API 445 + b
 - Il workflow dei test ora include il file di regressione storage e un trigger `pull_request` oltre al push sul branch candidato.
 - Verifica CI completata: run GitHub Actions `40223697873` (`Assistant Customer Pipeline Tests`) **success**, cinque passaggi della matrice riusciti. In ciascun passaggio sono risultati **103 test passati, 0 fallimenti**; i test storage nuovi sono inclusi (mapping mancante, scope duplicati, download cross-scope, delete cross-scope, rifiuto delle chiavi legacy). Totale: 515 esecuzioni di test riuscite sulla matrice. Run verificato sul commit `1be9c9f8230c51406f5e6835e27da1479b435c26`; i commit successivi interessano soltanto i documenti canonici, quindi il codice testato è invariato.
 - Il contratto richiede credenziali distinte per staging e produzione e scope distinti; il mapping usa SHA-256 della chiave come chiave JSON. La nuova variabile `VOCALFLASH_ASSISTANT_API_KEY_SCOPES` va configurata solo quando saranno autorizzate e pianificate le modifiche env. Nessuna chiave è stata generata, ruotata o cambiata.
+
+
+## Aggiornamento runbook — 25 ottobre 2026
+
+Prima del test storage end-to-end, leggere il log di readiness solo come `storage_control`: conferma che il bot raggiunge l'endpoint di controllo e che la health action crea una signed-upload URL. Non prova che upload, download o delete funzionino realmente. Il bot commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274` contiene questa correzione; verificare CI sul commit prima di procedere. Il test E2E resta un gate separato e va eseguito soltanto in staging autorizzato, con oggetto sintetico e verifica esplicita della cancellazione. Nessun test live è stato eseguito in questo ciclo.
