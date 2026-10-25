@@ -853,3 +853,14 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 - **Precisazione:** l'object key è fittizio e il servizio Redis è temporaneo di CI. Il risultato prova persistenza del riferimento in Redis, non l'esistenza dell'oggetto nel provider storage, la generazione/download di URL firmati dopo restart, né un restart effettivo di Redis o Render.
 - Restano NO-GO: restart E2E con storage audio reale; inventario read-only e drain/migrazione del namespace precedente; strategia di durabilità Redis; verifica staging Meta/App Secret/firma/Assistant API; review congiunta del contratto tra PR bot #2 e API #3.
 - Nessun merge, deploy staging/produzione, modifica di dati/configurazione live o invio WhatsApp reale.
+
+
+## Review statica del percorso audio/storage — 25 ottobre 2026
+
+- Lettura del branch candidato: `app_customer.py` instrada i messaggi `audio` e i comandi MultiVocale nel runtime V2. Il runtime usa storage temporaneo privato: upload dei byte con URL firmato, metadati e `object_key` in Redis, poi nuova richiesta di URL firmato per il download al momento del processing.
+- Il client Render (`multivocale_storage_v1.py`) autentica le richieste di controllo con la chiave Assistant; il segreto Supabase rimane sul lato Vercel nel percorso esaminato. Il test `test_multivocale_storage_v1.py` è simulato e non prova il provider reale.
+- Le strutture legacy `sessions`, `auto_batches`, `queued_batches`, `last_audio` sono ancora dichiarate in `app.py`; il routing candidato invia i tipi audio al runtime V2. La sola review statica non certifica che ogni percorso legacy sia irraggiungibile.
+- Hardening da valutare nella review congiunta: la API storage valida la forma dell'object key ma non riceve un identificatore separato di servizio/account né lega esplicitamente la chiave all'account proprietario. La chiave Assistant protegge l'endpoint interno; non va confusa con una policy di ownership per oggetto.
+- **Gate ancora aperti:** test con provider storage reale; download firmato dopo restart effettivo; isolamento/ownership dell'object key; verifica dei percorsi legacy; inventario read-only del namespace Redis precedente.
+- Gli strumenti Render disponibili espongono metadati/servizi/log ma non offrono un'interfaccia read-only per enumerare il keyspace Redis. L'inventario live resta quindi non eseguito; non si presume il namespace vuoto e non si usa `FLUSHDB`.
+- Nessun codice runtime modificato, merge/deploy, cambiamento live o invio WhatsApp reale.
