@@ -303,3 +303,13 @@ Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL li
 - Verifica effettiva: [run #40208605377](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40208605377), job `test` concluso `success`; log letto: **46 test, OK**.
 - Non ampliare la conclusione: i test passati sono deterministici/unitari. Restano da dimostrare Redis reale/concorrenza, perdita del rinnovo lease, restart/recovery, drain/migrazione e integrazione staging.
 - Tutti i gate da verificare sono ora registrati nell'[issue GitHub #5](https://github.com/VocalFlash/vocalflash-bot/issues/5). Non fare merge/deploy o modifiche live finché i gate non sono chiusi e verificati.
+
+
+## 2026-10-25 — riesame raccomandazione CI senza duplicazioni
+
+- Riesaminata la regola canonica §1.14: evitare trigger `push` e `pull_request` sovrapposti sullo stesso commit quando eseguono gli stessi test.
+- Corretto il workflow bot: il trigger push resta sul branch base `multivocale-runtime-v2`; il branch candidato è coperto da pull request verso il branch base e dispatch manuale.
+- Aggiunto test del fallimento della lease al controllo finale pre-consegna: la sintesi e il prompt MultiVocale non devono essere inviati. Run [#40208741560](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40208741560): 47 test, OK.
+- Verifica finale dopo la correzione dei trigger: [#40208821196](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40208821196), 47 test, OK.
+- Distinzione obbligatoria: il test aggiunto non copre ancora la perdita del rinnovo in background durante un'elaborazione lunga con recupero da un secondo worker. Restano inoltre Redis reale, restart/recovery, drain/migrazione, Vercel Preview e E2E controllato.
+- Tutti i gate aperti sono tracciati nell'[issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5). Nessun merge/deploy o cambiamento live senza i gate e l'autorizzazione pertinente.
