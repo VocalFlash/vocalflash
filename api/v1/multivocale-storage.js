@@ -21,7 +21,9 @@ function assistantScopeForKey(key){
   if(!mappings||typeof mappings!=="object"||Array.isArray(mappings))return "";
   const digest=crypto.createHash("sha256").update(key).digest("hex");
   const scope=mappings[digest];
-  return typeof scope==="string"&&/^[a-z0-9][a-z0-9._-]{1,63}$/.test(scope) ? scope : "";
+  if(typeof scope!=="string"||! /^[a-z0-9][a-z0-9._-]{1,63}$/.test(scope))return "";
+  if(Object.values(mappings).filter(value=>value===scope).length!==1)return "";
+  return scope;
 }
 
 function scopeSegment(scope){
