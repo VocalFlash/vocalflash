@@ -295,3 +295,11 @@ Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL li
 - La revisione statica ha confermato la correzione della chiave globale residua nel sottotipo timing. È emerso inoltre un caso da testare: se il rinnovo della lease fallisce, il thread di rinnovo termina e il processing continua; verificare che un worker con lease persa non possa inviare o finalizzare il batch.
 - Prima di qualsiasi deploy staging: suite verde sul commit esatto, test lease/fencing e restart, inventario/drain o migrazione dei batch e cleanup pendenti nel vecchio namespace, verifica del percorso audio effettivo. Il Redis senza persistenza su disco è un rischio separato.
 - Nessun merge/deploy, cambiamento di configurazione Render, invio WhatsApp reale o modifica live è stato effettuato. Non trasformare questa raccomandazione in autorizzazione al rilascio.
+
+
+## 2026-10-25 — aggiornamento dopo CI verificata
+
+- Punto CI sistemato con GitHub: aggiunto il trigger `pull_request` verso `multivocale-runtime-v2` al workflow MultiVocale.
+- Verifica effettiva: [run #40208605377](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40208605377), job `test` concluso `success`; log letto: **46 test, OK**.
+- Non ampliare la conclusione: i test passati sono deterministici/unitari. Restano da dimostrare Redis reale/concorrenza, perdita del rinnovo lease, restart/recovery, drain/migrazione e integrazione staging.
+- Tutti i gate da verificare sono ora registrati nell'[issue GitHub #5](https://github.com/VocalFlash/vocalflash-bot/issues/5). Non fare merge/deploy o modifiche live finché i gate non sono chiusi e verificati.
