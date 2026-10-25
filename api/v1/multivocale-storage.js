@@ -129,9 +129,6 @@ export default async function handler(req,res){
       if(!ownsObjectKey(objectKey)){
         return res.status(403).json({error:"Oggetto non appartenente allo scope autenticato"});
       }
-      if(!ownsObjectKey(objectKey)){
-        return res.status(403).json({error:"Oggetto non appartenente allo scope autenticato"});
-      }
       const {data,error}=await store.createSignedUrl(objectKey,300,{download:false});
       if(error)throw error;
       return res.status(200).json({
