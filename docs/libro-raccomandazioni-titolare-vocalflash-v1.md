@@ -278,20 +278,20 @@ Le chiavi Redis per batch attivo, ultimo audio e batch in coda sono costruite us
 
 Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL live o invio WhatsApp reale senza autorizzazione.
 
-## 2026-10-25 — Aggiornamento raccomandazioni: isolamento Redis
+## 2026-10-25 — Aggiornamento raccomandazioni: isolamento Redis (snapshot storico, poi aggiornato)
 
 - L'utente ha confermato il workspace Render My Workspace e ha chiesto di proseguire dopo la rilettura dei libri canonici.
 - È stato implementato un candidato di namespace Redis nel branch Draft assistant-conversation-photo-v1, separando chiavi per servizio Render e account WhatsApp configurato. Sono stati aggiunti test di isolamento e il workflow è stato aggiornato per includere il branch.
-- Non considerarlo testato: il controllo GitHub non ha restituito un run/status riferito all'head candidato. Non dichiarare la modifica chiusa finché non esiste evidenza CI sul commit esatto.
+- Stato in quel momento: non testato sul nuovo head. Questo snapshot è stato superato dalle run #40208741560 e #40208821196, che hanno eseguito 47 test con esito OK; vedere la sezione finale sulle CI senza duplicazioni.
 - Il Redis è condiviso tra staging e produzione e non ha persistenza su disco. Il namespace non risolve la durabilità; non cambiare configurazioni Render, non distribuire e non toccare produzione senza autorizzazione separata.
 - Prima di un deploy staging va predisposto un drain/migrazione verificato del vecchio namespace per evitare di rendere inaccessibili batch e cleanup pendenti.
 - Restano vincolanti le raccomandazioni canoniche: modifiche minime, test pertinenti prima di dichiarare conclusioni, nessuna affermazione oltre l'evidenza, produzione protetta e documentazione aggiornata dopo ogni avanzamento.
 
 
-## 2026-10-25 — Raccomandazione aggiornata: chiudere il gate CI prima di proseguire
+## 2026-10-25 — Raccomandazione aggiornata: chiudere il gate CI prima di proseguire (snapshot storico, poi aggiornato)
 
-- Ho ricontrollato il workflow Python: è configurato per eseguire la suite anche sul branch `assistant-conversation-photo-v1`, ma non ho evidenza che il workflow sia stato eseguito sul commit candidato `3e80f7034205ad6271b411e9394ebabea258f740` (status vuoti; nessun run recuperato).
-- Il tentativo di esecuzione locale non è riuscito perché l'ambiente non risolve `github.com`. Di conseguenza, non considero testata la correzione del timing sul nuovo head.
+- Stato storico al momento di quella verifica: non era disponibile un run sul commit candidato `3e80f7034205ad6271b411e9394ebabea258f740`. Questo è stato superato dai run successivi #40208741560 e #40208821196, entrambi con 47 test e risultato OK.
+- Il tentativo locale non riuscì a causa della risoluzione DNS; successivamente la suite è stata eseguita da GitHub Actions sul branch candidato. Il risultato resta limitato ai test deterministici, non all'E2E.
 - La revisione statica ha confermato la correzione della chiave globale residua nel sottotipo timing. È emerso inoltre un caso da testare: se il rinnovo della lease fallisce, il thread di rinnovo termina e il processing continua; verificare che un worker con lease persa non possa inviare o finalizzare il batch.
 - Prima di qualsiasi deploy staging: suite verde sul commit esatto, test lease/fencing e restart, inventario/drain o migrazione dei batch e cleanup pendenti nel vecchio namespace, verifica del percorso audio effettivo. Il Redis senza persistenza su disco è un rischio separato.
 - Nessun merge/deploy, cambiamento di configurazione Render, invio WhatsApp reale o modifica live è stato effettuato. Non trasformare questa raccomandazione in autorizzazione al rilascio.
