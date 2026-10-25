@@ -776,3 +776,16 @@ Non completato: routing audio, E2E A01–A20, verifica live Meta, schema SQL aut
 5. Mantenere produzione invariata finché staging non supera i gate.
 
 Classificazione attuale: implementazione candidata presente; test sul nuovo head NOT VERIFIED; deploy staging e produzione NON ESEGUITI.
+
+
+## Follow-up review — 25 ottobre 2026: timing queue namespace
+
+Una seconda revisione statica ha individuato una chiave globale residua nel sottotipo transport-aware multivocale_runtime_v2_timing.py: il metodo _schedule sovrascriveva il metodo base e continuava a scrivere su DUE_KEY globale. Il punto è stato corretto sul branch Draft: ora la pianificazione usa la chiave due namespaced per configurazione e i test timing verificano tale chiave.
+
+- Commit runtime: 9997affa1b4d1afe4f0eaa17a1345af071020284.
+- Commit test timing: 3e80f7034205ad6271b411e9394ebabea258f740.
+- Rilettura statica successiva: conferma l'uso della chiave namespaced nel sottotipo e l'assenza della scrittura globale DUE_KEY in quel metodo.
+- CI sul commit aggiornato: ancora NOT VERIFIED; status checks vuoti e nessun run recuperato dal connettore.
+- Nessun deploy/merge o modifica live.
+
+Questo conferma perché la revisione deve includere anche override e sottoclassi: la correzione resta candidata fino a test effettivi.
