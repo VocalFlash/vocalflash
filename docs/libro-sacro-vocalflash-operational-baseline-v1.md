@@ -890,3 +890,34 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 - Bot head `5d80b3802b1184cad4b9fd2b03894b39c6d9fa42`: run [#40217101979](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40217101979) `success`, **59 test OK**.
 - Sono commit documentali; i risultati non chiudono l'E2E di storage/restart, ownership object, audit legacy, inventario/drain namespace Redis, durabilità o staging Meta/Assistant.
 - Nessun merge, deploy produzione o azione WhatsApp reale; release resta NO-GO.
+
+
+## Verifica complessiva read-only — 25 ottobre 2026, seconda passata
+
+### GitHub / CI / Vercel
+- PR bot #2: aperta, Draft, non unita; head verificato `5d80b3802b1184cad4b9fd2b03894b39c6d9fa42`. Run #40217101979 risulta `success`; il job `test` è completato con esito success. Il precedente log documentale indica 59 test OK; questa interrogazione ha confermato l'esito del job ma il frammento di log recuperato non ha restituito la riga riepilogativa del conteggio.
+- PR API #3: aperta, Draft, non unita; head `34664de90acf860cb11b8b0a04bc54b5e90adb28`. Run #40217077754: 5/5 job completati con esito success. Il run precedente associato al commit documentale `74f60fe...` è verificato con 98 test per ciascun job; non confondere il conteggio precedente con un log del nuovo head.
+- Vercel: il progetto mostra deployment Preview `READY` per il head API `34664de...`; ciò prova il completamento della build Preview, non un E2E. La lettura dei runtime error Vercel ha restituito 403 per permessi insufficienti: errori runtime Vercel non verificati in questa passata.
+- I check di stato del commit bot non espongono status separati, ma la run GitHub Actions specifica sopra è completata con successo. Non inferire che una lista di status vuota significhi un test fallito o non eseguito.
+
+### Render — sola lettura
+- Staging `vocalflash-bot-staging`: servizio non sospeso, branch `multivocale-runtime-v2`, auto-deploy disattivato; deploy live `34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5`, risalente al 4 ottobre 2026.
+- Produzione `vocalflash-bot`: servizio non sospeso, branch `main`, auto-deploy abilitato; deploy live `788eecf280e0bb6eb22424669b89ed7ad0abc432`, risalente al 3 ottobre 2026.
+- Entrambi puntano alla stessa risorsa `vocalflash-redis`, Free/Oregon, versione 8.1.10, `persistenceMode=off`. Questo è un rischio di durabilità noto; non è evidenza di perdita dati.
+- Interrogazione Render dei log error/warn e dei request log nel periodo 24 ottobre 00:00 UTC–25 ottobre 16:00 UTC ha restituito liste vuote. I dati metrici HTTP di staging sono vuoti; anche le metriche HTTP di produzione non hanno serie restituite. Quindi non è possibile concludere da questa interrogazione né che il traffico sia sano né che non ci siano errori non registrati.
+- Le metriche Redis restituite indicano 0 connessioni attive nei campioni richiesti. È un segnale da verificare con log/runtime e non prova da solo che i servizi non usino Redis, dato il possibile limite o significato della metrica.
+- La cronologia eventi disponibile mostra gli ultimi deploy live sopra; non sono emersi eventi di servizio recenti nella finestra restituita. Nessun deploy, restart, modifica di variabili o scrittura Redis è stato eseguito in questa passata.
+- Gli strumenti Render disponibili non permettono di enumerare in sicurezza il keyspace Redis; inventario vecchio namespace e batch pendenti restano NON VERIFICATI. Nessun `FLUSHDB`.
+
+### Supabase — lettura del progetto attivo
+- Progetto `VocalFlash Assistant` (`tkfyfqgtumoeywlqzmdt`) stato `ACTIVE_HEALTHY`, PostgreSQL 17.6.1.171, regione eu-west-1.
+- Registro migrazioni live: 15 migrazioni, dalla `20261001181622` alla `20261004213059`; l'ultima è `customer_whatsapp_replay_conflict_v1`. La presenza delle migrazioni live non prova che tutti i file sorgente versionati siano riconciliati con esse.
+- Query read-only: 0 utenti Auth e 0 righe `business_members`. Conteggi attuali: 1 business, 2 workflow, 1 policy, 14 termini `business_vocabulary`, 1 business channel. Il dato è coerente con l'assenza di identità owner reale; non creare membri fittizi.
+- Advisor sicurezza: 15 tabelle public hanno RLS attivo ma zero policy. È fail-closed per accessi via ruoli che rispettano RLS, ma va verificato esplicitamente che il percorso di accesso server-side e i privilegi esposti corrispondano al modello previsto. Non aggiungere policy permissive senza analisi dell'ownership e test.
+- Advisor performance: 18 foreign key senza indice di copertura e 26 indici segnalati come inutilizzati. Sono suggerimenti INFO, non prova automatica di bug; non rimuovere indici o creare indici live senza esame query/uso e autorizzazione.
+- Nessuna migrazione, DDL o scrittura dati è stata eseguita.
+
+### Stato dei gate
+- Confermato NO-GO per merge/deploy: PR #2 e #3 restano Draft; il flusso combinato non è stato testato E2E.
+- Restano aperti: restart reale del processo Render con storage audio reale e URL firmato; ownership degli oggetti; audit dei percorsi legacy; inventario/drain del namespace Redis precedente; strategia di durabilità Redis; verifica effettiva della configurazione Meta App Secret/firma webhook in staging; riconciliazione delle migrazioni; policy RLS/privilegi; test E2E Meta/WhatsApp con autorizzazione separata.
+- La verifica Vercel runtime è bloccata da 403. La verifica Render ha avuto copertura limitata dai log/metriche vuoti e dall'impossibilità di interrogare il keyspace Redis.
