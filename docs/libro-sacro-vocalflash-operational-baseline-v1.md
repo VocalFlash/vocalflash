@@ -826,3 +826,11 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 - Il build log riporta `Build Completed` e `Deployment completed`. Il commit è documentale; lo stato READY dimostra che la build Preview si è conclusa, non che il contratto Assistant API → bot sia corretto né che l'E2E funzioni.
 - PR bot #2 e PR API #3 restano Draft; il gate di verifica congiunta resta aperto. Nessun merge o deploy di produzione.
 - Registro completo dei gate: [bot issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5).
+
+
+## Verifica lease concorrente — 25 ottobre 2026
+- Runtime corretto: se il worker perde il fencing token e fallisce, prima di qualsiasi messaggio di errore/riprova controlla lo stato persistito; se il batch è già stato recuperato o completato da un worker più recente, il worker obsoleto non invia messaggi e non tenta di finalizzare.
+- Test mirato `test_lost_lease_during_long_processing_second_worker_recovers_stale_worker_cannot_send_or_finalize` simula elaborazione lunga, fallimento del thread di rinnovo, recupero da parte del secondo worker e ritorno tardivo del primo.
+- CI sul commit `d31878080a94975a605b39b74c90790bf2fc9180`: run [#40209993482](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40209993482), **48 test, OK**; il log conferma il nuovo test e l'intera suite deterministica.
+- Limite: il test usa fake Redis e controlla deterministicamente l'ordine concorrente; non dimostra l'atomicità di Redis reale, né restart/recovery E2E o Meta/WhatsApp live.
+- Nessun merge, deploy Render, modifica live o invio WhatsApp reale effettuato.
