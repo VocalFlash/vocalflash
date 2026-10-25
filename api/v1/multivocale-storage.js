@@ -99,7 +99,8 @@ export default async function handler(req,res){
       return res.status(200).json({
         ok:true,
         action,
-        storage:true,
+        storage_control:true,
+        signed_upload_url_creation:true,
       });
     }
 
