@@ -484,3 +484,12 @@ Verification update 2026-10-24:
 - A second test closes and recreates the Redis client/store, reads the persisted processing state and ready answer, then recovers an expired lease. This verifies client/store recreation against the same Redis service; it is not a Redis server restart or Render process E2E.
 - CI hygiene: the duplicate five-pass customer diagnostics workflow is manual-only; the primary PR suite includes webhook signature and lease-heartbeat tests, with the fake store fixture aligned to current lease-token semantics.
 - Remaining: full restart/recovery with actual audio storage, Redis durability/eviction configuration, old-namespace inventory/drain, and Meta/WhatsApp E2E. No merge/deploy/live change or real WhatsApp send.
+
+
+## Release gate update — audio object reference survives Redis client recovery (2026-10-25)
+
+- Verified candidate bot commit `74806b1bac489279b247bebb1600f99194f5a6cf`: [GitHub Actions run #40215225458](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40215225458) succeeded; the job log reports **59 tests, OK**.
+- Real-Redis CI covers concurrent lease claims, stale fencing after recovery, and client/store recreation. The recovery test additionally asserts one persisted file reference with `status=ready` and `object_key=test-object/audio.ogg`, then recovers the expired lease and finalizes using the new token.
+- Evidence boundary: the storage key is a fixture, and Redis is an ephemeral CI service. This does not prove the object exists in the configured storage provider or that a signed download works after an actual process restart. No Redis server or Render service was restarted.
+- Next dependencies remain: real storage + process-restart E2E; read-only inventory and tested drain/migration of the old namespace; durability plan for shared Redis without disk persistence; staging Meta signature/Assistant API checks; joint bot/API contract review.
+- Release remains NO-GO. No merge/deploy/live mutation or real WhatsApp send.
