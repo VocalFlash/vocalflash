@@ -3,6 +3,14 @@
 **Updated:** 2026-10-24  
 **Status:** planning/engineering record on the isolated development branch. This document does not authorize database changes, merges, purchases, or deployments.
 
+
+## Registro di verifica — 25 ottobre 2026
+
+- Revisione statica del ramo `assistant-conversation-photo-v1`: rimosso un controllo duplicato identico di appartenenza scope in `api/v1/multivocale-storage.js`; il controllo effettivo resta presente prima della generazione del signed URL.
+- Commit della sola pulizia: `ab627a35072c38bc15f3fe419080fd012f7ce96f`.
+- La verifica GitHub Actions tramite endpoint disponibile non ha restituito run associati al commit; pertanto questa pulizia è **non ancora confermata da CI** in questo registro. Non dichiarare il commit testato finché non è visibile un esito sul commit/branch corrente.
+- Nessun deploy, merge, modifica di configurazioni/secret o operazione storage live eseguita.
+
 ## Product definition
 
 VocalFlash is an assistant operating through WhatsApp, not merely a transcription utility. Its job is to turn voice notes, customer messages, and (later) media into a clear, safe next step: understand intent, preserve important details, identify missing or uncertain data, ask targeted follow-up questions, prepare an actionable request, and perform only actions permitted by the configured business policy.
