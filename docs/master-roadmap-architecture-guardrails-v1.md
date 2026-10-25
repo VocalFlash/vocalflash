@@ -631,3 +631,10 @@ Verification update 2026-10-24:
 - Il workflow dei test ora include il file di regressione storage e un trigger `pull_request` oltre al push sul branch candidato.
 - Verifica CI completata: run GitHub Actions `40223697873` (`Assistant Customer Pipeline Tests`) **success**, cinque passaggi della matrice riusciti. In ciascun passaggio sono risultati **103 test passati, 0 fallimenti**; i test storage nuovi sono inclusi (mapping mancante, scope duplicati, download cross-scope, delete cross-scope, rifiuto delle chiavi legacy). Totale: 515 esecuzioni di test riuscite sulla matrice. Run verificato sul commit `1be9c9f8230c51406f5e6835e27da1479b435c26`; i commit successivi interessano soltanto i documenti canonici, quindi il codice testato è invariato.
 - Il contratto richiede credenziali distinte per staging e produzione e scope distinti; il mapping usa SHA-256 della chiave come chiave JSON. La nuova variabile `VOCALFLASH_ASSISTANT_API_KEY_SCOPES` va configurata solo quando saranno autorizzate e pianificate le modifiche env. Nessuna chiave è stata generata, ruotata o cambiata.
+
+
+## Registro avanzamento — 25 ottobre 2026
+
+- Readiness: distinguere esplicitamente `storage_control` da storage E2E. La health action crea una signed-upload URL ma non esegue round-trip. Correzione nel bot commit `0ab11b0fab036f27a2ecebbfd8ab7ba580a71274`; CI su tale commit ancora da verificare.
+- API head `c348cc0d6d1ba5b8334328570aaeb904cb9aa581`: CI run `40234931191` verde, cinque job; Vercel Preview `READY`. Nessuna evidenza di test E2E storage o produzione.
+- Gate prioritari invariati: upload/download reale, restart e recovery, env staging verificate, isolamento e pulizia oggetti legacy, integrazione API-bot-Meta. PR #3 e #2 restano Draft e non unite.
