@@ -381,3 +381,11 @@ Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL li
 - La review statica ha confermato che il namespace Redis del runtime V2 incorpora un digest derivato da `RENDER_SERVICE_ID` e `WA_PHONE_ID`; questo isola le nuove chiavi V2 tra servizi/account se entrambi i valori sono correttamente impostati. Non prova che i vecchi namespace siano vuoti o migrati.
 - Rimangono aperti: storage reale + download firmato dopo restart; ownership/isolamento oggetti; audit di tutti i percorsi legacy; inventario read-only del vecchio namespace; durabilità Redis; staging Meta/Assistant E2E; review congiunta del contratto.
 - Nessun merge, deploy produzione, mutazione live o invio WhatsApp reale. Release NO-GO.
+
+
+## Esito follow-up CI — 25 ottobre 2026 (ultimo controllo)
+
+- API commit documentale `74f60fe3114aaf026a3d5c10666403072340334d`: [run #40217077754](https://github.com/VocalFlash/vocalflash/actions/runs/40217077754) = `success`; tutti i 5 job completati, ciascun log mostra **98 pass, 0 fail**. Vercel Preview associata allo SHA `74f60fe...` = `READY`.
+- Bot commit documentale `5d80b3802b1184cad4b9fd2b03894b39c6d9fa42`: [run #40217101979](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40217101979) = `success`; log letto: **59 test, OK**.
+- Questi commit sono documentali, non modificano il runtime; CI/Preview positivi non sostituiscono i gate E2E.
+- PR #2 e #3 ancora Draft/non unite. Release ancora NO-GO: storage reale + restart; ownership object; audit legacy; inventario e drain namespace; durabilità Redis; verifica staging Meta/Assistant.
