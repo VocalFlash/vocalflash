@@ -371,3 +371,13 @@ Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL li
 - Vercel Preview per lo stesso SHA: deployment `dpl_A6q4UqnpkccNDMMuvfn8X93pECzr`, stato `READY`. Preview/build soltanto; non prova il comportamento semantico o un E2E con bot, Supabase, storage e Meta.
 - PR API #3 e bot #2 sono ancora Draft, aperte e non unite. Nessun merge o deploy di produzione.
 - Il risultato CI riguarda il branch API prima di questo aggiornamento documentale; eventuali commit successivi dei libri devono essere trattati come head nuovi e verificati separatamente.
+
+
+## Aggiornamento CI e Preview sull'head corrente — 25 ottobre 2026
+
+- Bot: head `d8f8c6c9c1a3de53af44e182c88580a740745832` è un commit documentale; run [#40215503185](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40215503185) = `success`, **59 test, OK**. La prova copre Redis reale temporaneo in CI e il recupero del riferimento fittizio; non prova storage reale né restart Render.
+- API: head documentale `99ad18b738c1cd50225176138319d601ff89aa78`; run [#40215818314](https://github.com/VocalFlash/vocalflash/actions/runs/40215818314) = `success`, tutti e 5 i job riusciti. Log letto: **98 test, 0 fallimenti**.
+- Vercel Preview sullo SHA API `99ad18b...`: deployment `dpl_Bc9B9HaHhTqTaobQWAFN2xYpcjpL`, stato `READY`. Questo certifica solo build/deployment Preview, non E2E integrato.
+- La review statica ha confermato che il namespace Redis del runtime V2 incorpora un digest derivato da `RENDER_SERVICE_ID` e `WA_PHONE_ID`; questo isola le nuove chiavi V2 tra servizi/account se entrambi i valori sono correttamente impostati. Non prova che i vecchi namespace siano vuoti o migrati.
+- Rimangono aperti: storage reale + download firmato dopo restart; ownership/isolamento oggetti; audit di tutti i percorsi legacy; inventario read-only del vecchio namespace; durabilità Redis; staging Meta/Assistant E2E; review congiunta del contratto.
+- Nessun merge, deploy produzione, mutazione live o invio WhatsApp reale. Release NO-GO.
