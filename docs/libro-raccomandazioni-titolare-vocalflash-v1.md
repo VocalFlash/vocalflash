@@ -320,3 +320,11 @@ Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL li
 - Verificata in sola lettura la Preview Vercel del branch candidato: deployment `dpl_8yxnr8L7cXmpi22EzPF57LhkMGDq`, commit documentale `082f1e7ac99cea0bbca80b8aa1beb1aa92ff7167`, stato `READY`; log di build concluso.
 - Applicando la regola canonica, `READY` significa soltanto che quella Preview è stata costruita. Non certifica il contratto bot/API né un E2E Meta/WhatsApp.
 - PR #2 e PR #3 restano Draft. Non unirle separatamente né rilasciare finché il contratto congiunto e i gate dell'[issue #5](https://github.com/VocalFlash/vocalflash-bot/issues/5) non sono verificati.
+
+
+## Registro ciclo tecnico — 25 ottobre 2026: lease persa durante elaborazione lunga
+- **Problema individuato:** se il rinnovo della lease falliva durante una sintesi lunga e un secondo worker recuperava il batch, il primo worker, al ritorno tardivo, poteva entrare nel ramo di errore e inviare un messaggio cliente “Premi Riprova” pur non essendo più proprietario del batch.
+- **Correzione implementata sul branch isolato:** prima di inviare messaggi di errore/riprova, il runtime verifica lo stato persistito e il fencing token; un worker obsoleto non invia e non tenta di finalizzare il batch recuperato.
+- **Prova:** test deterministico `test_lost_lease_during_long_processing_second_worker_recovers_stale_worker_cannot_send_or_finalize`; GitHub Actions [#40209993482](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40209993482), commit `d31878080a94975a605b39b74c90790bf2fc9180`, **48 test superati**.
+- **Limite esplicito:** fake Redis e orchestrazione controllata non provano concorrenza atomica su Redis reale, recovery dopo restart o consegna Meta. Nessun merge/deploy/modifica live autorizzato.
+- **Prossimo gate:** riprodurre il comportamento su Redis reale in un ambiente isolato e poi testare restart/recovery; prima di staging resta necessario l'inventario/drain del vecchio namespace.
