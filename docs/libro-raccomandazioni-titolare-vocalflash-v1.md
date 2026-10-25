@@ -346,3 +346,19 @@ Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL li
 - Scope: this verifies Redis serialization/recovery of the object reference against an ephemeral Redis 7 service. The object key is a test fixture, so this is **not** proof of a real storage object, signed download URL after restart, Redis server restart, or Render process restart.
 - Still open: actual audio-storage + process-restart E2E; read-only inventory and verified drain/migration of the old namespace; Redis durability/recovery; staging Meta signature and Assistant API integration; joint bot/API contract review.
 - No merge, deployment, live configuration/database mutation, or real WhatsApp send.
+
+
+## Review statica del percorso audio e del contratto storage — 25 ottobre 2026
+
+### Confermato dalla lettura del branch candidato
+- Il percorso V2 per i messaggi `audio` e i comandi MultiVocale è selezionato da `app_customer.py`; il runtime V2 scarica il media da Meta, lo carica nello storage privato tramite URL firmato, registra in Redis `object_key`/metadati e ricrea un URL firmato per il download quando elabora il batch.
+- `multivocale_state_v2.py` conserva metadati e riferimenti storage, non i byte audio; `multivocale_storage_v1.py` usa la Assistant API interna per autorizzare upload/download/delete e invia i byte direttamente agli URL firmati. Il segreto Supabase non viene passato al processo Render secondo il contratto implementato.
+- Le strutture legacy `sessions`, `auto_batches`, `queued_batches` e `last_audio` sono ancora dichiarate in `app.py`; l'handler candidato instrada i tipi audio e i comandi MultiVocale al runtime V2. Questo controllo statico non dimostra che ogni percorso storico sia irraggiungibile in ogni condizione: resta necessaria la verifica di regressione/E2E prima di staging.
+- La API storage Vercel valida la forma del percorso oggetto (`tmp/<UUID>/<SHA-256>.<ext>`) e limita le operazioni a upload/download/delete con chiave Assistant interna. Non è stata eseguita una prova integrata contro il provider storage reale; il test del client usa risposte simulate.
+- Punto di hardening da mantenere nella review congiunta: l'endpoint storage non riceve un'identità di servizio/account separata e non vincola esplicitamente ogni `object_key` all'account che l'ha creato. L'accesso è protetto dalla chiave interna condivisa; la separazione per account/servizio e l'autorizzazione sull'oggetto devono essere valutate prima del GO-LIVE, senza assumere che la sola forma dell'object key sia una policy di ownership.
+
+### Esito
+- Percorso audio e confine API/storage: **review statica parziale completata**.
+- Test reale del provider storage, download firmato dopo restart effettivo, isolamento ownership dell'oggetto e verifica di tutti i percorsi legacy: **NON ESEGUITI / gate aperti**.
+- Nessuna lettura o scrittura di chiavi Redis live; l'inventario del vecchio namespace non è eseguibile con gli strumenti read-only disponibili, che espongono metadati Render ma non il keyspace Redis. Non usare FLUSHDB né inventare che il namespace sia vuoto.
+- Nessuna modifica di codice, segreti, configurazione, schema, deploy o invio WhatsApp in questo ciclo di review.
