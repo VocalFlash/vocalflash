@@ -648,3 +648,11 @@ Verification update 2026-10-24:
 - CI API: run `40235503317` verde sul commit documentale `2fb250205556ae967195b08197c618464184b624`, tutti e cinque i job riusciti.
 - Vercel Preview del commit `2fb250205556ae967195b08197c618464184b624`: `READY` al controllo successivo. La produzione non è stata toccata.
 - Questi esiti chiudono il controllo CI dei commit citati, non i gate di storage reale, restart/recovery, env staging, migrazione legacy e E2E Meta.
+
+## Nuovo gate di routing MultiVocale — 25 ottobre 2026
+
+- **Rilevato in revisione statica:** un audio rifiutato/non gestito dal runtime V2 poteva raggiungere il gestore legacy con stato in memoria; anche i comandi testuali MultiVocale non gestiti potevano ricadere nel percorso legacy.
+- **Correzione implementata sul branch bot:** commit `d5e75a618d48a17a1f120153213167134bebe52f`.
+- **Test aggiunti:** commit `ee9127f480746f83cb301822be153ddbfb993244`, per audio non gestito e comando MultiVocale non gestito.
+- **Verifica:** CI del nuovo head ancora da confermare. Finché non è verde, stato = implementato, non ancora validato.
+- **Non cambia il NO-GO di rilascio:** restano storage E2E, recovery dopo restart, env staging, migrazione/isolamento oggetti legacy e integrazione API-bot-Meta.
