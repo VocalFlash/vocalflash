@@ -921,3 +921,44 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 - Confermato NO-GO per merge/deploy: PR #2 e #3 restano Draft; il flusso combinato non è stato testato E2E.
 - Restano aperti: restart reale del processo Render con storage audio reale e URL firmato; ownership degli oggetti; audit dei percorsi legacy; inventario/drain del namespace Redis precedente; strategia di durabilità Redis; verifica effettiva della configurazione Meta App Secret/firma webhook in staging; riconciliazione delle migrazioni; policy RLS/privilegi; test E2E Meta/WhatsApp con autorizzazione separata.
 - La verifica Vercel runtime è bloccata da 403. La verifica Render ha avuto copertura limitata dai log/metriche vuoti e dall'impossibilità di interrogare il keyspace Redis.
+
+
+## Addendum — verifica estesa piattaforme e cronologia disponibile (2026-10-25, UTC)
+
+### Stato della verifica
+- Sono stati riletti i due libri canonici e la roadmap, consultati i registri/riassunti delle conversazioni VocalFlash disponibili in ChatGPT Library e recuperato lo stato live delle piattaforme con accessi read-only. Questo consolida le evidenze recuperabili; non va descritto come lettura manuale esaustiva di ogni singola chat dell'account, perché l'interfaccia non espone un inventario completo delle conversazioni.
+- Nessun merge, deploy, restart, modifica di variabili/secret, scrittura o DDL su database live, invio WhatsApp reale o acquisto è stato eseguito.
+
+### GitHub / Vercel
+- Commit documentale API corrente: `730bfdd642307b5b3c06c54ce26eec64aea3ed55`; deployment Vercel `dpl_4XGZiWPAMnXjEurq8e2mENDbHwaP` ora risulta **READY**. È una Preview (target non production), non prova E2E né stato di produzione.
+- Il progetto Vercel `vocalflash` ha Node.js `24.x`; SSO protection è abilitata per tutti gli ambienti eccetto i domini custom; password protection è disabilitata. Domini custom `api.vocalflash.it`, `vocalflash.it` e `www.vocalflash.it` risultano verificati; apex reindirizza a www con 308. Questa verifica non prova che ogni endpoint applicativo sia sano.
+- Inventario env Vercel read-only (valori non letti): `VF_ASSISTANT_SUPABASE_URL`, `VF_ASSISTANT_SUPABASE_SECRET_KEY`, `VF_MULTIVOCALE_STORAGE_BUCKET` e `VOCALFLASH_ASSISTANT_API_KEYS` risultano solo per Preview con branch `assistant-auth-v1) (la secret Supabase ha anche un target development). Non risultano assegnati al branch Preview `assistant-conversation-photo-v1` nell'inventario consultato. Le variabili legacy `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `VOCALFLASH_API_KEYS`, `OPENAI_API_KEY` hanno target più ampi. **Da fare:** confrontare i nomi richiesti dal codice del branch candidato con target/branch reali e correggere il binding solo dopo aver validato la necessità; non copiare né mostrare valori segreti. La presenza di una variabile non prova che il valore sia valido.
+- GitHub PR bot #2 e API #3 restano Draft/non unite secondo l'ultimo stato verificato. I risultati CI positivi su commit precedenti non si trasferiscono automaticamente ai successivi commit documentali; verificare il commit esatto prima di ogni gate.
+
+### Render
+- Servizio staging `vocalflash-bot-staging`: branch `multivocale-runtime-v2`, avvio `gunicorn app_customer:app`, auto-deploy OFF, piano Free, 1 istanza, Oregon, pubblico `0.0.0.0/0), nessun health check configurato.
+- Produzione `vocalflash-bot`: branch `main`, avvio `gunicorn app:app`, auto-deploy ON ad ogni commit, piano Free, 1 istanza, Oregon, pubblico `0.0.0.0/0), nessun health check configurato.
+- Ultimi deploy live rimangono staging commit `34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5` del 4 ottobre e produzione commit `788eecf280e0bb6eb22424669b89ed7ad0abc432` del 3 ottobre.
+- Entrambi i servizi condividono `vocalflash-redis`: Free, Oregon, Redis 8.1.10, `maxmemoryPolicy=noeviction), `persistenceMode=off). Rischio P0: separare staging/produzione e definire durabilità/recupero prima del pilota. Non eseguire flush né migrazione distruttiva.
+- Gli strumenti Render usati non espongono in modo affidabile l'inventario dei valori/nomi di tutte le env var né un keyspace Redis enumerabile in sicurezza. Questi punti restano **non verificati**, non “a posto”. Eventi recenti interrogati non restituiscono righe; questo non dimostra assenza di incidenti.
+- **Da fare:** aggiungere health check appropriato e testare dipendenze, dopo aver identificato endpoint sicuro e semantica; non modificare il servizio live in questa fase.
+
+### Supabase
+- Progetto attivo `VocalFlash Assistant`, ID `tkfyfqgtumoeywlqzmdt`, stato `ACTIVE_HEALTHY`, PostgreSQL 17.6.1.171, regione eu-west-1.
+- Esiste anche `VocalFlash's Project`, ID `miavlccjtknaemnmjoqb`, stato INACTIVE: va chiarito se resta il backend del questionario storico o se è dismesso; non cancellare né riattivare senza verificare dipendenze e dati.
+- Il progetto Assistant mostra 15 migrazioni live fino a `20261004213059 customer_whatsapp_replay_conflict_v1); la fonte SQL versionata completa resta non riconciliata. Nessuna development branch e nessuna Edge Function nel progetto Assistant al controllo corrente.
+- Advisor security: 15 tabelle public con RLS abilitata e nessuna policy (livello INFO). È necessario confermare grants, percorsi server-side e modello di accesso; non creare policy permissive automaticamente.
+- Advisor performance: 18 foreign key senza indice di copertura; analizzare query e workload prima di aggiungere indici. Gli indici inutilizzati restano solo segnalazioni, non candidati a cancellazione automatica.
+- Non creare la development branch: costo già stimato in precedenza, ma non approvato. Non applicare migrazioni live per colmare il drift.
+
+### P0 confermati e ordine di intervento
+1. Riconciliare la provenienza delle 15 migrazioni e rendere riproducibile lo schema in un ambiente isolato autorizzato.
+2. Separare Redis di staging e produzione; inventario e drain del namespace legacy con procedura non distruttiva; definire durabilità e recovery.
+3. Verificare binding delle env Vercel al branch Preview corretto senza esporre segreti; inventariare in modo sicuro le env Render, dato che il connettore non le ha rese verificabili.
+4. Eseguire test storage audio reale + signed URL dopo restart effettivo, ownership degli oggetti e audit dei percorsi legacy in RAM.
+5. Verificare META_APP_SECRET e firma webhook nel vero staging, quindi test congiunto bot/API, delivery ambiguity/outbox e callback.
+6. Correggere/validare health check e accessibilità dei servizi; valutare piano Vercel commerciale/DPA, privacy, retention e subprocessori prima del lancio.
+7. Rivedere il progetto Supabase inattivo del questionario e la coerenza dei target di ambiente; nessuna cancellazione senza prova di non dipendenza.
+
+### Stato release
+**NO-GO** invariato. La Preview corrente READY chiude solo il build per quel commit. Nessuna delle verifiche read-only autorizza merge, deploy, modifiche live o messaggi reali.
