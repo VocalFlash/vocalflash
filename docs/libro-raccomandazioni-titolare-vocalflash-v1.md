@@ -328,3 +328,12 @@ Gate invariati: nessun routing audio, modifica del timing, merge, deploy, DDL li
 - **Prova:** test deterministico `test_lost_lease_during_long_processing_second_worker_recovers_stale_worker_cannot_send_or_finalize`; GitHub Actions [#40209993482](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40209993482), commit `d31878080a94975a605b39b74c90790bf2fc9180`, **48 test superati**.
 - **Limite esplicito:** fake Redis e orchestrazione controllata non provano concorrenza atomica su Redis reale, recovery dopo restart o consegna Meta. Nessun merge/deploy/modifica live autorizzato.
 - **Prossimo gate:** riprodurre il comportamento su Redis reale in un ambiente isolato e poi testare restart/recovery; prima di staging resta necessario l'inventario/drain del vecchio namespace.
+
+
+## Ciclo tecnico — 25 ottobre 2026: Redis reale e recovery
+- Verificato contro Redis reale in CI: servizio effimero Redis 7; due claim simultanei sullo stesso batch producono un solo proprietario; dopo recovery il fencing token precedente non può salvare la risposta né finalizzare.
+- Verificata la ricostruzione del client/store: dopo aver chiuso il client e creato un nuovo client/store sulla stessa istanza Redis, lo stato processing e la risposta preparata risultano persistiti e la lease scaduta può essere recuperata.
+- Evidenza: run #40210411337 (https://github.com/VocalFlash/vocalflash-bot/actions/runs/40210411337), commit 15fb25eb73c45b8d08a766f9bde8696a10eb974c, 59 test superati.
+- Limiti: non è stato riavviato il server Redis né il servizio Render; lo storage audio reale, la durabilità in caso di perdita Redis e l'E2E Meta restano non verificati.
+- CI: la suite primaria PR include ora i test firma webhook, lease e Redis reale; il workflow diagnostico duplicato è manual-only. Nessun merge/deploy o modifica live.
+- Prossimo gate: test isolato che coinvolga storage audio effettivo e restart del processo, poi piano read-only di drain/migrazione del vecchio namespace prima di qualsiasi deploy staging.

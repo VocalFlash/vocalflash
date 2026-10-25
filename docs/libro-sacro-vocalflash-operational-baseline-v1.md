@@ -834,3 +834,13 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 - CI sul commit `d31878080a94975a605b39b74c90790bf2fc9180`: run [#40209993482](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40209993482), **48 test, OK**; il log conferma il nuovo test e l'intera suite deterministica.
 - Limite: il test usa fake Redis e controlla deterministicamente l'ordine concorrente; non dimostra l'atomicità di Redis reale, né restart/recovery E2E o Meta/WhatsApp live.
 - Nessun merge, deploy Render, modifica live o invio WhatsApp reale effettuato.
+
+
+## Verifica reale Redis e recupero dopo riavvio client — 25 ottobre 2026
+- Aggiunto al workflow CI un servizio Redis effimero redis:7-alpine; i test usano un prefisso univoco e non eseguono FLUSHDB.
+- Run #40210411337 (https://github.com/VocalFlash/vocalflash-bot/actions/runs/40210411337), commit bot 15fb25eb73c45b8d08a766f9bde8696a10eb974c: 59 test, OK, log verificato.
+- test_concurrent_claim_and_stale_fencing_after_recovery ha verificato contro Redis reale che due claim concorrenti producano un solo proprietario e che il token obsoleto non possa scrivere la risposta né finalizzare dopo il recupero.
+- test_processing_state_survives_client_restart_and_expired_lease_recovers ha verificato la persistenza dello stato quando si ricrea il client/store e il recupero della lease scaduta.
+- Limite: è un test di integrazione Redis su servizio effimero CI; il test di restart ricrea client/store ma non riavvia Redis/Render e non verifica lo storage audio reale. Il gate E2E completo resta aperto.
+- Il workflow diagnostico con cinque passaggi identici è stato reso manual-only; la suite primaria PR include anche i test firma webhook e heartbeat lease. Il fixture FakeStore è stato aggiornato per rappresentare il fencing token e la pulizia terminale.
+- Nessun merge, deploy Render, modifica live o invio WhatsApp reale.

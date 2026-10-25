@@ -475,3 +475,12 @@ Verification update 2026-10-24:
 - Added a deterministic concurrency regression test: long-running first worker, renewal-thread failure, lease expiry, second-worker recovery and successful delivery, then late return of the stale worker. Acceptance checks cover no stale summary, no stale retry message, exactly one successful follow-up, and final batch state remains completed.
 - CI run [#40209993482](https://github.com/VocalFlash/vocalflash-bot/actions/runs/40209993482), commit `d31878080a94975a605b39b74c90790bf2fc9180`: **48 tests, OK**, including the new regression.
 - The test uses FakeRedis and deterministic orchestration. Real Redis concurrency and end-to-end restart/recovery remain open. No merge, Render deployment, production change or real WhatsApp send.
+
+
+## Real Redis and client-restart recovery evidence — 2026-10-25
+- Candidate CI starts an ephemeral redis:7-alpine service and runs integration tests against real Redis using unique prefixes; tests do not flush the database.
+- Run #40210411337 (https://github.com/VocalFlash/vocalflash-bot/actions/runs/40210411337), bot commit 15fb25eb73c45b8d08a766f9bde8696a10eb974c: 59 tests, OK; the workflow job and log were inspected.
+- Real Redis test verified exactly one winner for two simultaneous lease claims, then confirmed the old fencing token cannot write the answer or finalize after recovery.
+- A second test closes and recreates the Redis client/store, reads the persisted processing state and ready answer, then recovers an expired lease. This verifies client/store recreation against the same Redis service; it is not a Redis server restart or Render process E2E.
+- CI hygiene: the duplicate five-pass customer diagnostics workflow is manual-only; the primary PR suite includes webhook signature and lease-heartbeat tests, with the fake store fixture aligned to current lease-token semantics.
+- Remaining: full restart/recovery with actual audio storage, Redis durability/eviction configuration, old-namespace inventory/drain, and Meta/WhatsApp E2E. No merge/deploy/live change or real WhatsApp send.
