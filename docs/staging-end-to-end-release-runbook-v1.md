@@ -3,6 +3,10 @@
 **Updated:** 2026-10-23  
 **Status:** execution checklist only. No test in this document is claimed as run. No production deployment, live schema change, secret change, or database branch creation is authorized by this document.
 
+
+
+- Revisione statica storage: l'azione `health` prima restituiva `storage:true` dopo la sola creazione di una signed-upload URL, senza eseguire upload/download reali. La risposta è stata resa più precisa (`storage_control:true`, `signed_upload_url_creation:true`) nel commit `6b9cb7c8c38f51c4b22baf00f8ccaace05509ccb`. Questo non dimostra un round-trip Supabase reale e il commit resta in attesa di CI; non considerare chiuso il gate storage E2E.
+
 ## Release principle
 
 The JavaScript Assistant API PR and Python/Render bot PR are a single release unit. Keep both PRs Draft until the gates below pass with recorded evidence. A green unit-test workflow or Vercel Preview is necessary but not sufficient.
