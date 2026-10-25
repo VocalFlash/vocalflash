@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - assistant-conversation-photo-v1
+  pull_request:
+    branches:
+      - assistant-conversation-photo-v1
   workflow_dispatch:
 
 permissions:
