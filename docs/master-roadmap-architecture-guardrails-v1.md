@@ -656,3 +656,7 @@ Verification update 2026-10-24:
 - **Test aggiunti:** commit `ee9127f480746f83cb301822be153ddbfb993244`, per audio non gestito e comando MultiVocale non gestito.
 - **Verifica:** CI del nuovo head ancora da confermare. Finché non è verde, stato = implementato, non ancora validato.
 - **Non cambia il NO-GO di rilascio:** restano storage E2E, recovery dopo restart, env staging, migrazione/isolamento oggetti legacy e integrazione API-bot-Meta.
+
+### Chiusura gate CI routing — 25 ottobre 2026
+
+La run bot `40237092071` sul commit `ee9127f480746f83cb301822be153ddbfb993244` è `success`, con job `test` completato senza step falliti. Il rischio di fallback legacy per audio/comando non gestito è coperto dai nuovi test automatizzati. Restano aperti i gate di staging e integrazione end-to-end.
