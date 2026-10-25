@@ -864,3 +864,12 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 - **Gate ancora aperti:** test con provider storage reale; download firmato dopo restart effettivo; isolamento/ownership dell'object key; verifica dei percorsi legacy; inventario read-only del namespace Redis precedente.
 - Gli strumenti Render disponibili espongono metadati/servizi/log ma non offrono un'interfaccia read-only per enumerare il keyspace Redis. L'inventario live resta quindi non eseguito; non si presume il namespace vuoto e non si usa `FLUSHDB`.
 - Nessun codice runtime modificato, merge/deploy, cambiamento live o invio WhatsApp reale.
+
+
+## Verifica esatta head API/Preview — 25 ottobre 2026
+
+- Head verificato prima di questo addendum: `15959d5ea30e2d35acf5b8e9210e5ec5146f2ffd`.
+- GitHub Actions run [#40215662915](https://github.com/VocalFlash/vocalflash/actions/runs/40215662915): `success`, tutti e 5 i job superati. Log del quinto job: **98 test, 0 falliti**; tutti gli altri quattro job sono anch'essi `success`.
+- Vercel Preview per lo stesso SHA: `dpl_A6q4UqnpkccNDMMuvfn8X93pECzr`, stato `READY`. Si tratta di build Preview, non di test E2E.
+- Dopo il controllo sono stati aggiunti solo aggiornamenti documentali; il nuovo head documentale va verificato separatamente se si richiede prova CI sull'esatto SHA.
+- PR API #3 e bot #2 restano Draft/non unite. Nessun merge, deploy produzione, modifica live o invio WhatsApp reale.
