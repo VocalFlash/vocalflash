@@ -962,3 +962,11 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 
 ### Stato release
 **NO-GO** invariato. La Preview corrente READY chiude solo il build per quel commit. Nessuna delle verifiche read-only autorizza merge, deploy, modifiche live o messaggi reali.
+
+
+## Correzione di stato dopo gli aggiornamenti documentali — 25 ottobre 2026
+- L'ultimo commit della branch API è ora `22c3cb8a5a80816ff4f6c04d2176d4d892e2bc05`; la Preview Vercel `dpl_AocXz9YMy3GrP4TSgm2ZD8BRwc1y` associata a questo commit risulta **READY**. È build Preview, non target production e non E2E.
+- I tre commit successivi all'audit sono documentali; prima di attribuire loro una nuova prova di runtime, controllare il diff effettivo. Il connettore GitHub per workflow-run sul commit corrente non ha restituito run PR-triggered; ciò non prova che nessun altro workflow sia partito. L'ultimo run bot visibile sul commit `5d80b3802b1184cad4b9fd2b03894b39c6d9fa42` è success e registra 59 test; per l'API la precedente run sul commit `74f60fe3114aaf026a3d5c10666403072340334d` era success con 98 pass / 0 fail e 5/5 job, ma non è un run del nuovo commit documentale.
+- **Nuovo finding Vercel da verificare:** l'inventario env senza valori mostra le variabili Assistant/Storage specifiche come Preview variables associate al branch `assistant-auth-v1`; non risultano associate al branch `assistant-conversation-photo-v1`. Il codice candidato legge `VF_ASSISTANT_SUPABASE_URL`, `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS`. Prima di un test E2E occorre confermare il binding branch/environment e la validità della configurazione senza esporre o copiare segreti. Il build READY da solo non verifica queste variabili.
+- La review statica indica che la health probe ora usa `checkAssistantReadiness` con probe read-only e timeout; inoltre i moduli ingest/coordinator/dispatch usano il helper `supabaseRestHeaders` che distingue `sb_secret_` dalle credenziali JWT legacy. Gli issue #6 e #7 sono stati aggiornati con queste evidenze, ma restano aperti finché i test di accettazione e l'integrazione isolata non sono verificati.
+- Nessun runtime code, ambiente live o segreto è stato modificato in questo ciclo.
