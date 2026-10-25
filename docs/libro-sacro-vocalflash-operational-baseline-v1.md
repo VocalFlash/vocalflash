@@ -789,3 +789,13 @@ Una seconda revisione statica ha individuato una chiave globale residua nel sott
 - Nessun deploy/merge o modifica live.
 
 Questo conferma perché la revisione deve includere anche override e sottoclassi: la correzione resta candidata fino a test effettivi.
+
+
+## Follow-up operativo — 25 ottobre 2026: verifica del gate Python
+
+- Riletto il sottotipo effettivamente importato, `multivocale_runtime_v2_timing.PersistentMultivocaleRuntime`: l'override di scheduling ora usa la chiave due namespaced tramite `self._due_key(config)`; il vecchio write diretto sulla costante globale non compare più nel metodo.
+- Il workflow Python è configurato per push sul branch `assistant-conversation-photo-v1` e per `workflow_dispatch`. La configurazione del trigger non è prova che un run sia partito.
+- Per il commit candidato `3e80f7034205ad6271b411e9394ebabea258f740`, gli status restituiti sono vuoti e non è stato recuperato alcun workflow run. Il tentativo di clone/esecuzione locale è fallito per impossibilità di risolvere `github.com`. **Test sul nuovo head: NOT VERIFIED.**
+- La lease predefinita è 120 s e viene rinnovata da un thread; se il rinnovo fallisce, il thread termina mentre il processing può proseguire fino al successivo controllo/fencing. Aggiungere un test mirato per impedire invio/finalizzazione con lease persa. Non classificare questo rischio come bug riprodotto: è un gate di verifica.
+- Verificare il percorso audio attivo e il ruolo residuo delle strutture legacy in memoria; non fare inferenze basate solo sulla loro dichiarazione in `app.py`.
+- Nessun merge/deploy, modifica Render, invio Meta reale o scrittura database live. Il namespace candidato resta non rilasciato finché non si ottengono suite verde sull'head, test di lease/recovery e piano verificato di drain/migrazione delle chiavi precedenti.
