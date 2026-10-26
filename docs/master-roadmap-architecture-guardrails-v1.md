@@ -693,3 +693,8 @@ La run bot `40237092071` sul commit `ee9127f480746f83cb301822be153ddbfb993244` �
 - Il PASS storico resta valido per il deploy e la configurazione di quel momento. Non è una prova del candidato PR #2/#3: Render staging è ancora sul commit 34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5; il candidato bot ee9127f480746f83cb301822be153ddbfb993244 non è distribuito e include la verifica HMAC Meta e routing aggiornato.
 - Log Render dal 23 al 26 ottobre: zero righe restituite; ultimo evento deploy riuscito il 4 ottobre. Non interpretare l'assenza di log come guasto o come readiness.
 - La roadmap deve quindi tenere separati E2E storico PASS e E2E candidato NOT RUN; prima del test candidato servono branch/env scoped e Meta App Secret corretti, senza toccare callback o produzione.
+
+
+## Gate sicurezza conferma — dettaglio aggiuntivo 26 ottobre 2026
+
+La RPC live vf_record_owner_command_confirmation_v1, in caso di conflitto su work_events_external_message_uidx (business_channel_id, external_message_id), recupera l'evento esistente senza confrontare event_type, membro, proposal_event_id e source event con la richiesta corrente. Aggiungere alla remediation atomica una distinzione tra replay identico e replay conflittuale; la sola risposta CONFIRMATION_EXISTS non deve autorizzare una write. Testare collisioni stesso ID/differente proposta, membro e tipo evento. Nessuna patch live: attendere fonte autorevole delle 15 migrazioni e database isolato riproducibile.
