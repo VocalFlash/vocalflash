@@ -580,3 +580,26 @@ Il recupero dei 15 corpi SQL dal registro Supabase è riuscito e i file sono ver
 ## Verifica finale corpi migrazione — 26 ottobre 2026
 
 Verifica diretta conclusa: **15/15 file SQL coincidono esattamente** con il corrispondente statements[1] del registro Supabase live (versione e nome abbinati), con lunghezze e Git blob SHA-1 coerenti. CI sul commit ef89c1274fc7d749aa3af10bf9a0413607a21451 ha superato il controllo automatico dell'inventario e la suite focalizzata. Resta solo il gate distinto del baseline precedente alla prima migrazione e del replay isolato; nessun SQL è stato eseguito.
+
+
+## Rilettura canonica e piano conferma titolare — 26 ottobre 2026, revisione serale
+
+### Stato già verificato, da non ripetere
+- Il runtime owner-command intercetta la frase esplicita di conferma e restituisce ATOMIC_CONFIRMATION_NOT_ENABLED prima di persistence, interpretazione o scritture. È il fail-closed corretto e deve restare attivo.
+- Le RPC live vf_commit_owner_note_v1 e vf_commit_owner_schedule_action_v1 accettano p_confirmed e p_proposal_event_id, ma non dimostrano validazione, lock, scadenza e consumo monouso dell'evento di conferma nella stessa transazione della write.
+- La RPC vf_record_owner_command_confirmation_v1 ha un difetto di replay: in caso di conflitto sull'indice univoco (business_channel_id, external_message_id), recupera un evento per quei due campi e restituisce CONFIRMATION_EXISTS senza confrontare business, membro, tipo evento, proposta e source event.
+- I 15 corpi delle migrazioni registrate sono stati recuperati e confrontati direttamente col registro Supabase: 15/15 corrispondenze esatte; validatore e test focalizzati CI verdi. Sono migrazioni incrementali, non il baseline iniziale.
+- Nessuna migrazione live, modifica dati/schema, branch Supabase a pagamento, merge o deploy è stato eseguito per questo lavoro.
+
+### Piano vincolante per la conferma
+1. Recuperare il baseline pre-2026-10-01 o uno snapshot schema completo e revisionato; ricostruire il database in ambiente isolato e dimostrare replay e parità di schema/funzioni. Non inventare semantiche di colonne o TTL.
+2. Mappare gli eventi/proposte effettivamente presenti: campi, payload, stati, eventuali scadenze, chiavi d'idempotenza, vincoli univoci, grants e chiamanti. Scegliere e documentare la durata massima di validità della proposta/conferma in base a una regola di prodotto esplicita; non dedurla dal codice esistente.
+3. Correggere la RPC di registrazione: in conflitto, REPLAY_MATCH soltanto se business, membro, canale, event_type, proposal_event_id, source event e identità dell'evento corrispondono tutti; altrimenti REPLAY_CONFLICT/DENIED, senza autorizzare la write. CONFIRMATION_EXISTS non può valere come autorizzazione.
+4. Creare una singola RPC transazionale di commit (o un contratto transazionale equivalente) per note e azioni pianificate: lock della proposta e della conferma; verifica di mittente/canale verificati, business/membro, tipo e payload dell'azione, proposta ancora valida, conferma esplicita e non scaduta; consumo monouso; write e stato idempotente nella stessa transazione. Nessuna chiamata WhatsApp in uscita dentro la transazione: delivery tramite outbox durevole.
+5. Mantenere i privilegi solo per i ruoli server autorizzati e rifiutare fail-closed ogni parametro di conferma proveniente dal chiamante non supportato da un evento valido.
+6. Testare prima su DB isolato: conferma mancante/scaduta; proposta scaduta; business/membro/canale/proposta/source event errati; azione o payload diverso dalla proposta; replay identico; stesso external ID con proposta/membro/tipo evento diverso; doppia conferma concorrente; retry dopo commit; rollback senza effetti; grant non autorizzati. Verificare esattamente zero effetti per i casi negati e un solo effetto per la conferma valida.
+7. Solo dopo test SQL/RPC e revisione, preparare una migrazione forward versionata e testarla in ambiente isolato. Non applicarla al progetto live senza autorizzazione esplicita.
+8. Integrare il runtime JS e i contratti bot/API; rimuovere il blocco ATOMIC_CONFIRMATION_NOT_ENABLED soltanto quando la nuova RPC è usata realmente e l'intera matrice è PASS. Quindi E2E staging Meta → proposta → conferma → write → risposta; PR #2/#3 restano coordinate e Draft finché i gate non passano.
+
+### Prossimo lavoro indipendente
+Mentre il baseline viene recuperato, continuare l'analisi read-only di schema, payload e test esistenti e preparare la matrice di test/contratto, senza modificare SQL live, segreti, configurazioni, deploy o inviare messaggi. Non ripetere il confronto dei 15 SQL: è già PASS.
