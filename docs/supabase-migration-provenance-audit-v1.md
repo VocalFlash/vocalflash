@@ -71,3 +71,8 @@ The live schema inventory again showed the 15 public tables documented above; Su
 - Questo è recupero dal registro delle migrazioni effettivamente applicate, non prova che sia stata recuperata la formattazione del file originale conservato dallo sviluppatore. La riproducibilità resta da dimostrare con replay completo in un database isolato e confronto dello schema/funzioni risultanti; non dichiarare ancora il gate pienamente chiuso.
 - Non eseguire questi file sul progetto live: il loro scopo è ricostruire la cronologia versionata e consentire una futura replay controllata. Nessuna migrazione è stata applicata, nessun branch di sviluppo è stato creato e nessun dato/schema è stato modificato.
 - Il gate atomico della conferma titolare resta aperto: il recupero della cronologia non risolve i difetti già descritti nell'audit, incluso il replay che non confronta tutti gli identificatori e la mancata validazione/consumazione atomica nella write RPC.
+
+
+## Scope limitation found during recovery — 26 October 2026
+
+The recovered 15 SQL bodies are the incremental statements recorded by the live migration registry, but they are not a standalone initial schema baseline. Multiple statements alter or reference core public tables/functions that already existed before version 20261001181622. Consequently, the SQL files restore the registered incremental history but do not by themselves enable a clean install/replay from an empty database. The original pre-registry baseline (or a reviewed equivalent reconstructed from a schema snapshot) remains missing. Keep the replayability gate open until that baseline is recovered and the combined sequence is replayed and compared in an isolated environment.

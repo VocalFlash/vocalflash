@@ -703,3 +703,8 @@ La RPC live vf_record_owner_command_confirmation_v1, in caso di conflitto su wor
 ## Recupero migrazioni Supabase dal registro live — 26 ottobre 2026
 
 Sono stati recuperati in sola lettura i 15 corpi SQL conservati in supabase_migrations.schema_migrations.statements e ricostruiti come file versionati in supabase/migrations. Il manifest registra SHA-256 e lunghezza dei corpi. Nessun SQL è stato eseguito. La provenienza è ora ricostruita dal registro applicato, ma non ancora validata con replay completo in un database isolato; il gate di riproducibilità resta aperto fino a quel confronto. Non creare branch a pagamento o applicare migrazioni live senza autorizzazione. La conferma titolare resta fail-closed e non è risolta da questo recupero.
+
+
+## Baseline database — stato aggiornato 26 ottobre 2026
+
+Le 15 migrazioni incrementali sono state recuperate dal registro live, versionate e corredate di manifest SHA-256 con validazione automatica in CI. Non costituiscono però un bootstrap schema: alterano/riutilizzano oggetti core che precedono la prima versione registrata. La roadmap resta bloccata sul recupero del baseline pre-2026-10-01 e sul replay isolato comparativo; nessun DDL live va applicato.

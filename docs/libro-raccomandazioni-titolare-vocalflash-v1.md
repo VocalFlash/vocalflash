@@ -570,3 +570,8 @@ Confermata verde la CI bot run `40237092071` sul commit `ee9127f480746f83cb30182
 ## Recupero migrazioni Supabase dal registro live — 26 ottobre 2026
 
 Sono stati recuperati in sola lettura i 15 corpi SQL conservati in supabase_migrations.schema_migrations.statements e ricostruiti come file versionati in supabase/migrations. Il manifest registra SHA-256 e lunghezza dei corpi. Nessun SQL è stato eseguito. La provenienza è ora ricostruita dal registro applicato, ma non ancora validata con replay completo in un database isolato; il gate di riproducibilità resta aperto fino a quel confronto. Non creare branch a pagamento o applicare migrazioni live senza autorizzazione. La conferma titolare resta fail-closed e non è risolta da questo recupero.
+
+
+## Precisazione sulla provenienza SQL — 26 ottobre 2026
+
+Il recupero dei 15 corpi SQL dal registro Supabase è riuscito e i file sono versionati nel branch candidato con manifest e controllo SHA-256 in CI. Tuttavia sono migrazioni incrementali: presuppongono tabelle/funzioni core preesistenti alla prima versione registrata. Non costituiscono da sole un baseline di installazione pulita. Prima di chiudere il gate occorre recuperare il baseline precedente o uno snapshot schema equivalente verificato e riprodurre l'intera sequenza in ambiente isolato.

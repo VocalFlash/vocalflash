@@ -246,3 +246,8 @@ Questi test sono NOT RUN; la funzione live non è stata modificata.
 ## Recupero migrazioni Supabase dal registro live — 26 ottobre 2026
 
 Sono stati recuperati in sola lettura i 15 corpi SQL conservati in supabase_migrations.schema_migrations.statements e ricostruiti come file versionati in supabase/migrations. Il manifest registra SHA-256 e lunghezza dei corpi. Nessun SQL è stato eseguito. La provenienza è ora ricostruita dal registro applicato, ma non ancora validata con replay completo in un database isolato; il gate di riproducibilità resta aperto fino a quel confronto. Non creare branch a pagamento o applicare migrazioni live senza autorizzazione. La conferma titolare resta fail-closed e non è risolta da questo recupero.
+
+
+## Nota sul gate migrazioni — aggiornamento 26 ottobre 2026
+
+I 15 corpi incrementali registrati sono stati recuperati dal registro Supabase e versionati, con manifest SHA-256 e controllo automatico di nomi, ordine, lunghezze e checksum in CI. Non sono una baseline autonoma: alcuni riferiscono tabelle/funzioni create prima del primo record. Il Gate di replay resta BLOCKED finché il baseline preesistente non è recuperato e l'intera sequenza non è riprodotta e confrontata in un database isolato. Nessun SQL è stato eseguito in questo recupero.

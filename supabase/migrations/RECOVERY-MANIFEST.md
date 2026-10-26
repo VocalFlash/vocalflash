@@ -23,3 +23,8 @@ The registry reported one stored SQL statement per version and no rollback state
 | 20261002165149 | customer_whatsapp_ingest_v1 | 20261002165149_customer_whatsapp_ingest_v1.sql | 5486 | 9c0de794ea8755f58a3093cb0b78914e0420f92f7850352c2885557a3d73d596 |
 | 20261003080614 | new_work_write_path_exactly_once_v1 | 20261003080614_new_work_write_path_exactly_once_v1.sql | 10065 | e749874a16c14df1da0619c0484e863dc3f898026b364a5ca0dad649ea6a1208 |
 | 20261004213059 | customer_whatsapp_replay_conflict_v1 | 20261004213059_customer_whatsapp_replay_conflict_v1.sql | 6323 | ff17db755c8fbc006e9efcb5483f3e35dc40abcbd7236c8f6bbee5865291a98e |
+
+
+## Scope limitation — not a standalone bootstrap baseline
+
+These 15 registry entries are incremental migrations, not the complete initial schema: several statements alter or define functions against public tables and helper objects that pre-date the first registered version. Therefore, these files alone must not be treated as a clean-install baseline or replayed into an empty PostgreSQL instance. A faithful isolated replay requires recovering/constructing and reviewing the pre-2026-10-01 baseline first, then applying these 15 files in order and comparing the resulting schema/functions. This baseline gap remains open.
