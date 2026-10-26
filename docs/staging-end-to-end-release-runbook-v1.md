@@ -228,3 +228,16 @@ La ricerca dei log Render per 23–26 ottobre 2026 ha restituito zero righe e l'
 - [PASS storico, vecchio deploy] Webhook/audio/risposta WhatsApp e MultiVocale due audio.
 - [NOT RUN sul candidato corrente] firma Meta HMAC in staging, storage scoped round-trip, restart/recovery e test combinato aggiornato.
 - Prima del test aggiornato: configurare branch Preview e scope storage corretti, verificare META_APP_SECRET nello staging e confermare che il destinatario sia il numero di test autorizzato; nessun callback Meta o produzione va modificato.
+
+
+## Nuovi casi obbligatori per Gate C — replay della conferma titolare
+
+La verifica read-only del 26 ottobre ha individuato che la RPC di registrazione della conferma, quando incontra un conflitto sull'indice (business_channel_id, external_message_id), può restituire CONFIRMATION_EXISTS senza verificare che l'evento esistente abbia lo stesso event_type, business member, proposal_event_id e source event della richiesta.
+
+Aggiungere prima del rilascio:
+- [ ] Ripetizione identica di una conferma: risposta di replay senza nuovo effetto.
+- [ ] Stesso external message ID ma proposal_event_id diverso: REPLAY_CONFLICT/DENIED, nessuna write.
+- [ ] Stesso ID ma membro diverso o event_type diverso: fail-closed, nessuna write.
+- [ ] Verifica che CONFIRMATION_EXISTS da sola non autorizzi il commit.
+- [ ] Concorrenza e consumo singolo della conferma nella stessa transazione della write.
+Questi test sono NOT RUN; la funzione live non è stata modificata.
