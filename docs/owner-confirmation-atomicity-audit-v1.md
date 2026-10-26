@@ -93,3 +93,8 @@ Required correction in the future isolated, authoritative migration:
 
 ### Stato
 NO-GO conferma titolare. I punti sopra sono piano operativo, non implementazione completata. Non è stata eseguita alcuna scrittura SQL live.
+
+
+## Riscontro schema live aggiuntivo — 26 ottobre 2026, sola lettura
+
+L'inventario delle colonne di public.work_events conferma che la tabella ha occurred_at e created_at, ma non una colonna dedicata expires_at o consumed_at. Le proposte/conferme sono eventi con payload JSONB. Questo non prova che nel payload non esista alcuna convenzione, quindi prima di implementare occorre cercare e validare le convenzioni effettive nei payload e in tutti i chiamanti; non inventare una scadenza o uno stato di consumo. Se il modello attuale non offre una rappresentazione affidabile di scadenza/consumo, la migrazione forward dovrà introdurre un modello esplicito e atomico, provato soltanto nel database isolato. Nessuna scrittura è stata eseguita.
