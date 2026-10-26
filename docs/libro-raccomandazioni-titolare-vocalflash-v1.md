@@ -529,3 +529,14 @@ Confermata verde la CI bot run `40237092071` sul commit `ee9127f480746f83cb30182
 - Le CI verdi non equivalgono a test live. Restano NON ESEGUITI: round-trip reale Supabase Storage e test cross-scope live, prova di recupero dopo riavvio Render, test webhook Meta con firme reali e flusso combinato WhatsApp end-to-end.
 - Storage scoped: pianificare compatibilità/migrazione delle chiavi legacy prima del deploy; il nuovo formato rifiuta le chiavi non scoped. Verificare anche che le variabili Preview siano associate al branch candidato corretto.
 - PR #3 (Assistant API) e PR #2 (bot) restano Draft/non unite; nessun merge o deploy di produzione autorizzato. Release NO-GO fino al superamento dei gate live. Nessuna nuova risorsa a pagamento, modifica di secret o operazione distruttiva eseguita.
+
+
+## Verifica e raccomandazioni supplementari — 26 ottobre 2026
+
+- Continuare in autonomia su verifiche read-only, test locali/CI e documentazione; non fermarsi soltanto perché un ambiente esterno è bloccato. Riunire in fondo le azioni che richiedono il titolare.
+- Stato CI riconfermato: bot commit `ee9127f480746f83cb301822be153ddbfb993244`, run `40237092071` success; Assistant API code head `77ecff859726656a39d2e7b946cd22f96ed7e3fc`, run `40237237326`, cinque job success. Non attribuire a queste run prove live che non hanno eseguito.
+- Stato ambiente Supabase riletto in modalità read-only: progetto `tkfyfqgtumoeywlqzmdt` ACTIVE_HEALTHY; 15 migrazioni registrate; nessun branch di sviluppo. Non applicare migrazioni o creare branch a pagamento senza autorizzazione esplicita e senza prima riconciliare le 15 migrazioni con le fonti SQL versionate.
+- Vercel: deployment Preview READY sul commit documentale `8f8a225433515209fc19ecbd5404201289c4547b`; anche il commit di codice API `77ecff859726656a39d2e7b946cd22f96ed7e3fc` risulta associato a una Preview READY. Preview READY non prova test funzionali, segreti corretti, storage live o flusso WhatsApp completo.
+- Render: la lettura dei servizi è bloccata perché l'integrazione richiede un workspace esplicitamente confermato. Non selezionare autonomamente un workspace e non effettuare azioni su servizi finché il titolare non conferma quale workspace usare.
+- Gate critici non risolti: conferma atomica del titolare (`ATOMIC_CONFIRMATION_NOT_ENABLED` e RPC che non vincolano/consumano atomicamente l'evento di conferma), provenienza delle 15 migrazioni, test storage reali, recupero Render dopo riavvio, firme Meta live e test end-to-end. Non tentare di correggere la conferma atomica direttamente sul database live senza una fonte migrazione autorevole e un ambiente isolato.
+- Le due PR restano Draft/non unite e formano una sola unità di rilascio. Nessun merge, deploy produzione, cambio di segreti, modifica di schema/dati live, invio WhatsApp o risorsa a pagamento eseguito in questa sessione.
