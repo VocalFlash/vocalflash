@@ -184,3 +184,34 @@ La run bot `40237092071` sul commit `ee9127f480746f83cb301822be153ddbfb993244` �
 - Vercel: deployment Preview READY sul branch candidato, head documentale `8f8a225433515209fc19ecbd5404201289c4547b`; Preview del codice API `77ecff859726656a39d2e7b946cd22f96ed7e3fc` anch'essa READY. Sono build Preview, non test E2E né produzione.
 - Render: i controlli read-only dei servizi non sono stati eseguiti perché l'integrazione richiede un `workspaceId` esplicitamente scelto dal titolare. Non selezionare autonomamente il workspace e non eseguire operazioni Render finché non è confermato.
 - Nessuna prova reale Supabase Storage, restart Render o Meta/WhatsApp E2E è stata eseguita in questa sessione. Non dichiararle superate. Nessun merge, deploy di produzione, cambio di segreti, scrittura SQL o operazione distruttiva è stata eseguita.
+
+
+## Riconciliazione ambiente effettivo — 26 ottobre 2026
+
+### Render — configurazione corrente letta in sola lettura
+- Workspace: My Workspace (tea-dadhee67bikc73c68s40).
+- Servizio staging: vocalflash-bot-staging (srv-db03iaid0e5s739vhj0g), URL https://vocalflash-bot-staging.onrender.com, branch multivocale-runtime-v2, start gunicorn app_customer:app, auto-deploy disabilitato.
+- Deploy live corrente: 34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5 del 4 ottobre 2026. Non è il candidato bot ee9127f480746f83cb301822be153ddbfb993244. Nessun deploy è stato avviato.
+- Produzione vocalflash-bot è separata su main; non usare per test.
+
+### Vercel — variabili branch-specifiche
+- Il filtro per il branch assistant-conversation-photo-v1 non ha restituito variabili dedicate.
+- Nell'inventario generale, VOCALFLASH_ASSISTANT_API_KEYS, VF_ASSISTANT_SUPABASE_URL, VF_ASSISTANT_SUPABASE_SECRET_KEY, VF_MULTIVOCALE_STORAGE_BUCKET risultano Preview associati al branch assistant-auth-v1, non al branch candidato.
+- VOCALFLASH_ASSISTANT_API_KEY_SCOPES non è comparsa nell'inventario. La storage API attuale richiede questo mapping JSON per hash SHA-256 della chiave; se assente/malformato restituisce 503 fail-closed. Nessun valore segreto è stato decrittato o cambiato.
+- Gate A ambiente: BLOCKED fino a una configurazione branch-specifica verificata, con scope distinti e senza riutilizzare chiavi tra staging e produzione. Preparare la modifica solo dopo approvazione del titolare; non inserire valori segreti in Git o in questo documento.
+
+### CI e Preview correnti
+- API PR #3 head a12364b2fa06bf737a839222b6e5931c838d8842: run 40376454322, cinque job success; Preview Vercel READY.
+- Bot PR #2 head ee9127f480746f83cb301822be153ddbfb993244: run 40237092071, job test success.
+- Questi risultati non chiudono alcun gate E2E.
+
+### Supabase migration provenance
+La registry contiene gli stessi 15 record descritti sopra; non esiste un branch di sviluppo. La ricerca dei nomi distintivi delle migrazioni non ha trovato la sequenza SQL autorevole nei risultati accessibili. Non applicare DDL o creare migrazioni sintetiche: recuperare prima la fonte originale, confrontare le definizioni e preparare un replay isolato.
+
+### Gate aggiornati
+- [PASS] CI API e bot sui commit sopra indicati.
+- [PASS] Preview Vercel sul head API documentale corrente.
+- [BLOCKED] Configurazione Vercel branch-specifica per il candidato e mapping storage scope.
+- [BLOCKED] Deploy del candidato su staging (nessun deploy avviato; auto-deploy disabilitato).
+- [BLOCKED] Conferma atomica, fonte migrazioni, storage round-trip reale, recovery restart, Meta signature live e flusso end-to-end.
+- Nessun merge, deploy, modifica env/secret, scrittura Supabase o invio WhatsApp è stato eseguito.
