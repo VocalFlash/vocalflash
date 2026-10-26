@@ -13,7 +13,7 @@ The JavaScript Assistant API PR and Python/Render bot PR are a single release un
 
 ## Preconditions — do not start a live WhatsApp test until all are true
 
-- [ ] Confirm the exact Render staging service/workspace and the dedicated Meta test app/phone number. Do not infer that the production number is a test number.
+- [x] Render workspace/service identified from prior chat and verified read-only on 26 October: My Workspace → vocalflash-bot-staging, branch multivocale-runtime-v2. The dedicated Meta test setup was previously used successfully on 4 October; revalidate that the same test app/recipient is still configured before the next live test. Never use the production number.
 - [ ] Confirm the Assistant API Preview/staging URL is protected as intended and reachable only by the bot/service credentials.
 - [ ] Confirm staging has the matching Meta App Secret, WhatsApp token/phone ID/verify token, Redis URL, Assistant API URL/key, Supabase URL/key, and transcription key configured in the correct secret stores. Never copy secret values into this runbook, issues, logs, or chat.
 - [ ] Confirm startup readiness reports each dependency as healthy; do not expose secrets or customer message content in diagnostics.
@@ -182,7 +182,7 @@ La run bot `40237092071` sul commit `ee9127f480746f83cb301822be153ddbfb993244` �
 - Supabase project `tkfyfqgtumoeywlqzmdt`: stato `ACTIVE_HEALTHY`; registry migrazioni confermata a 15 record (dal 2026-10-01 al 2026-10-04); nessun branch di sviluppo. Nessuna migrazione applicata e nessun dato modificato.
 - Riconfermata la criticità di conferma atomica leggendo le definizioni live delle RPC `vf_commit_owner_note_v1` e `vf_commit_owner_schedule_action_v1`: i percorsi di commit verificano il booleano `p_confirmed` e la proposta, ma non risultano validare e consumare atomicamente il corrispondente evento `owner_command_confirmation`. Il runtime applicativo continua correttamente a fallire chiuso con `ATOMIC_CONFIRMATION_NOT_ENABLED`. Gate di rilascio bloccante, da correggere solo con migrazione SQL autorevole in ambiente isolato.
 - Vercel: deployment Preview READY sul branch candidato, head documentale `8f8a225433515209fc19ecbd5404201289c4547b`; Preview del codice API `77ecff859726656a39d2e7b946cd22f96ed7e3fc` anch'essa READY. Sono build Preview, non test E2E né produzione.
-- Render: i controlli read-only dei servizi non sono stati eseguiti perché l'integrazione richiede un `workspaceId` esplicitamente scelto dal titolare. Non selezionare autonomamente il workspace e non eseguire operazioni Render finché non è confermato.
+- Render: nota superata dalla riconvalida read-only del 26 ottobre 2026. Workspace e servizi sono stati identificati e verificati senza modifiche; il deploy live e i gate di staging sono descritti nell'addendum successivo.
 - Nessuna prova reale Supabase Storage, restart Render o Meta/WhatsApp E2E è stata eseguita in questa sessione. Non dichiararle superate. Nessun merge, deploy di produzione, cambio di segreti, scrittura SQL o operazione distruttiva è stata eseguita.
 
 
