@@ -685,3 +685,11 @@ La run bot `40237092071` sul commit `ee9127f480746f83cb301822be153ddbfb993244` �
 - CI corrente: API head documentale a12364b2fa06bf737a839222b6e5931c838d8842, run 40376454322, cinque job success; bot head ee9127f480746f83cb301822be153ddbfb993244, run 40237092071, success. Preview Vercel del nuovo head API è READY. Questi risultati non sono E2E.
 - Supabase: 15 migrazioni note, nessun branch di sviluppo; le ricerche per due nomi di migrazione distintivi non hanno recuperato fonti SQL autorevoli. Il blocco è di provenienza/riproducibilità, non autorizza a generare una falsa baseline.
 - Sequenza dipendenze: recupero fonte migrazioni → ambiente isolato riproducibile senza costi non approvati → correzione atomica e testata della conferma → piano oggetti legacy + configurazione storage scoped → deploy solo staging autorizzato → test storage, restart/recovery, firma Meta e cinque prove E2E tracciabili → revisione congiunta PR #3/#2. Nessuna promozione a produzione prima del superamento di tutti i gate.
+
+
+## Distinzione E2E storico vs candidato — 26 ottobre 2026
+
+- Le conversazioni precedenti attestano un E2E PASS il 4 ottobre sul vecchio deploy staging: webhook ricevuto, audio 14.684 byte, VocalFlash API HTTP 200, 1 credito consumato, risposta WhatsApp HTTP 200; anche MultiVocale con due audio e API HTTP 200. Mancano message ID/provider ID.
+- Il PASS storico resta valido per il deploy e la configurazione di quel momento. Non è una prova del candidato PR #2/#3: Render staging è ancora sul commit 34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5; il candidato bot ee9127f480746f83cb301822be153ddbfb993244 non è distribuito e include la verifica HMAC Meta e routing aggiornato.
+- Log Render dal 23 al 26 ottobre: zero righe restituite; ultimo evento deploy riuscito il 4 ottobre. Non interpretare l'assenza di log come guasto o come readiness.
+- La roadmap deve quindi tenere separati E2E storico PASS e E2E candidato NOT RUN; prima del test candidato servono branch/env scoped e Meta App Secret corretti, senza toccare callback o produzione.
