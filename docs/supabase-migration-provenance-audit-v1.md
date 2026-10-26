@@ -76,3 +76,8 @@ The live schema inventory again showed the 15 public tables documented above; Su
 ## Scope limitation found during recovery — 26 October 2026
 
 The recovered 15 SQL bodies are the incremental statements recorded by the live migration registry, but they are not a standalone initial schema baseline. Multiple statements alter or reference core public tables/functions that already existed before version 20261001181622. Consequently, the SQL files restore the registered incremental history but do not by themselves enable a clean install/replay from an empty database. The original pre-registry baseline (or a reviewed equivalent reconstructed from a schema snapshot) remains missing. Keep the replayability gate open until that baseline is recovered and the combined sequence is replayed and compared in an isolated environment.
+
+
+## Exact-body verification — 26 October 2026
+
+The 15 reconstructed files were each compared directly to the matching live supabase_migrations.schema_migrations.statements[1] value, keyed by exact version and name. Result: **15/15 exact matches**, matching lengths and Git blob SHA-1 checksums. CI run 40381380389 passed the recovered-source inventory validator and focused API test matrix on commit ef89c1274fc7d749aa3af10bf9a0413607a21451. The remaining migration gate is not file fidelity: it is the missing pre-registry bootstrap baseline and isolated replay/schema comparison.

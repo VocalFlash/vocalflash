@@ -708,3 +708,8 @@ Sono stati recuperati in sola lettura i 15 corpi SQL conservati in supabase_migr
 ## Baseline database — stato aggiornato 26 ottobre 2026
 
 Le 15 migrazioni incrementali sono state recuperate dal registro live, versionate e corredate di manifest Git blob SHA-1 con validazione automatica in CI. Non costituiscono però un bootstrap schema: alterano/riutilizzano oggetti core che precedono la prima versione registrata. La roadmap resta bloccata sul recupero del baseline pre-2026-10-01 e sul replay isolato comparativo; nessun DDL live va applicato.
+
+
+## Stato verifica migrazioni — 26 ottobre 2026
+
+La verifica byte/stringa dei corpi SQL rispetto al registro live è conclusa: **15/15 exact match** su statements[1] per versione/nome, lunghezze e Git blob SHA-1. Il validator automatico e i test focalizzati API sono passati in CI sul commit ef89c1274fc7d749aa3af10bf9a0413607a21451. Il residuo è recuperare il baseline pre-registro e dimostrare replay/schema parity in un database isolato, non recuperare di nuovo questi 15 file.

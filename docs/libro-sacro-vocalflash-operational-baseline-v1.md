@@ -1129,3 +1129,8 @@ Sono stati recuperati in sola lettura i 15 corpi SQL conservati in supabase_migr
 ## Limite residuo del recupero migrazioni — 26 ottobre 2026
 
 I 15 corpi SQL registrati sono stati recuperati e versionati, ma sono incrementali e presuppongono oggetti core già presenti prima della prima versione registrata (2026-10-01). Non bastano per una nuova installazione pulita. La provenienza delle migrazioni registrate è migliorata, ma il gate di riproducibilità resta aperto finché non si recupera il baseline preesistente e non si esegue un replay completo in un database isolato, seguito da confronto di schema e funzioni.
+
+
+## Verifica esatta migrazioni — 26 ottobre 2026
+
+Tutti i 15 file SQL recuperati sono stati confrontati direttamente con il corrispondente valore statements[1] nel registro Supabase live, abbinando versione e nome: **15/15 exact match**. Lunghezze e Git blob SHA-1 corrispondono al manifest; CI sul commit ef89c1274fc7d749aa3af10bf9a0413607a21451 ha passato validatore e suite API focalizzata. La provenienza dei 15 corpi incrementali è quindi verificata rispetto al registro applicato. Resta aperto il baseline schema preesistente e il replay isolato; nessuna migrazione è stata applicata.

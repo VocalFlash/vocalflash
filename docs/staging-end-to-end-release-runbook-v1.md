@@ -251,3 +251,10 @@ Sono stati recuperati in sola lettura i 15 corpi SQL conservati in supabase_migr
 ## Nota sul gate migrazioni — aggiornamento 26 ottobre 2026
 
 I 15 corpi incrementali registrati sono stati recuperati dal registro Supabase e versionati, con manifest Git blob SHA-1 e controllo automatico di nomi, ordine, lunghezze e checksum in CI. Non sono una baseline autonoma: alcuni riferiscono tabelle/funzioni create prima del primo record. Il Gate di replay resta BLOCKED finché il baseline preesistente non è recuperato e l'intera sequenza non è riprodotta e confrontata in un database isolato. Nessun SQL è stato eseguito in questo recupero.
+
+
+## Verifica provenienza SQL — esito del confronto diretto
+
+- [PASS] 15/15 file migration confrontati direttamente con statements[1] del registro Supabase live, per versione e nome: corpi esattamente uguali, lunghezze e Git blob SHA-1 coerenti.
+- [PASS] CI run 40381380389: validatore migrazioni e suite API focalizzata verdi sul commit ef89c1274fc7d749aa3af10bf9a0413607a21451.
+- [BLOCKED] Baseline schema precedente alla prima migrazione e replay completo in ambiente isolato. Non eseguire i file sul progetto live e non considerare questo confronto come prova di clean install.

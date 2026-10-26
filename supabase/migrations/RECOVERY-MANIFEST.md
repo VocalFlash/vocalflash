@@ -27,3 +27,8 @@ The registry reported one stored SQL statement per version and no rollback state
 ## Scope limitation — not a standalone bootstrap baseline
 
 These 15 registry entries are incremental migrations, not the complete initial schema: several statements alter or define functions against public tables and helper objects that pre-date the first registered version. Therefore, these files alone must not be treated as a clean-install baseline or replayed into an empty PostgreSQL instance. A faithful isolated replay requires recovering/constructing and reviewing the pre-2026-10-01 baseline first, then applying these 15 files in order and comparing the resulting schema/functions. This baseline gap remains open.
+
+
+## Exact comparison completed — 26 October 2026
+
+All 15 files were compared directly with the matching live registry value statements[1], using the exact version and migration name. Result: **15/15 exact matches**, with matching lengths. GitHub blob SHA-1 values match the manifest, and the automated inventory/checksum validator passed in CI on commit ef89c1274fc7d749aa3af10bf9a0413607a21451. This proves fidelity to the recorded applied SQL bodies, but does not supply the missing pre-registry bootstrap schema or prove a clean isolated replay.

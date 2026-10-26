@@ -575,3 +575,8 @@ Sono stati recuperati in sola lettura i 15 corpi SQL conservati in supabase_migr
 ## Precisazione sulla provenienza SQL — 26 ottobre 2026
 
 Il recupero dei 15 corpi SQL dal registro Supabase è riuscito e i file sono versionati nel branch candidato con manifest e controllo Git blob SHA-1 in CI. Tuttavia sono migrazioni incrementali: presuppongono tabelle/funzioni core preesistenti alla prima versione registrata. Non costituiscono da sole un baseline di installazione pulita. Prima di chiudere il gate occorre recuperare il baseline precedente o uno snapshot schema equivalente verificato e riprodurre l'intera sequenza in ambiente isolato.
+
+
+## Verifica finale corpi migrazione — 26 ottobre 2026
+
+Verifica diretta conclusa: **15/15 file SQL coincidono esattamente** con il corrispondente statements[1] del registro Supabase live (versione e nome abbinati), con lunghezze e Git blob SHA-1 coerenti. CI sul commit ef89c1274fc7d749aa3af10bf9a0413607a21451 ha superato il controllo automatico dell'inventario e la suite focalizzata. Resta solo il gate distinto del baseline precedente alla prima migrazione e del replay isolato; nessun SQL è stato eseguito.
