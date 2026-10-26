@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import {createClient} from "@supabase/supabase-js";
 
-const OBJECT_RE=/^tmp\/[0-9a-f-]{36}\/[0-9a-f]{64}\.(ogg|mp3|m4a|wav|webm|flac)$/i;
+const OBJECT_RE=/^tmp\/[0-9a-f-]{36}\/[0-9a-f-]{36}\/[0-9a-f]{64}\.(ogg|mp3|m4a|wav|webm|flac)$/i;
 const UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function assistantKeys(){
@@ -9,6 +9,26 @@ function assistantKeys(){
     .split(",")
     .map(v=>v.trim())
     .filter(Boolean);
+}
+
+function assistantScopeForKey(key){
+  let mappings;
+  try {
+    mappings=JSON.parse(process.env.VOCALFLASH_ASSISTANT_API_KEY_SCOPES||"{}");
+  } catch {
+    return "";
+  }
+  if(!mappings||typeof mappings!=="object"||Array.isArray(mappings))return "";
+  const digest=crypto.createHash("sha256").update(key).digest("hex");
+  const scope=mappings[digest];
+  if(typeof scope!=="string"||! /^[a-z0-9][a-z0-9._-]{1,63}$/.test(scope))return "";
+  if(Object.values(mappings).filter(value=>value===scope).length!==1)return "";
+  return scope;
+}
+
+function scopeSegment(scope){
+  const hex=crypto.createHash("sha256").update("vocalflash-storage-scope:"+scope).digest("hex").slice(0,32);
+  return hex.slice(0,8)+"-"+hex.slice(8,12)+"-4"+hex.slice(13,16)+"-a"+hex.slice(17,20)+"-"+hex.slice(20,32);
 }
 
 function clean(v,max=512){
@@ -56,6 +76,10 @@ export default async function handler(req,res){
   if(!key||typeof key!=="string"||valid.length===0||!valid.includes(key)){
     return res.status(401).json({error:"Assistant API Key non valida"});
   }
+  const scope=assistantScopeForKey(key);
+  if(!scope)return res.status(503).json({error:"Scope credenziale storage non configurato"});
+  const scopeId=scopeSegment(scope);
+  const ownsObjectKey=value=>validObjectKey(value)&&value.split("/")[1]===scopeId;
 
   const {url,secret,bucket}=storageConfig();
   if(!url||!secret||!bucket){
@@ -68,14 +92,15 @@ export default async function handler(req,res){
 
   try{
     if(action==="health"){
-      const healthKey=`health/${crypto.randomUUID()}.ogg`;
+      const healthKey=`health/${scopeId}/${crypto.randomUUID()}.ogg`;
       const {data,error}=await store.createSignedUploadUrl(healthKey,{upsert:false});
       if(error)throw error;
       if(!data?.signedUrl)throw new Error("Signed upload health incompleto");
       return res.status(200).json({
         ok:true,
         action,
-        storage:true,
+        storage_control:true,
+        signed_upload_url_creation:true,
       });
     }
 
@@ -86,7 +111,7 @@ export default async function handler(req,res){
       if(!UUID_RE.test(batchId)||!messageId){
         return res.status(400).json({error:"batch_id/message_id non validi"});
       }
-      const objectKey=makeObjectKey(batchId,messageId,mimeType);
+      const objectKey=`tmp/${scopeId}/${makeObjectKey(batchId,messageId,mimeType).split("/").slice(1).join("/")}`;
       const {data,error}=await store.createSignedUploadUrl(objectKey,{upsert:false});
       if(error)throw error;
       return res.status(200).json({
@@ -101,6 +126,9 @@ export default async function handler(req,res){
       const objectKey=clean(req.body?.object_key,512);
       if(!validObjectKey(objectKey)){
         return res.status(400).json({error:"object_key non valida"});
+      }
+      if(!ownsObjectKey(objectKey)){
+        return res.status(403).json({error:"Oggetto non appartenente allo scope autenticato"});
       }
       const {data,error}=await store.createSignedUrl(objectKey,300,{download:false});
       if(error)throw error;
@@ -117,6 +145,9 @@ export default async function handler(req,res){
       const objectKey=clean(req.body?.object_key,512);
       if(!validObjectKey(objectKey)){
         return res.status(400).json({error:"object_key non valida"});
+      }
+      if(!ownsObjectKey(objectKey)){
+        return res.status(403).json({error:"Oggetto non appartenente allo scope autenticato"});
       }
       const {error}=await store.remove([objectKey]);
       if(error)throw error;
