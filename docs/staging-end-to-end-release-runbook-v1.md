@@ -215,3 +215,16 @@ La registry contiene gli stessi 15 record descritti sopra; non esiste un branch 
 - [BLOCKED] Deploy del candidato su staging (nessun deploy avviato; auto-deploy disabilitato).
 - [BLOCKED] Conferma atomica, fonte migrazioni, storage round-trip reale, recovery restart, Meta signature live e flusso end-to-end.
 - Nessun merge, deploy, modifica env/secret, scrittura Supabase o invio WhatsApp è stato eseguito.
+
+
+## E2E storico recuperato — 4 ottobre 2026
+
+Le conversazioni precedenti documentano un test riuscito sullo staging allora distribuito: webhook WhatsApp ricevuto, audio 14.684 byte, chiamata VocalFlash API HTTP 200, un credito consumato e risposta WhatsApp HTTP 200. Un test MultiVocale separato ha elaborato due file audio con API HTTP 200. Non sono disponibili message ID o provider message ID, quindi non è possibile ricostruire una traccia completa retroattiva.
+
+**Interpretazione obbligatoria:** il risultato storico non equivale al test del candidato corrente. Il servizio Render staging risulta ancora sul commit 34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5 del 4 ottobre; il bot candidato è ee9127f480746f83cb301822be153ddbfb993244 e include la verifica HMAC della firma webhook e modifiche di routing. Il candidato non è stato distribuito.
+
+La ricerca dei log Render per 23–26 ottobre 2026 ha restituito zero righe e l'ultimo evento deploy disponibile è del 4 ottobre. Registrare questo come assenza di log recenti, non come prova di guasto né di funzionamento.
+
+- [PASS storico, vecchio deploy] Webhook/audio/risposta WhatsApp e MultiVocale due audio.
+- [NOT RUN sul candidato corrente] firma Meta HMAC in staging, storage scoped round-trip, restart/recovery e test combinato aggiornato.
+- Prima del test aggiornato: configurare branch Preview e scope storage corretti, verificare META_APP_SECRET nello staging e confermare che il destinatario sia il numero di test autorizzato; nessun callback Meta o produzione va modificato.
