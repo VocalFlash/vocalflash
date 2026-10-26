@@ -57,7 +57,7 @@ Use synthetic messages and the staging business only.
 - [ ] An error or ambiguous timeout never results in a claim that a work item was created unless the persisted outcome is verified.
 - [ ] Owner commands remain blocked for writes while the runtime returns ATOMIC_CONFIRMATION_NOT_ENABLED. Do not bypass this gate with a caller-supplied boolean or direct production RPC.
 
-**Important:** complete persistent multi-turn conversation state and a durable outbound outbox are not implemented yet. Tests requiring restart-safe field collection, atomic proposal-bound confirmation, or delivery reconciliation are release blockers and must not be marked passed based only on unit tests.
+**Important:** persistent multi-turn state for the customer Assistant and a durable outbound outbox/reconciliation are not implemented yet. Separately, MultiVocale V2 has a Redis-backed batch-state store and private object storage for audio bytes, but real storage round-trip and controlled Render restart/recovery have NOT RUN. These are separate gates; do not describe the V2 design as tested runtime behavior.
 
 ## Gate D — outbound WhatsApp behavior
 
