@@ -660,3 +660,10 @@ Verification update 2026-10-24:
 ### Chiusura gate CI routing — 25 ottobre 2026
 
 La run bot `40237092071` sul commit `ee9127f480746f83cb301822be153ddbfb993244` è `success`, con job `test` completato senza step falliti. Il rischio di fallback legacy per audio/comando non gestito è coperto dai nuovi test automatizzati. Restano aperti i gate di staging e integrazione end-to-end.
+
+## Aggiornamento verifica — 26 ottobre 2026
+- CI Assistant API head PR #3 `77ecff859726656a39d2e7b946cd22f96ed7e3fc`: run `40237237326`, tutti e 5 i job della matrice completati con successo.
+- CI bot WhatsApp commit `ee9127f480746f83cb301822be153ddbfb993244`: run `40237092071` completata con successo; il run precedente `40237070328` è stato cancellato e non è l'esito finale.
+- Le CI verdi non equivalgono a test live. Restano NON ESEGUITI: round-trip reale Supabase Storage e test cross-scope live, prova di recupero dopo riavvio Render, test webhook Meta con firme reali e flusso combinato WhatsApp end-to-end.
+- Storage scoped: pianificare compatibilità/migrazione delle chiavi legacy prima del deploy; il nuovo formato rifiuta le chiavi non scoped. Verificare anche che le variabili Preview siano associate al branch candidato corretto.
+- PR #3 (Assistant API) e PR #2 (bot) restano Draft/non unite; nessun merge o deploy di produzione autorizzato. Release NO-GO fino al superamento dei gate live. Nessuna nuova risorsa a pagamento, modifica di secret o operazione distruttiva eseguita.
