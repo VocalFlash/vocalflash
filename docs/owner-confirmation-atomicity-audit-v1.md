@@ -57,3 +57,16 @@ Implement and review a single transactional database operation (or a transaction
 The live RPC definitions were inspected again. The two commit RPCs still accept `p_confirmed boolean` and a proposal event ID without verifying, locking, expiring, and consuming the corresponding owner-confirmation event in the same transaction as the write. Existing advisory locks and write idempotency do not close that authorization gap.
 
 **Decision: keep `ATOMIC_CONFIRMATION_NOT_ENABLED`.** No SQL was applied and no live write behavior was changed. Do not implement a migration against the live schema or infer the missing table/column semantics from function names. Next implementation must be based on the recovered authoritative migration history and tested against an isolated database. Required tests include wrong business/member/proposal, absent confirmation, expired confirmation, replay/second consumption, concurrent duplicate commit, mismatched action/payload, and transaction rollback on any failed check. Verify grants remain restricted to trusted service execution and prove that invalid confirmation leaves no side effect.
+
+
+## Recheck addendum — 26 October 2026: replay binding gap
+
+The live definition of vf_record_owner_command_confirmation_v1 was retrieved again. It checks active member/channel and a proposal belonging to the same business/member, then inserts an owner_command_confirmation event containing proposal_event_id and owner_command_source_event_id. However, if INSERT ... ON CONFLICT returns no new row, the fallback lookup selects an existing work_events row using only business_channel_id + external_message_id and returns CONFIRMATION_EXISTS without validating the existing row's event_type, business_id, business_member_id, proposal_event_id, or source event against the current request.
+
+The live unique index work_events_external_message_uidx is unique on (business_channel_id, external_message_id). Therefore a duplicate external message ID associated with a different member/proposal or a different event type can be reported by this RPC as an existing confirmation unless the caller independently verifies the returned event. The RPC must not treat this status alone as authorization.
+
+Required correction in the future isolated, authoritative migration:
+- On conflict, fetch the full existing event and compare business, member, channel, event type, proposal ID, and source-event binding; return a distinct REPLAY_MATCH only for an exact match, otherwise REPLAY_CONFLICT/DENIED with no write.
+- The atomic commit RPC must lock the proposal and confirmation event, validate the same binding, validate expiry and explicit confirmation, consume the confirmation once, and commit the requested action in the same transaction.
+- Add tests for same external ID with identical replay, same ID with different proposal, different member/business, and collision with another event type; assert no unauthorized side effect.
+- This finding is read-only. No live SQL or data was changed; do not patch the live function until the authoritative 15-migration source sequence and an isolated replayable database are available.
