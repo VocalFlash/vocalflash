@@ -727,3 +727,8 @@ La verifica byte/stringa dei corpi SQL rispetto al registro live è conclusa: **
 8. P1 — storage/Multivocale E2E: round-trip reale, isolamento scope, restart recovery, outbox e contratto bot/API. Non confondere i test unitari con prove reali.
 
 Guardrail: nessuna modifica al Supabase live, nessun branch a pagamento, segreto, deploy, merge o invio WhatsApp senza autorizzazione specifica. Le 15 migrazioni recuperate sono incrementali e non costituiscono baseline clean-install.
+
+
+## Riscontro schema live aggiuntivo — 26 ottobre 2026, sola lettura
+
+L'inventario delle colonne di public.work_events conferma che la tabella ha occurred_at e created_at, ma non una colonna dedicata expires_at o consumed_at. Le proposte/conferme sono eventi con payload JSONB. Questo non prova che nel payload non esista alcuna convenzione, quindi prima di implementare occorre cercare e validare le convenzioni effettive nei payload e in tutti i chiamanti; non inventare una scadenza o uno stato di consumo. Se il modello attuale non offre una rappresentazione affidabile di scadenza/consumo, la migrazione forward dovrà introdurre un modello esplicito e atomico, provato soltanto nel database isolato. Nessuna scrittura è stata eseguita.
