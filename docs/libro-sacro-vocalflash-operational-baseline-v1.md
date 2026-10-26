@@ -54,7 +54,7 @@ La sintesi vocale deve privilegiare informazioni rilevanti e azioni, senza ripor
 - Head verificato: `8cde5a65fdfda62633eadd5e38e2a10cbdd72808`.
 - CI Python sul commit verificato: 32 test superati. Sono unit test; non dimostrano Redis/Meta/Render end-to-end.
 - Lease heartbeat e check pre-send sono presenti sul ramo; non rendono atomica una chiamata HTTP esterna con la persistenza Redis.
-- Firma webhook HMAC-SHA256 implementata nel ramo di sviluppo, ma non verificata nel servizio Render target.
+- Firma webhook HMAC-Git blob SHA-1 implementata nel ramo di sviluppo, ma non verificata nel servizio Render target.
 - L'invio è at-most-once nel percorso protetto, non consegna durevole exactly-once.
 
 ### Supabase
@@ -1014,7 +1014,7 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 ## Addendum — storage scope enforcement implementation (2026-10-25, CI pending)
 
 ### Implementato nel branch candidato
-- `api/v1/multivocale-storage.js` ora richiede una mappatura server-side `VOCALFLASH_ASSISTANT_API_KEY_SCOPES` in JSON. La chiave della mappatura è il digest SHA-256 della chiave API effettiva; il valore è uno scope stabile, ad esempio `staging-bot` o `production-bot`. I valori delle API key non vanno inseriti nella mappatura né nella documentazione.
+- `api/v1/multivocale-storage.js` ora richiede una mappatura server-side `VOCALFLASH_ASSISTANT_API_KEY_SCOPES` in JSON. La chiave della mappatura è il digest Git blob SHA-1 della chiave API effettiva; il valore è uno scope stabile, ad esempio `staging-bot` o `production-bot`. I valori delle API key non vanno inseriti nella mappatura né nella documentazione.
 - La mappatura mancante/malformata per una chiave autenticata fallisce chiuso con HTTP 503; credenziali non valide continuano a ricevere HTTP 401.
 - Il percorso degli oggetti è stato versionato implicitamente come `tmp/<scope-uuid>/<batch-uuid>/<sha256>.<ext>`. Download e cancellazione rifiutano oggetti appartenenti a un altro scope (HTTP 403) e rifiutano il vecchio formato non scoped (HTTP 400). L'upload firmato usa lo stesso scope server-side.
 - Aggiunto `api/v1/multivocale-storage.test.js` con casi per mapping assente, download/cancellazione cross-scope e rifiuto del formato legacy; la suite CI è stata aggiornata per eseguire questi test.
@@ -1031,7 +1031,7 @@ Questo conferma perché la revisione deve includere anche override e sottoclassi
 - Rafforzato il fail-closed: se due credenziali hanno lo stesso scope, l'endpoint rifiuta la mappatura. Aggiunto test per questo caso.
 - Il workflow dei test ora include il file di regressione storage e un trigger `pull_request` oltre al push sul branch candidato.
 - Verifica CI completata: run GitHub Actions `40223697873` (`Assistant Customer Pipeline Tests`) **success**, cinque passaggi della matrice riusciti. In ciascun passaggio sono risultati **103 test passati, 0 fallimenti**; i test storage nuovi sono inclusi (mapping mancante, scope duplicati, download cross-scope, delete cross-scope, rifiuto delle chiavi legacy). Totale: 515 esecuzioni di test riuscite sulla matrice. Run verificato sul commit `1be9c9f8230c51406f5e6835e27da1479b435c26`; i commit successivi interessano soltanto i documenti canonici, quindi il codice testato è invariato.
-- Il contratto richiede credenziali distinte per staging e produzione e scope distinti; il mapping usa SHA-256 della chiave come chiave JSON. La nuova variabile `VOCALFLASH_ASSISTANT_API_KEY_SCOPES` va configurata solo quando saranno autorizzate e pianificate le modifiche env. Nessuna chiave è stata generata, ruotata o cambiata.
+- Il contratto richiede credenziali distinte per staging e produzione e scope distinti; il mapping usa Git blob SHA-1 della chiave come chiave JSON. La nuova variabile `VOCALFLASH_ASSISTANT_API_KEY_SCOPES` va configurata solo quando saranno autorizzate e pianificate le modifiche env. Nessuna chiave è stata generata, ruotata o cambiata.
 
 
 ## Registro di verifica — 25 ottobre 2026, follow-up readiness storage
@@ -1123,7 +1123,7 @@ La CI bot run `40237092071` sul commit test `ee9127f480746f83cb301822be153ddbfb9
 
 ## Recupero migrazioni Supabase dal registro live — 26 ottobre 2026
 
-Sono stati recuperati in sola lettura i 15 corpi SQL conservati in supabase_migrations.schema_migrations.statements e ricostruiti come file versionati in supabase/migrations. Il manifest registra SHA-256 e lunghezza dei corpi. Nessun SQL è stato eseguito. La provenienza è ora ricostruita dal registro applicato, ma non ancora validata con replay completo in un database isolato; il gate di riproducibilità resta aperto fino a quel confronto. Non creare branch a pagamento o applicare migrazioni live senza autorizzazione. La conferma titolare resta fail-closed e non è risolta da questo recupero.
+Sono stati recuperati in sola lettura i 15 corpi SQL conservati in supabase_migrations.schema_migrations.statements e ricostruiti come file versionati in supabase/migrations. Il manifest registra Git blob SHA-1 e lunghezza dei corpi. Nessun SQL è stato eseguito. La provenienza è ora ricostruita dal registro applicato, ma non ancora validata con replay completo in un database isolato; il gate di riproducibilità resta aperto fino a quel confronto. Non creare branch a pagamento o applicare migrazioni live senza autorizzazione. La conferma titolare resta fail-closed e non è risolta da questo recupero.
 
 
 ## Limite residuo del recupero migrazioni — 26 ottobre 2026
