@@ -258,3 +258,36 @@ I 15 corpi incrementali registrati sono stati recuperati dal registro Supabase e
 - [PASS] 15/15 file migration confrontati direttamente con statements[1] del registro Supabase live, per versione e nome: corpi esattamente uguali, lunghezze e Git blob SHA-1 coerenti.
 - [PASS] CI run 40381380389: validatore migrazioni e suite API focalizzata verdi sul commit ef89c1274fc7d749aa3af10bf9a0413607a21451.
 - [BLOCKED] Baseline schema precedente alla prima migrazione e replay completo in ambiente isolato. Non eseguire i file sul progetto live e non considerare questo confronto come prova di clean install.
+
+
+## Sequenza esecutiva aggiornata — conferma titolare (26 ottobre 2026)
+
+### Gate A — database riproducibile
+- [x] Recuperati dal registro live tutti i 15 corpi SQL.
+- [x] Confronto diretto: 15/15 corpi identici a statements[1], per versione e nome; validatore CI PASS.
+- [ ] Recuperare il baseline pre-2026-10-01 oppure uno snapshot schema completo revisionato.
+- [ ] Ricostruire database isolato, applicare in ordine il baseline + 15 migrazioni e confrontare schema, funzioni, indici, grants e trigger.
+- [ ] Nessun replay sul progetto live.
+
+### Gate B — contratto di conferma
+- [ ] Inventariare definizioni reali di eventi, payload, indici univoci, campi timestamp e grants; identificare tutti i chiamanti JS/API.
+- [ ] Specificare la scadenza di proposta/conferma e la regola per timestamp affidabile; non assumere un TTL non definito.
+- [ ] Modificare la RPC di registrazione affinché collisione identica = REPLAY_MATCH, collisione con binding differente = REPLAY_CONFLICT/DENIED. Confrontare business, membro, canale, tipo evento, proposta e source event.
+- [ ] Introdurre commit atomico: lock di proposta e conferma, verifica esplicita e freschezza, binding completo all'azione/payload, consumo singolo e write nella stessa transazione.
+- [ ] Mantenere grants server-only e separare invio WhatsApp via outbox durevole.
+- [ ] Mantenere il runtime fail-closed; nessuna rimozione di ATOMIC_CONFIRMATION_NOT_ENABLED in anticipo.
+
+### Gate C — test obbligatori in ambiente isolato
+- [ ] Conferma mancante, vaga, modificata o scaduta; proposta scaduta.
+- [ ] Business, membro, canale, proposal ID, source event o payload azione non corrispondenti.
+- [ ] Replay identico senza nuovo effetto; stesso external message ID con proposta/membro/event type diverso deve fallire chiuso.
+- [ ] Due commit concorrenti sulla stessa conferma: al massimo una write.
+- [ ] Retry dopo commit senza duplicazione; errore prima/dopo il commit; rollback senza effetti parziali.
+- [ ] Verifica privilegi: ruoli anon/authenticated non possono invocare le RPC protette.
+- [ ] Tutti i casi negati dimostrano zero side effect; caso valido dimostra un solo effetto.
+
+### Gate D — runtime ed E2E staging
+- [ ] Integrare JS runtime e contratto bot/API con esiti non ambigui; test unitari/contratto aggiornati.
+- [ ] Rimuovere il blocco di conferma solo dopo PASS del Gate C e uso effettivo della nuova RPC.
+- [ ] E2E candidato: Meta webhook con firma valida/non valida → proposta → conferma → singola write → risposta, verificando outbox e retry.
+- [ ] PR #3 e #2 coordinate, ancora Draft; nessun merge o produzione impliciti.
