@@ -1086,3 +1086,12 @@ La CI bot run `40237092071` sul commit test `ee9127f480746f83cb301822be153ddbfb9
 5. Verificare compatibilità delle chiavi storage preesistenti e la strategia di migrazione prima di un eventuale deploy.
 6. Rivedere le quattro fonti operative e registrare i risultati live soltanto dopo averli ottenuti. Nessun risultato CI sostituisce questi gate.
 
+
+
+## Riconvalida read-only — 26 ottobre 2026 (sessione di prosecuzione)
+
+- Supabase project `tkfyfqgtumoeywlqzmdt`: stato `ACTIVE_HEALTHY`; registry migrazioni confermata a 15 record (dal 2026-10-01 al 2026-10-04); nessun branch di sviluppo. Nessuna migrazione applicata e nessun dato modificato.
+- Riconfermata la criticità di conferma atomica leggendo le definizioni live delle RPC `vf_commit_owner_note_v1` e `vf_commit_owner_schedule_action_v1`: i percorsi di commit verificano il booleano `p_confirmed` e la proposta, ma non risultano validare e consumare atomicamente il corrispondente evento `owner_command_confirmation`. Il runtime applicativo continua correttamente a fallire chiuso con `ATOMIC_CONFIRMATION_NOT_ENABLED`. Gate di rilascio bloccante, da correggere solo con migrazione SQL autorevole in ambiente isolato.
+- Vercel: deployment Preview READY sul branch candidato, head documentale `8f8a225433515209fc19ecbd5404201289c4547b`; Preview del codice API `77ecff859726656a39d2e7b946cd22f96ed7e3fc` anch'essa READY. Sono build Preview, non test E2E né produzione.
+- Render: i controlli read-only dei servizi non sono stati eseguiti perché l'integrazione richiede un `workspaceId` esplicitamente scelto dal titolare. Non selezionare autonomamente il workspace e non eseguire operazioni Render finché non è confermato.
+- Nessuna prova reale Supabase Storage, restart Render o Meta/WhatsApp E2E è stata eseguita in questa sessione. Non dichiararle superate. Nessun merge, deploy di produzione, cambio di segreti, scrittura SQL o operazione distruttiva è stata eseguita.
