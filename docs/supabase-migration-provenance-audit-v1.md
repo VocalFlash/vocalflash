@@ -81,3 +81,8 @@ The recovered 15 SQL bodies are the incremental statements recorded by the live 
 ## Exact-body verification — 26 October 2026
 
 The 15 reconstructed files were each compared directly to the matching live supabase_migrations.schema_migrations.statements[1] value, keyed by exact version and name. Result: **15/15 exact matches**, matching lengths and Git blob SHA-1 checksums. CI run 40381380389 passed the recovered-source inventory validator and focused API test matrix on commit ef89c1274fc7d749aa3af10bf9a0413607a21451. The remaining migration gate is not file fidelity: it is the missing pre-registry bootstrap baseline and isolated replay/schema comparison.
+
+
+## Sequenza corretta per il prossimo lavoro — 26 ottobre 2026, sera
+
+La provenienza dei 15 corpi incrementali è già verificata 15/15 contro il registro live. Non ripetere il recupero. Il gate successivo è il baseline schema anteriore alla prima migrazione registrata: recuperare uno snapshot completo e verificabile oppure la migrazione iniziale autorevole, quindi ricostruire e confrontare tutto esclusivamente in un ambiente isolato. Solo dopo il replay/schema parity si può implementare e testare la migrazione forward della conferma atomica. Nessun DDL live o branch a pagamento è stato autorizzato.
