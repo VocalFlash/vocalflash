@@ -70,3 +70,26 @@ Required correction in the future isolated, authoritative migration:
 - The atomic commit RPC must lock the proposal and confirmation event, validate the same binding, validate expiry and explicit confirmation, consume the confirmation once, and commit the requested action in the same transaction.
 - Add tests for same external ID with identical replay, same ID with different proposal, different member/business, and collision with another event type; assert no unauthorized side effect.
 - This finding is read-only. No live SQL or data was changed; do not patch the live function until the authoritative 15-migration source sequence and an isolated replayable database are available.
+
+
+## Piano di remediation preciso — revisione 26 ottobre 2026, sera
+
+### Fatto e verificato
+- Runtime fail-closed verificato in lib/owner-command-runtime-v1.js: ATOMIC_CONFIRMATION_NOT_ENABLED viene restituito prima di qualsiasi chiamata a persistence/context/interpretazione.
+- Le definizioni live confermano che la RPC di registrazione verifica membro/canale attivi e proposta dello stesso business/membro, ma il ramo conflitto legge l'evento usando solo canale + external_message_id e restituisce CONFIRMATION_EXISTS senza confronto completo.
+- Le RPC di commit note e schedule non provano di validare, bloccare, scadere e consumare la conferma nella stessa transazione della write.
+- Tutti i 15 corpi SQL incrementali sono recuperati e confrontati esattamente con il registro live; manca ancora il baseline pre-registro e il replay isolato.
+
+### Remediation da implementare (non ancora eseguita)
+1. Baseline: recuperare uno schema iniziale completo o snapshot verificato; replay solo in ambiente isolato e confronto di funzioni, indici, trigger, policy e grants.
+2. Specifica: determinare la durata di validità della proposta e della conferma, la fonte timestamp affidabile e il comportamento in caso di timestamp tardivi. Nessun TTL va inventato.
+3. Registrazione/replay: rendere la RPC idempotente ma non permissiva. Su conflitto confrontare business ID, member ID, channel ID, event type, proposal_event_id e owner_command_source_event_id; includere gli altri identificatori stabili richiesti dallo schema. Esito REPLAY_MATCH solo per identità completa; altrimenti REPLAY_CONFLICT/DENIED. Non restituire un successo autorizzativo generico.
+4. Commit atomico: sostituire il pattern booleano p_confirmed come prova sufficiente. Una RPC transazionale deve risolvere e lockare la proposta e la conferma, verificare stato/freschezza/binding e corrispondenza del payload dell'azione, consumare la conferma una sola volta e scrivere nota/schedule nella stessa transazione. Una seconda azione con la stessa conferma deve fallire senza side effect.
+5. Idempotenza e delivery: distinguere il replay della richiesta già committed dal tentativo di riusare la conferma per un'altra azione. La risposta WhatsApp non deve essere inviata dentro la transazione; usare outbox durevole con retry/reconciliation.
+6. Privilege review: mantenere EXECUTE solo ai ruoli server previsti; testare che anon/authenticated e un chiamante non autorizzato non possano scrivere o consumare conferme.
+7. Test richiesti: conferma/proposta mancanti o scadute; business/membro/canale/proposta/source errati; payload/azione alterati; replay identico; external ID riusato con proposta, membro o tipo evento differente; due richieste concorrenti; retry dopo commit; rollback; zero side effects per ogni diniego e una sola write per il caso valido.
+8. Abilitazione runtime: mantenere ATOMIC_CONFIRMATION_NOT_ENABLED fino a quando il nuovo contratto è effettivamente chiamato dal runtime e tutta la matrice SQL/RPC + test di integrazione è PASS. Quindi eseguire E2E staging con Meta firmato, proposta, conferma, write, outbox e risposta.
+9. Rilascio: la migrazione forward deve essere versionata e provata in isolamento; nessun DDL live, merge o deploy produzione senza autorizzazione specifica.
+
+### Stato
+NO-GO conferma titolare. I punti sopra sono piano operativo, non implementazione completata. Non è stata eseguita alcuna scrittura SQL live.
