@@ -1134,3 +1134,25 @@ I 15 corpi SQL registrati sono stati recuperati e versionati, ma sono incrementa
 ## Verifica esatta migrazioni — 26 ottobre 2026
 
 Tutti i 15 file SQL recuperati sono stati confrontati direttamente con il corrispondente valore statements[1] nel registro Supabase live, abbinando versione e nome: **15/15 exact match**. Lunghezze e Git blob SHA-1 corrispondono al manifest; CI sul commit ef89c1274fc7d749aa3af10bf9a0413607a21451 ha passato validatore e suite API focalizzata. La provenienza dei 15 corpi incrementali è quindi verificata rispetto al registro applicato. Resta aperto il baseline schema preesistente e il replay isolato; nessuna migrazione è stata applicata.
+
+
+## Piano operativo canonico — conferma titolare (rilettura 26 ottobre 2026, sera)
+
+### Stato certo
+- Il runtime blocca ogni frase di conferma con ATOMIC_CONFIRMATION_NOT_ENABLED prima di persistence/interpretazione/write. Questo è il comportamento sicuro attuale, non un errore da rimuovere.
+- La RPC di registrazione può confondere replay identico e collisione conflittuale: CONFIRMATION_EXISTS viene restituito cercando per canale + external message ID senza validare tutti i legami dell'evento.
+- Le RPC di commit note/schedule non verificano e consumano atomicamente una specifica conferma legata alla proposta; il booleano p_confirmed non prova l'autorizzazione.
+- 15/15 SQL registrati sono stati recuperati e confrontati esattamente col registro live. Il validatore e i test API focalizzati sono passati in CI. Rimane il baseline pre-registro e il replay isolato; il recupero SQL non autorizza l'applicazione di DDL.
+- Nessuna modifica al database live, nessun deploy/merge e nessun branch a pagamento effettuati.
+
+### Ordine obbligatorio dei prossimi passi
+A. Recuperare il baseline schema precedente alla prima migrazione e creare una ricostruzione isolata verificabile; non riapplicare le 15 migrazioni al live.
+B. Inventariare schema reale e semantica degli eventi di proposta/conferma, indici, payload, grants e chiamanti; non inventare TTL. La durata di validità proposta/conferma deve essere una regola esplicita da documentare prima dell'implementazione.
+C. Correggere il replay nella RPC di registrazione: confronto completo di business, membro, canale, event type, proposta e source event; distinguere REPLAY_MATCH da REPLAY_CONFLICT; mai trattare CONFIRMATION_EXISTS come autorizzazione.
+D. Implementare una transazione/RPC unica per validare, bloccare, consumare una volta la conferma e applicare la write. Verificare che l'azione/payload corrisponda alla proposta; mantenere i privilegi server-only; outbox separata per risposte WhatsApp.
+E. Eseguire la matrice SQL/RPC in ambiente isolato: assenza/scadenza, binding errato, replay identico/conflittuale, concorrenza, retry, rollback e nessun effetto collaterale per i casi negati.
+F. Solo dopo PASS, integrare il runtime e il contratto bot/API; mantenere ATOMIC_CONFIRMATION_NOT_ENABLED fino all'effettiva adozione del percorso atomico. Poi E2E staging completo.
+G. Migrazione forward e deploy staging solo secondo i guardrail/autorizzazioni già registrati; nessuna operazione live o produzione implicita.
+
+### Cosa non rifare
+Non rifare il recupero o il confronto dei 15 SQL (15/15 PASS), né dichiarare E2E aggiornato sulla base del test storico del 4 ottobre, né confondere CI/Preview READY con verifica del database o di WhatsApp live.
