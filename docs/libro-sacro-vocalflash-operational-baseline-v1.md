@@ -1104,3 +1104,11 @@ La CI bot run `40237092071` sul commit test `ee9127f480746f83cb301822be153ddbfb9
 - Head PR #3 aggiornato a a12364b2fa06bf737a839222b6e5931c838d8842: CI run 40376454322, cinque job success; Preview Vercel READY. PR #2 head ee9127f480746f83cb301822be153ddbfb993244: CI run 40237092071 success. Entrambe le PR restano Draft/non unite.
 - Supabase migration registry riletto: stessi 15 record; nessun branch di sviluppo. Ricerca dei nomi harden_event_audit_functions_v1 e owner_command_confirmation_binding_v1 non ha individuato i file SQL nel repository ricercato. Provenienza ancora non riconciliata: non ricostruire DDL storico per supposizione.
 - I gate conferma atomica, migrazioni, storage round-trip, recovery dopo restart, Meta signature live ed E2E restano aperti. Nessun dato/schema/secret modificato, nessun deploy o merge eseguito.
+
+
+## Evidenza storica recuperata dalle chat — 26 ottobre 2026
+
+- Il 4 ottobre 2026 era stato riportato un E2E WhatsApp PASS sullo staging allora attivo: webhook ricevuto, audio 14.684 byte, API VocalFlash HTTP 200, 1 credito consumato, invio risposta WhatsApp HTTP 200. Era riportato anche un test MultiVocale PASS con 2 file audio e API HTTP 200. Non sono disponibili ID messaggio/provider né un registro strutturato di tutti i passaggi.
+- Questo PASS storico non certifica l'attuale PR #2/#3: Render staging è ancora sul commit 34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5 del 4 ottobre, mentre il candidato bot ee9127f480746f83cb301822be153ddbfb993244 contiene nuove modifiche, inclusa la verifica HMAC della firma Meta.
+- Log Render staging dal 23 al 26 ottobre: zero righe restituite; ultimo evento deploy riuscito il 4 ottobre. È un'assenza di evidenza recente, non prova autonoma di guasto.
+- Distinguere nel Libro sacro: E2E storico = eseguito e riportato PASS sul vecchio deploy; E2E sul candidato corrente = NON ESEGUITO. Non ripetere test live fino a configurazione branch/env/Meta coerente e test destinatario autorizzato.
