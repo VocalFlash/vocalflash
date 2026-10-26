@@ -558,3 +558,10 @@ Confermata verde la CI bot run `40237092071` sul commit `ee9127f480746f83cb30182
 - Questo è un risultato storico valido per quel deploy/configurazione, non una prova del candidato attuale: il deploy Render staging attualmente live è del 4 ottobre sul commit 34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5; il candidato bot è ee9127f480746f83cb301822be153ddbfb993244 e include modifiche di routing e firma webhook non distribuite.
 - La query dei log Render staging per il periodo 23–26 ottobre 2026 ha restituito zero righe; gli eventi Render mostrano l'ultimo deploy riuscito il 4 ottobre. Non dedurre da questo che il servizio sia guasto, ma non usare i log come prova di readiness corrente.
 - Non ripetere il test live prima di rendere coerenti branch, env e Meta App Secret; non cambiare callback Meta né inviare messaggi a destinatari non autorizzati.
+
+
+## Nuova criticità conferma titolare — 26 ottobre 2026
+
+- Ulteriore lettura della RPC live vf_record_owner_command_confirmation_v1: in caso di conflitto sull'indice univoco (business_channel_id, external_message_id), il fallback recupera l'evento esistente con soli questi due campi e restituisce CONFIRMATION_EXISTS senza confrontare event_type, business_member_id, proposal_event_id e source event con la richiesta corrente.
+- Non trattare CONFIRMATION_EXISTS come autorizzazione: il replay deve risultare identico per business, membro, canale, proposta, evento sorgente e tipo evento; altrimenti deve fallire chiuso come REPLAY_CONFLICT/DENIED.
+- Questo si aggiunge al blocco già noto: le RPC di commit non consumano e validano atomicamente l'evento di conferma. Correzione solo in una migrazione forward autorevole, dopo ripristino/replay isolato delle 15 migrazioni. Nessuna modifica live eseguita.
