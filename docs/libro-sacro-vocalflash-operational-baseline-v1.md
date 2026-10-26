@@ -1112,3 +1112,10 @@ La CI bot run `40237092071` sul commit test `ee9127f480746f83cb301822be153ddbfb9
 - Questo PASS storico non certifica l'attuale PR #2/#3: Render staging è ancora sul commit 34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5 del 4 ottobre, mentre il candidato bot ee9127f480746f83cb301822be153ddbfb993244 contiene nuove modifiche, inclusa la verifica HMAC della firma Meta.
 - Log Render staging dal 23 al 26 ottobre: zero righe restituite; ultimo evento deploy riuscito il 4 ottobre. È un'assenza di evidenza recente, non prova autonoma di guasto.
 - Distinguere nel Libro sacro: E2E storico = eseguito e riportato PASS sul vecchio deploy; E2E sul candidato corrente = NON ESEGUITO. Non ripetere test live fino a configurazione branch/env/Meta coerente e test destinatario autorizzato.
+
+
+## Ulteriore controllo sicurezza RPC — 26 ottobre 2026
+
+- La funzione live vf_record_owner_command_confirmation_v1 registra la proposta e l'evento sorgente, ma il percorso ON CONFLICT recupera l'evento esistente usando solo business_channel_id + external_message_id e restituisce CONFIRMATION_EXISTS senza verificare che tipo evento, membro, proposta e source event coincidano con la richiesta corrente.
+- L'indice univoco live work_events_external_message_uidx è (business_channel_id, external_message_id). Perciò la risposta di replay non costituisce prova sufficiente di conferma valida. Il futuro contratto deve distinguere replay identico da replay conflittuale e non autorizzare azioni su un evento associato a un'altra proposta.
+- Il requisito rimane: conferma verificata, fresca, legata alla proposta e consumata una sola volta nella stessa transazione della scrittura; test di replay identico, replay con proposta diversa, membro diverso e tipo evento diverso. Solo ambiente isolato e migrazione autorevole; nessuna modifica SQL live.
