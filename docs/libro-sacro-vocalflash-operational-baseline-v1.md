@@ -1059,3 +1059,30 @@ Durante la revisione del percorso del bot è stato confermato un rischio concret
 ### Esito CI della correzione routing — 25 ottobre 2026
 
 La CI bot run `40237092071` sul commit test `ee9127f480746f83cb301822be153ddbfb993244` è terminata `success`; il job `test` è completato senza step falliti. Sono quindi validati dalla suite automatizzata i nuovi casi che bloccano il fallback legacy per audio e comando MultiVocale non gestiti. Questo chiude il gate CI della modifica, non i gate di infrastruttura o rilascio.
+
+## Registro di verifica supplementare — 26 ottobre 2026
+
+### CI e test automatici — verificati
+- Bot WhatsApp, commit `ee9127f480746f83cb301822be153ddbfb993244`: GitHub Actions run `40237092071`, workflow `Test MultiVocale Runtime V2`, conclusione **success**. Il job `test` e tutti i suoi step risultano completati con successo, inclusa la suite deterministica. Il run precedente `40237070328` è `cancelled`; non va confuso con il run finale riuscito.
+- Assistant API, head PR #3 `77ecff859726656a39d2e7b946cd22f96ed7e3fc`: GitHub Actions run `40237237326`, workflow `Assistant Customer Pipeline Tests`, conclusione **success**; tutti e cinque i job della matrice (pass 1–5) risultano completati con successo.
+- Assistant API: la run `40223697873` ha tutti e cinque i job della matrice completati con successo e comprende i test automatici dello storage scoped. È prova di test mock/unitari, non di un round-trip sul servizio Supabase reale.
+- Le prove sopra attestano la CI dei commit indicati; non attestano che siano stati eseguiti test live di storage, recupero dopo riavvio Render, Meta/WhatsApp end-to-end o isolamento reale degli account.
+
+### Stato release — NO-GO invariato
+- PR Assistant API #3 e bot #2 sono ancora aperte, Draft e non unite; vanno rilasciate insieme per la dipendenza dal contratto `assistant_message`.
+- Il routing del bot è stato modificato per impedire il ripiego sul gestore legacy nei casi V2 non gestiti; la CI del commit bot finale sopra è verde. Resta da verificare con una prova d'integrazione che non esistano altri percorsi legacy raggiungibili, e il processo conserva raccolte audio in memoria: il recupero dopo riavvio non è dimostrato.
+- Storage: i test di scope sono verdi in CI, ma non sono stati verificati upload/download/delete reali su Supabase. Prima del rilascio restano obbligatori: test positivo nello stesso scope; diniego cross-scope su download e delete; credenziali errate; chiavi malformate/legacy; verifica delle variabili Preview sul branch corretto. Il nuovo formato scoped rifiuta chiavi legacy non scoped: occorre un piano compatibilità/migrazione e svuotamento controllato delle raccolte attive prima di qualsiasi deploy.
+- Render: persistenza dopo riavvio non verificata; audio e batch restano temporaneamente in memoria. Redis fornisce deduplica/lock ma non rende persistenti gli audio.
+- Meta/WhatsApp: nessun invio live o test end-to-end combinato eseguito in questa sessione. La firma webhook e la variabile `META_APP_SECRET` non sono provate come attive negli ambienti live.
+- Sicurezza/identità: non creare utenti o membri fittizi. La creazione operativa resta bloccata finché la conferma del titolare non è atomica e l'identità business reale non è configurata. Il controllo `ATOMIC_CONFIRMATION_NOT_ENABLED` resta un gate.
+- Vincolo costi: non creare branch Supabase a pagamento o attivare servizi SMS; la scelta del branch `conversation-state-v1` resta rinviata alla fase pre-lancio, come deciso.
+- Nessun merge, deploy di produzione, cambio di segreti/variabili live, invio WhatsApp, modifica distruttiva a Redis/Supabase o creazione di risorse a pagamento è stato eseguito.
+
+### Prossime verifiche obbligatorie (non dichiarare completate)
+1. Confermare il Preview per l'head corrente e la corretta associazione delle variabili d'ambiente al branch `assistant-conversation-photo-v1`; il precedente audit aveva trovato le variabili Assistant/storage associate a `assistant-auth-v1`, non al branch candidato.
+2. Eseguire test storage live in ambiente isolato, inclusi permessi cross-scope, senza usare o cancellare oggetti di produzione.
+3. Eseguire prova controllata di riavvio del servizio Render e verificare il comportamento di un batch attivo e della deduplica.
+4. Eseguire test webhook con firma valida, firma assente, firma non valida e corpo alterato, poi flusso combinato Meta → Render → Assistant API/Preview → storage, usando esclusivamente dati e destinatari di test autorizzati.
+5. Verificare compatibilità delle chiavi storage preesistenti e la strategia di migrazione prima di un eventuale deploy.
+6. Rivedere le quattro fonti operative e registrare i risultati live soltanto dopo averli ottenuti. Nessun risultato CI sostituisce questi gate.
+
