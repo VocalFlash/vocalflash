@@ -565,3 +565,8 @@ Confermata verde la CI bot run `40237092071` sul commit `ee9127f480746f83cb30182
 - Ulteriore lettura della RPC live vf_record_owner_command_confirmation_v1: in caso di conflitto sull'indice univoco (business_channel_id, external_message_id), il fallback recupera l'evento esistente con soli questi due campi e restituisce CONFIRMATION_EXISTS senza confrontare event_type, business_member_id, proposal_event_id e source event con la richiesta corrente.
 - Non trattare CONFIRMATION_EXISTS come autorizzazione: il replay deve risultare identico per business, membro, canale, proposta, evento sorgente e tipo evento; altrimenti deve fallire chiuso come REPLAY_CONFLICT/DENIED.
 - Questo si aggiunge al blocco già noto: le RPC di commit non consumano e validano atomicamente l'evento di conferma. Correzione solo in una migrazione forward autorevole, dopo ripristino/replay isolato delle 15 migrazioni. Nessuna modifica live eseguita.
+
+
+## Recupero migrazioni Supabase dal registro live — 26 ottobre 2026
+
+Sono stati recuperati in sola lettura i 15 corpi SQL conservati in supabase_migrations.schema_migrations.statements e ricostruiti come file versionati in supabase/migrations. Il manifest registra SHA-256 e lunghezza dei corpi. Nessun SQL è stato eseguito. La provenienza è ora ricostruita dal registro applicato, ma non ancora validata con replay completo in un database isolato; il gate di riproducibilità resta aperto fino a quel confronto. Non creare branch a pagamento o applicare migrazioni live senza autorizzazione. La conferma titolare resta fail-closed e non è risolta da questo recupero.

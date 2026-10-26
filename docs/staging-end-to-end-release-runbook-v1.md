@@ -241,3 +241,8 @@ Aggiungere prima del rilascio:
 - [ ] Verifica che CONFIRMATION_EXISTS da sola non autorizzi il commit.
 - [ ] Concorrenza e consumo singolo della conferma nella stessa transazione della write.
 Questi test sono NOT RUN; la funzione live non è stata modificata.
+
+
+## Recupero migrazioni Supabase dal registro live — 26 ottobre 2026
+
+Sono stati recuperati in sola lettura i 15 corpi SQL conservati in supabase_migrations.schema_migrations.statements e ricostruiti come file versionati in supabase/migrations. Il manifest registra SHA-256 e lunghezza dei corpi. Nessun SQL è stato eseguito. La provenienza è ora ricostruita dal registro applicato, ma non ancora validata con replay completo in un database isolato; il gate di riproducibilità resta aperto fino a quel confronto. Non creare branch a pagamento o applicare migrazioni live senza autorizzazione. La conferma titolare resta fail-closed e non è risolta da questo recupero.

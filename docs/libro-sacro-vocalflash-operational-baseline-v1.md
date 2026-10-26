@@ -1119,3 +1119,8 @@ La CI bot run `40237092071` sul commit test `ee9127f480746f83cb301822be153ddbfb9
 - La funzione live vf_record_owner_command_confirmation_v1 registra la proposta e l'evento sorgente, ma il percorso ON CONFLICT recupera l'evento esistente usando solo business_channel_id + external_message_id e restituisce CONFIRMATION_EXISTS senza verificare che tipo evento, membro, proposta e source event coincidano con la richiesta corrente.
 - L'indice univoco live work_events_external_message_uidx è (business_channel_id, external_message_id). Perciò la risposta di replay non costituisce prova sufficiente di conferma valida. Il futuro contratto deve distinguere replay identico da replay conflittuale e non autorizzare azioni su un evento associato a un'altra proposta.
 - Il requisito rimane: conferma verificata, fresca, legata alla proposta e consumata una sola volta nella stessa transazione della scrittura; test di replay identico, replay con proposta diversa, membro diverso e tipo evento diverso. Solo ambiente isolato e migrazione autorevole; nessuna modifica SQL live.
+
+
+## Recupero migrazioni Supabase dal registro live — 26 ottobre 2026
+
+Sono stati recuperati in sola lettura i 15 corpi SQL conservati in supabase_migrations.schema_migrations.statements e ricostruiti come file versionati in supabase/migrations. Il manifest registra SHA-256 e lunghezza dei corpi. Nessun SQL è stato eseguito. La provenienza è ora ricostruita dal registro applicato, ma non ancora validata con replay completo in un database isolato; il gate di riproducibilità resta aperto fino a quel confronto. Non creare branch a pagamento o applicare migrazioni live senza autorizzazione. La conferma titolare resta fail-closed e non è risolta da questo recupero.

@@ -698,3 +698,8 @@ La run bot `40237092071` sul commit `ee9127f480746f83cb301822be153ddbfb993244` �
 ## Gate sicurezza conferma — dettaglio aggiuntivo 26 ottobre 2026
 
 La RPC live vf_record_owner_command_confirmation_v1, in caso di conflitto su work_events_external_message_uidx (business_channel_id, external_message_id), recupera l'evento esistente senza confrontare event_type, membro, proposal_event_id e source event con la richiesta corrente. Aggiungere alla remediation atomica una distinzione tra replay identico e replay conflittuale; la sola risposta CONFIRMATION_EXISTS non deve autorizzare una write. Testare collisioni stesso ID/differente proposta, membro e tipo evento. Nessuna patch live: attendere fonte autorevole delle 15 migrazioni e database isolato riproducibile.
+
+
+## Recupero migrazioni Supabase dal registro live — 26 ottobre 2026
+
+Sono stati recuperati in sola lettura i 15 corpi SQL conservati in supabase_migrations.schema_migrations.statements e ricostruiti come file versionati in supabase/migrations. Il manifest registra SHA-256 e lunghezza dei corpi. Nessun SQL è stato eseguito. La provenienza è ora ricostruita dal registro applicato, ma non ancora validata con replay completo in un database isolato; il gate di riproducibilità resta aperto fino a quel confronto. Non creare branch a pagamento o applicare migrazioni live senza autorizzazione. La conferma titolare resta fail-closed e non è risolta da questo recupero.
