@@ -713,3 +713,17 @@ Le 15 migrazioni incrementali sono state recuperate dal registro live, versionat
 ## Stato verifica migrazioni — 26 ottobre 2026
 
 La verifica byte/stringa dei corpi SQL rispetto al registro live è conclusa: **15/15 exact match** su statements[1] per versione/nome, lunghezze e Git blob SHA-1. Il validator automatico e i test focalizzati API sono passati in CI sul commit ef89c1274fc7d749aa3af10bf9a0413607a21451. Il residuo è recuperare il baseline pre-registro e dimostrare replay/schema parity in un database isolato, non recuperare di nuovo questi 15 file.
+
+
+## Roadmap prioritaria aggiornata — conferma titolare, 26 ottobre 2026
+
+1. P0 — baseline database e ambiente riproducibile (BLOCKED): recuperare schema precedente al primo record migrazione o snapshot completo revisionato; ricostruire e confrontare in ambiente isolato. I 15 SQL incrementali sono già recuperati e 15/15 coincidono col registro: non ripetere questo lavoro. Nessun DDL live.
+2. P0 — specifica di validità e binding (DESIGN REQUIRED): documentare la durata della proposta/conferma, la fonte del timestamp e i criteri di freschezza prima di scrivere codice; inventariare schema e payload reali, senza presumere campi/TTL.
+3. P0 — replay binding (IMPLEMENTATION REQUIRED): correggere vf_record_owner_command_confirmation_v1: solo replay perfettamente identico per business, membro, canale, event type, proposal ID e source event può restituire REPLAY_MATCH; ogni collisione differente è REPLAY_CONFLICT/DENIED, senza autorizzare la write.
+4. P0 — commit atomico (IMPLEMENTATION REQUIRED): una sola transazione/RPC deve lockare proposta e conferma, verificare il binding e l'azione esatta, controllare validità e conferma esplicita, consumare la conferma una volta e applicare la write. La consegna WhatsApp resta fuori transazione e passa da outbox durevole.
+5. P0 — test DB/RPC (NOT RUN): test negati senza effetti; replay identico idempotente; replay conflittuale; scadenza; identità errata; doppia concorrenza; retry dopo commit; rollback; grants server-only.
+6. P0 — integrazione runtime (BLOCKED): il runtime continua a rispondere ATOMIC_CONFIRMATION_NOT_ENABLED. Rimuovere il blocco solo dopo che usa la nuova RPC e la matrice è PASS.
+7. P0 — E2E staging (NOT RUN sul candidato): webhook Meta firmato → autenticazione/mapping → proposta → conferma → singola write → risposta; coordinare API PR #3 e bot PR #2, ancora Draft.
+8. P1 — storage/Multivocale E2E: round-trip reale, isolamento scope, restart recovery, outbox e contratto bot/API. Non confondere i test unitari con prove reali.
+
+Guardrail: nessuna modifica al Supabase live, nessun branch a pagamento, segreto, deploy, merge o invio WhatsApp senza autorizzazione specifica. Le 15 migrazioni recuperate sono incrementali e non costituiscono baseline clean-install.
