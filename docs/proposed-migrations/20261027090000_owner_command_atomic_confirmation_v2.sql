@@ -18,7 +18,7 @@ returns jsonb
 language plpgsql
 security definer
 set search_path = public, pg_temp
-as $
+as $owner_confirmation$
 declare
   v_event_id uuid;
   v_source_event_id text;
@@ -108,7 +108,7 @@ begin
     'proposal_event_id',p_proposal_event_id
   );
 end;
-$;
+$owner_confirmation$;
 
 create or replace function public.vf_resolve_pending_owner_command_proposal_v2(
   p_business_id uuid,
