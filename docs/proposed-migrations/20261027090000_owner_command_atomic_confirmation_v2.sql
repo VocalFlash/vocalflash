@@ -29,6 +29,11 @@ declare
   v_work_item_id uuid;
   v_payload jsonb;
 begin
+  if p_business_id is null or p_member_id is null or p_channel_id is null
+     or p_external_message_id is null or length(btrim(p_external_message_id))=0 then
+    return jsonb_build_object('ok',false,'status','INVALID','reason','CONFIRMATION_BINDING_REQUIRED','writes_performed',false);
+  end if;
+
   select exists(
     select 1 from public.business_members m
     where m.id=p_member_id and m.business_id=p_business_id and m.is_active=true
@@ -322,7 +327,9 @@ begin
   where id=p_proposal_event_id and business_id=p_business_id;
 
   return jsonb_build_object('ok',true,'status','CONFIRMATION_COMMITTED',
-    'result',v_result,'replayed',false,'writes_performed',true);
+    'result',v_result,
+    'replayed',v_result->>'status' in ('NOTE_EXISTS','ACTION_EXISTS'),
+    'writes_performed',v_result->>'status' in ('NOTE_ADDED','ACTION_CREATED'));
 end;
 $$;
 
