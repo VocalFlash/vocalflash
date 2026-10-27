@@ -25,6 +25,8 @@ test("proposed SQL binds exact proposal, validates affirmative text, and rejects
   assert.ok(sql.includes("EXPLICIT_CONFIRMATION_REQUIRED"));
   assert.ok(sql.includes("REPLAY_CONFLICT"));
   assert.ok(sql.includes("CONFIRMATION_OR_PROPOSAL_ALREADY_CONSUMED"));
+  assert.ok(sql.includes("CONFIRMATION_BINDING_MISMATCH"));
+  assert.ok(sql.includes("v_existing.normalized_text is distinct from p_normalized_text"));
   assert.ok(sql.includes("owner_command_source_event_id"));
 });
 
