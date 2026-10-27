@@ -14,6 +14,7 @@ DECLARE
   v_failed boolean;
   v_count integer;
   v_due timestamptz;
+  v_i integer;
 BEGIN
   INSERT INTO public.business_members(id,business_id,is_active,permissions)
   VALUES(v_member,v_business,true,jsonb_build_object(
@@ -146,6 +147,32 @@ BEGIN
   v_result := public.vf_commit_owner_command_confirmation_v2(v_business,v_member,v_channel,v_confirmation,v_proposal);
   IF v_result->>'status'<>'CONFIRMATION_COMMITTED' OR v_result->'result'->>'status'<>'ACTION_CREATED' THEN
     RAISE EXCEPTION 'expected committed schedule action, got %',v_result;
+  END IF;
+
+  -- If the bounded resolver scan reaches 50 rows, it must not claim a unique match:
+  -- older proposals could exist beyond the scan window.
+  FOR v_i IN 1..51 LOOP
+    v_source := gen_random_uuid();
+    v_proposal := gen_random_uuid();
+    INSERT INTO public.work_events(id,business_id,work_item_id,business_member_id,business_channel_id,
+      actor_type,direction,event_type,normalized_text,external_message_id,payload,occurred_at)
+    VALUES(v_source,v_business,v_work,v_member,v_channel,'member','inbound','owner_command_received',
+      'scan cap source '||v_i,'wamid-scan-source-'||v_i,'{}'::jsonb,
+      now()-(v_i*interval '1 millisecond'));
+    INSERT INTO public.work_events(id,business_id,work_item_id,business_member_id,actor_type,direction,
+      event_type,content_type,payload,occurred_at)
+    VALUES(v_proposal,v_business,v_work,v_member,'assistant','internal','owner_command_proposal',
+      'application/json',jsonb_build_object('intent','add_note','note','scan cap note '||v_i,
+        'owner_command_source_event_id',v_source::text,
+        'expires_at',case when v_i<=49 then (now()-interval '1 minute')::text
+                         else (now()+interval '10 minutes')::text end),
+      now()-(v_i*interval '1 millisecond'));
+  END LOOP;
+  v_resolved := public.vf_resolve_pending_owner_command_proposal_v2(
+    v_business,v_member,v_channel,'wamid-scan-cap','confermo');
+  IF v_resolved->>'status'<>'AMBIGUOUS_PENDING_PROPOSAL'
+     OR v_resolved->>'reason'<>'CANDIDATE_SCAN_LIMIT_REACHED' THEN
+    RAISE EXCEPTION 'resolver did not fail closed at candidate scan cap: %',v_resolved;
   END IF;
 
   -- Leave one valid unconsumed confirmation for the shell-driven concurrency test.
