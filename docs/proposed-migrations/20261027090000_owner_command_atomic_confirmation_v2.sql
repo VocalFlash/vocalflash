@@ -169,7 +169,6 @@ declare
   v_due_at timestamptz;
   v_source_id uuid;
   v_result jsonb;
-  v_existing_result jsonb;
   v_normalized_confirmation text;
 begin
   if p_business_id is null or p_member_id is null or p_channel_id is null
@@ -329,5 +328,5 @@ $$;
 
 revoke all on function public.vf_resolve_pending_owner_command_proposal_v2(uuid,uuid,uuid,text) from public, anon, authenticated;
 revoke all on function public.vf_commit_owner_command_confirmation_v2(uuid,uuid,uuid,uuid,uuid) from public, anon, authenticated;
-grant execute on function public.vf_resolve_pending_owner_command_proposal_v2(uuid,uuid,uuid) to service_role;
+grant execute on function public.vf_resolve_pending_owner_command_proposal_v2(uuid,uuid,uuid,text) to service_role;
 grant execute on function public.vf_commit_owner_command_confirmation_v2(uuid,uuid,uuid,uuid,uuid) to service_role;
