@@ -707,3 +707,8 @@ Priorità operative confermate:
 6. Tenere aperti i gate #4 ambiente isolato/costo, #5 benchmark italiano, #6 readiness, #7 credenziali Supabase e #8 privacy/DPA/retention finché i criteri non sono provati sul target finale.
 
 La review live ha inoltre confermato RLS attivo ma non forzato e zero policy dirette sulle sei tabelle operative ispezionate. Le RPC legacy esaminate sono `SECURITY DEFINER` con owner `postgres`; i controlli espliciti business/member/channel e le ACL server-only sono quindi essenziali e vanno testati su schema completo. Nessun segreto è stato decifrato o cambiato; nessun SQL live, merge, deploy o messaggio è stato eseguito.
+
+
+## Corsia questionario/ESM — controllo separato, 27 ottobre 2026
+
+La PR #1 `questionario-e2e-v1` resta Draft su `main`. La correzione proposta aggiunge `type: module` per l'API ESM; i controlli Preview riportati nella PR hanno risposte HTTP attese per le route diagnostiche. Rimane però un problema separato: nel Preview del questionario `SUPABASE_URL` punta al progetto atteso, ma il `SUPABASE_SECRET_KEY` configurato restituisce HTTP 401. Non confondere questo problema con le variabili Assistant `VF_ASSISTANT_*`. Non ruotare o modificare chiavi senza diagnosi e approvazione esplicita. Prima di promuovere il questionario su `main`, risolvere ESM e validare la credenziale del progetto questionario su Preview, poi rieseguire i test sul branch finale. Nessuna credenziale è stata letta o modificata in questo audit.
