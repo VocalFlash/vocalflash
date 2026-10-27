@@ -668,3 +668,14 @@ Questo è un controllo più forte, ma non è ancora una copia integrale dello sc
 Prima di un E2E, verificare che il target disponga delle RPC v2: il runtime del candidato è collegato a `api/v1/assistant.js`, ma le RPC proposte non sono ancora nel live. Se manca una RPC, il test deve essere considerato bloccato, non un test funzionale superato. Non provare il flusso con identità o destinatari reali senza autorizzazione specifica.
 
 La verifica read-only ha confermato RLS attivo e nessuna policy diretta rilevata sulle sei tabelle operative controllate; le funzioni owner-command esistenti sono `SECURITY DEFINER`, owner postgres e `search_path=public, pg_temp`, con ACL osservata per `service_role`. Preservare l'accesso server-only e rivalutare ogni grant/policy nella prova su schema completo. CI verde su head PR `9dde053f67874a609d29387c5e6b4b1395a4aeb2` (run #40489729525) non sostituisce compatibilità schema completa né E2E.
+
+
+## Verifica ambiente Preview Vercel — 27 ottobre 2026, sola lettura
+
+È stato controllato il progetto Vercel `vocalflash` senza decifrare né leggere i valori dei segreti:
+- La query filtrata per branch `owner-command-atomic-confirmation-v3` non restituisce variabili branch-specific.
+- `VF_ASSISTANT_SUPABASE_URL`, `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS` risultano associate a Preview del branch `assistant-auth-v1`, non al branch candidato corrente. La secret Supabase è anche presente come target Development, ma non è una configurazione Preview generale.
+- `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non compare nell'inventario delle variabili Vercel.
+- Esistono variabili generiche `SUPABASE_URL`/`SUPABASE_SECRET_KEY`, ma il codice `api/v1/assistant.js` usa esplicitamente le variabili `VF_ASSISTANT_*`: le generiche non sostituiscono automaticamente quelle attese.
+
+**Conseguenza:** il Preview del branch candidato non è configurato per eseguire correttamente il percorso Assistant DB/owner confirmation. Senza le variabili `VF_ASSISTANT_*` il codice risponde con errore di configurazione DB; senza TTL la creazione della proposta fallisce chiusa. Nessun valore è stato decifrato, nessuna variabile è stata modificata. Prima dell'E2E occorre approvare e configurare esplicitamente lo scope Preview corretto e scegliere un TTL; non riutilizzare automaticamente segreti di un altro branch.
