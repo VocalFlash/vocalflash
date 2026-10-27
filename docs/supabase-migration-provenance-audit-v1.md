@@ -86,3 +86,12 @@ The 15 reconstructed files were each compared directly to the matching live supa
 ## Sequenza corretta per il prossimo lavoro — 26 ottobre 2026, sera
 
 La provenienza dei 15 corpi incrementali è già verificata 15/15 contro il registro live. Non ripetere il recupero. Il gate successivo è il baseline schema anteriore alla prima migrazione registrata: recuperare uno snapshot completo e verificabile oppure la migrazione iniziale autorevole, quindi ricostruire e confrontare tutto esclusivamente in un ambiente isolato. Solo dopo il replay/schema parity si può implementare e testare la migrazione forward della conferma atomica. Nessun DDL live o branch a pagamento è stato autorizzato.
+
+
+## Aggiornamento 27 ottobre 2026 — conferma titolare v2 isolata
+
+È stato creato il draft PR #10 sul branch `owner-command-atomic-confirmation-v3`. Il runtime ora instrada le conferme esplicite verso un resolver di proposta pendente e una nuova RPC atomica proposta; i test runtime dedicati sono inclusi nel workflow CI. Nessun merge, deploy, modifica a Supabase live o invio WhatsApp.
+
+La scadenza è obbligatoria ma non viene inventata: il runtime richiede `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` e, se manca, restituisce `CONFIG_REQUIRED` senza creare la proposta. Il SQL rimane in `docs/proposed-migrations/`, fuori dall'inventario delle 15 migrazioni recuperate, per non falsare il controllo di provenienza.
+
+Stato non ancora GO: CI del draft da attendere; SQL non eseguito su PostgreSQL isolato; baseline storica da recuperare; replay/concorrenza/rollback e privilegi da testare su DB isolato; TTL da decidere/configurare prima dell'eventuale staging. `ATOMIC_CONFIRMATION_NOT_ENABLED` resta il fallback se mancano le nuove dipendenze di persistenza.
