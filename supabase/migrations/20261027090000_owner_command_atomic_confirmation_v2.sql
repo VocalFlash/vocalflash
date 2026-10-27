@@ -214,7 +214,7 @@ begin
       regexp_replace(lower(btrim(coalesce(v_confirmation.normalized_text,''))), '[,:;]+', ' ', 'g'),
       '[.!?]+$', ''
     ),
-    '\\s+', ' ', 'g'
+    '\s+', ' ', 'g'
   );
   if v_normalized_confirmation not in ('confermo','si confermo','sì confermo','ok confermo','confermo ok') then
     return jsonb_build_object('ok',false,'status','DENIED','reason','EXPLICIT_CONFIRMATION_REQUIRED','writes_performed',false);
