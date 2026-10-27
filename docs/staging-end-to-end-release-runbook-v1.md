@@ -357,3 +357,19 @@ Durante il riesame è emerso un caso limite reale: il resolver leggeva al massim
 ## Esito CI del fix limite scansione — 27 ottobre 2026
 
 La run GitHub Actions **#40492732210** è terminata con **success** sul commit `7cbf6c357e0f29f9fa97f11d1e9cd2a6121a024b`: cinque pass Assistant API e il job PostgreSQL transazionale sono verdi. Il job PostgreSQL ha caricato il SQL proposto in due database effimeri, inclusa la fixture con le RPC legacy recuperate; il nuovo caso con 51 proposte e limite di scansione ha superato il controllo fail-closed. Questo non equivale a un test sullo schema completo live o a un E2E Meta/WhatsApp. Nessuna migrazione live applicata.
+
+
+## Refresh dei gate dopo audit 360° — 27 ottobre 2026
+
+- [x] CI isolata owner-confirmation sul pre-audit head `06c616e40f4aedc47b76eb19eb8678b17fa9cfc3`: run #40493167613 success, cinque pass API + contratto PostgreSQL.
+- [x] Query read-only Supabase: 15 migrazioni; 0 Auth users, 0 business members; 1 workflow attivo, 1 policy attiva, 14 vocaboli attivi; 1 work item e 4 eventi; nessun evento owner-command.
+- [x] Verificata assenza delle RPC v2 candidate nel live e presenza delle sole RPC legacy elencate nell'audit.
+- [x] Verificato l'inventario Vercel senza decifrare segreti: le variabili `VF_ASSISTANT_*`/API key Preview sono sul branch `assistant-auth-v1`; TTL assente sul candidato.
+- [ ] Recuperare baseline pre-registry e replayare le migrazioni su schema isolato completo.
+- [ ] Testare SQL function-only su schema completo, inclusi RLS/grants, `SECURITY DEFINER`, tenant binding, replay concorrente, rollback e TTL.
+- [ ] Approvare valore TTL e configurazione Preview specifica del branch; non copiare automaticamente segreti tra branch.
+- [ ] Con autorizzazione, predisporre identità sintetica/owner verificato e destinatario di test; eseguire E2E Meta → API → Supabase e verificare effetti/risposte.
+- [ ] Pianificare integrazione branch e risolvere ESM su `main`; rieseguire CI sul branch finale.
+- [ ] Chiudere i gate #4–#8 e i flussi persistenti/outbox/media prima del pilota commerciale.
+
+La CI del commit documentale corrente va controllata dopo l'aggiornamento. Nessuna modifica live o invio reale è autorizzato da questo runbook.
