@@ -111,3 +111,8 @@ Le nuove RPC owner-confirmation v2 non risultano installate nel database live. L
 L'inventario Vercel, eseguito senza decifrare segreti, mostra che le variabili Preview `VF_ASSISTANT_SUPABASE_URL`, `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS` sono associate al branch `assistant-auth-v1`, non alla branch owner-confirmation; `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non è presente. Non eseguire l'E2E fino a quando l'ambiente non è configurato con approvazione esplicita.
 
 CI #40493167613 è passata sul pre-audit head `06c616e40f4aedc47b76eb19eb8678b17fa9cfc3` (cinque pass API e contratto PostgreSQL isolato). Questo non prova la parità con schema completo, il Preview configurato o il percorso Meta/WhatsApp. Il baseline pre-registry, il replay completo e i gate legali/privacy restano aperti.
+
+
+## Corsia questionario/ESM — controllo separato, 27 ottobre 2026
+
+La PR #1 `questionario-e2e-v1` resta Draft su `main`. La correzione proposta aggiunge `type: module` per l'API ESM; i controlli Preview riportati nella PR hanno risposte HTTP attese per le route diagnostiche. Rimane però un problema separato: nel Preview del questionario `SUPABASE_URL` punta al progetto atteso, ma il `SUPABASE_SECRET_KEY` configurato restituisce HTTP 401. Non confondere questo problema con le variabili Assistant `VF_ASSISTANT_*`. Non ruotare o modificare chiavi senza diagnosi e approvazione esplicita. Prima di promuovere il questionario su `main`, risolvere ESM e validare la credenziale del progetto questionario su Preview, poi rieseguire i test sul branch finale. Nessuna credenziale è stata letta o modificata in questo audit.
