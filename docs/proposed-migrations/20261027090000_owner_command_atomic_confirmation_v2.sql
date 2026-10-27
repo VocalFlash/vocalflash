@@ -441,7 +441,9 @@ begin
 end;
 $$;
 
+revoke all on function public.vf_record_owner_command_confirmation_v1(uuid,uuid,uuid,text,uuid,text,timestamptz,jsonb) from public, anon, authenticated;
 revoke all on function public.vf_resolve_pending_owner_command_proposal_v2(uuid,uuid,uuid,text,text) from public, anon, authenticated;
 revoke all on function public.vf_commit_owner_command_confirmation_v2(uuid,uuid,uuid,uuid,uuid) from public, anon, authenticated;
+grant execute on function public.vf_record_owner_command_confirmation_v1(uuid,uuid,uuid,text,uuid,text,timestamptz,jsonb) to service_role;
 grant execute on function public.vf_resolve_pending_owner_command_proposal_v2(uuid,uuid,uuid,text,text) to service_role;
 grant execute on function public.vf_commit_owner_command_confirmation_v2(uuid,uuid,uuid,uuid,uuid) to service_role;
