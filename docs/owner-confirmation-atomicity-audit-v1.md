@@ -112,3 +112,12 @@ L'inventario delle colonne di public.work_events conferma che la tabella ha occu
 
 ### Gate ancora obbligatori
 La CI del draft PR #10 è in coda al momento della registrazione. Il SQL non è stato eseguito su PostgreSQL isolato: non considerarlo validato né pronto per migrazione. Prima di promuovere il file occorre recuperare la baseline storica, testare transazioni/concorrenza/replay/rollback su database isolato e riconciliare la migrazione forward con il registro live. La configurazione della TTL richiede ancora una decisione esplicita; finché non viene impostata il flusso resta fail-closed.
+
+
+## Stato finale verificato del draft owner confirmation v2 — 27 ottobre 2026
+
+- Draft PR #10, branch `owner-command-atomic-confirmation-v3`, head applicativo `9550ac57510585a41ff6522062095e416f850f8b`.
+- GitHub Actions run #40479095192 sul medesimo head: **success**, tutti e cinque i job/pass completati con successo. Comprende i test runtime aggiunti e i controlli statici del contratto SQL; non è un'esecuzione SQL su PostgreSQL.
+- La registrazione di conferma rifiuta ora il riuso conflittuale dell'identificativo esterno confrontando attività, membro, canale, tipo evento, testo, proposta e sorgente. La persistenza verifica anche il testo nel replay.
+- Il SQL proposto rimane in `docs/proposed-migrations/`; il manifesto recuperato delle 15 migrazioni non è stato alterato. Nessuna scrittura Supabase live, merge, deploy o invio WhatsApp.
+- **NO-GO rilascio:** mancano ancora baseline storica autorevole, test transazionali/concorrenza/rollback su PostgreSQL isolato e staging E2E. `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non è configurata e non ha un default: il runtime fallisce chiuso senza proposta finché la durata non viene decisa e configurata esplicitamente.
