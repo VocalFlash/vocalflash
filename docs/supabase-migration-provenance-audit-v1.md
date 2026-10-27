@@ -149,3 +149,12 @@ Questo è un controllo più forte, ma non è ancora una copia integrale dello sc
 - Queste verifiche sono read-only e non sostituiscono una prova su schema completo: il baseline anteriore alla prima migrazione registrata e il replay integrale restano aperti. TTL target non verificato e staging E2E non eseguito.
 
 **Esito:** nessuna migrazione strutturale appare necessaria per il design corrente; resta necessario un rilascio SQL function-only versionato, subordinato ai gate elencati. Nessuna modifica al live.
+
+
+## Esito aggiornato di provenienza e compatibilità — 27 ottobre 2026
+
+Le 15 migrazioni risultano registrate nel database live. Non è stato recuperato il baseline storico precedente alla prima migrazione; non dichiarare la catena completamente riproducibile finché non si ricostruisce e si esegue il replay integrale su database isolato. Il file proposto resta function-only (tre funzioni e ACL), non è una migrazione strutturale e non è applicato.
+
+La query read-only conferma RLS abilitato ma non forzato e zero policy dirette su `work_events`, `work_items`, `open_actions`, `appointments`, `business_members`, `business_channels`. Le RPC legacy ispezionate sono `SECURITY DEFINER`, owner postgres, `search_path=public, pg_temp`, privilegio EXECUTE osservato. Indici univoci per deduplica e source-event presenti; nessun trigger non interno su `work_events`. La verifica su schema completo deve provare i controlli espliciti di business/member/channel e gli ACL, non affidarsi alla sola RLS.
+
+CI #40493167613 ha passato il contratto PostgreSQL isolato e i cinque pass API sul pre-audit head `06c616e40f4aedc47b76eb19eb8678b17fa9cfc3`. Restano aperti schema parity, baseline/replay, TTL e staging E2E; nessuna migrazione live applicata.
