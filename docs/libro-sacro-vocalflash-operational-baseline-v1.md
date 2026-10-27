@@ -1221,3 +1221,14 @@ Riesame read-only delle PR aperte nel repository:
 La comparazione GitHub ha rilevato `assistant-auth-v1` a **91 commit avanti e 1 indietro rispetto a main**, e `assistant-conversation-photo-v1` a **423 commit avanti e 3 indietro rispetto a assistant-auth-v1**. Questo non è di per sé un errore funzionale, ma è un rischio concreto di promozione: definire una sequenza di integrazione, aggiornare le basi e rieseguire CI sul risultato finale prima di qualunque merge.
 
 **Ordine di lavoro suggerito:** (1) fissare e verificare la strategia ESM/base su main; (2) fare review e integrazione controllata della pipeline PR #3; (3) mantenere PR #10 subordinata a schema SQL function-only, baseline/replay, TTL ed E2E; (4) tenere PR #9 separata con gate di costo e attivazione SMS. Nessuna PR è stata unita da questo audit.
+
+
+## Verifica ambiente Preview Vercel — 27 ottobre 2026, sola lettura
+
+È stato controllato il progetto Vercel `vocalflash` senza decifrare né leggere i valori dei segreti:
+- La query filtrata per branch `owner-command-atomic-confirmation-v3` non restituisce variabili branch-specific.
+- `VF_ASSISTANT_SUPABASE_URL`, `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS` risultano associate a Preview del branch `assistant-auth-v1`, non al branch candidato corrente. La secret Supabase è anche presente come target Development, ma non è una configurazione Preview generale.
+- `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non compare nell'inventario delle variabili Vercel.
+- Esistono variabili generiche `SUPABASE_URL`/`SUPABASE_SECRET_KEY`, ma il codice `api/v1/assistant.js` usa esplicitamente le variabili `VF_ASSISTANT_*`: le generiche non sostituiscono automaticamente quelle attese.
+
+**Conseguenza:** il Preview del branch candidato non è configurato per eseguire correttamente il percorso Assistant DB/owner confirmation. Senza le variabili `VF_ASSISTANT_*` il codice risponde con errore di configurazione DB; senza TTL la creazione della proposta fallisce chiusa. Nessun valore è stato decifrato, nessuna variabile è stata modificata. Prima dell'E2E occorre approvare e configurare esplicitamente lo scope Preview corretto e scegliere un TTL; non riutilizzare automaticamente segreti di un altro branch.
