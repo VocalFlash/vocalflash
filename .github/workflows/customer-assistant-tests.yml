@@ -74,6 +74,37 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f scripts/owner-command-atomic-confirmation-postgres-fixture.sql
           psql -v ON_ERROR_STOP=1 -f docs/proposed-migrations/20261027090000_owner_command_atomic_confirmation_v2.sql
           psql -v ON_ERROR_STOP=1 -f scripts/owner-command-atomic-confirmation-postgres-test.sql
+      - name: Test with recovered legacy write RPCs
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: |
+          createdb owner_confirmation_real
+          PGDATABASE=owner_confirmation_real psql -v ON_ERROR_STOP=1 -f scripts/owner-command-atomic-confirmation-real-rpc-fixture.sql
+          PGDATABASE=owner_confirmation_real psql -v ON_ERROR_STOP=1 -f docs/proposed-migrations/20261027090000_owner_command_atomic_confirmation_v2.sql
+          PGDATABASE=owner_confirmation_real psql -v ON_ERROR_STOP=1 -f scripts/owner-command-atomic-confirmation-postgres-test.sql
+      - name: Verify real legacy RPC concurrency is single-use
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: owner_confirmation_real
+        run: |
+          CONFIRMATION_ID="$(psql -Atqc "select id from public.work_events where external_message_id='wamid-confirm-concurrent' and event_type='owner_command_confirmation'")"
+          test -n "$CONFIRMATION_ID"
+          psql -v ON_ERROR_STOP=1 -c "select public.vf_commit_owner_command_confirmation_v2('10000000-0000-4000-8000-000000000001'::uuid,'10000000-0000-4000-8000-000000000002'::uuid,'10000000-0000-4000-8000-000000000003'::uuid,'$CONFIRMATION_ID'::uuid,'10000000-0000-4000-8000-000000000402'::uuid)" > /tmp/owner-confirmation-real-a.log &
+          PID_A=$!
+          psql -v ON_ERROR_STOP=1 -c "select public.vf_commit_owner_command_confirmation_v2('10000000-0000-4000-8000-000000000001'::uuid,'10000000-0000-4000-8000-000000000002'::uuid,'10000000-0000-4000-8000-000000000003'::uuid,'$CONFIRMATION_ID'::uuid,'10000000-0000-4000-8000-000000000402'::uuid)" > /tmp/owner-confirmation-real-b.log &
+          PID_B=$!
+          wait "$PID_A"
+          wait "$PID_B"
+          grep -q "CONFIRMATION_COMMITTED" /tmp/owner-confirmation-real-a.log
+          grep -q "CONFIRMATION_COMMITTED" /tmp/owner-confirmation-real-b.log
+          psql -v ON_ERROR_STOP=1 -f scripts/owner-command-atomic-confirmation-postgres-concurrency-assert.sql
+
       - name: Verify concurrent commits are single-use
         env:
           PGHOST: 127.0.0.1
