@@ -7,7 +7,8 @@
 create or replace function public.vf_resolve_pending_owner_command_proposal_v2(
   p_business_id uuid,
   p_member_id uuid,
-  p_channel_id uuid
+  p_channel_id uuid,
+  p_external_message_id text
 )
 returns jsonb
 language plpgsql
@@ -20,6 +21,8 @@ declare
   v_row record;
   v_expiry timestamptz;
   v_candidate record;
+  v_existing_confirmation public.work_events%rowtype;
+  v_existing_proposal_id uuid;
   v_count integer := 0;
   v_proposal_id uuid;
   v_source_event_id uuid;
@@ -42,6 +45,51 @@ begin
     return jsonb_build_object('ok',false,'status','DENIED','reason','CHANNEL_NOT_ACTIVE');
   end if;
 
+  -- Resolve exact retries before scanning for unconsumed proposals.
+  select * into v_existing_confirmation
+  from public.work_events
+  where business_channel_id=p_channel_id
+    and external_message_id=p_external_message_id
+  limit 1;
+  if found then
+    if v_existing_confirmation.business_id<>p_business_id
+       or v_existing_confirmation.business_member_id<>p_member_id
+       or v_existing_confirmation.event_type<>'owner_command_confirmation' then
+      return jsonb_build_object('ok',false,'status','REPLAY_CONFLICT','reason','CONFIRMATION_MESSAGE_ID_REUSED','writes_performed',false);
+    end if;
+    begin
+      v_existing_proposal_id := (v_existing_confirmation.payload->>'proposal_event_id')::uuid;
+    exception when others then
+      return jsonb_build_object('ok',false,'status','REPLAY_CONFLICT','reason','CONFIRMATION_PROPOSAL_BINDING_INVALID','writes_performed',false);
+    end;
+    select p.id,p.business_id,p.work_item_id,p.business_member_id,p.payload,p.occurred_at,
+           s.id as source_id,s.business_channel_id
+      into v_candidate
+    from public.work_events p
+    join public.work_events s
+      on s.id::text=(p.payload->>'owner_command_source_event_id')
+     and s.business_id=p.business_id
+     and s.business_member_id=p.business_member_id
+     and s.event_type='owner_command_received'
+    where p.id=v_existing_proposal_id
+      and p.business_id=p_business_id
+      and p.business_member_id=p_member_id
+      and s.business_channel_id=p_channel_id
+      and p.event_type='owner_command_proposal';
+    if not found then
+      return jsonb_build_object('ok',false,'status','REPLAY_CONFLICT','reason','CONFIRMATION_PROPOSAL_BINDING_INVALID','writes_performed',false);
+    end if;
+    return jsonb_build_object(
+      'ok',true,'status','EXISTING_CONFIRMATION',
+      'proposal_event_id',v_candidate.id,
+      'source_event_id',v_candidate.source_id,
+      'work_item_id',v_candidate.work_item_id,
+      'expires_at',v_candidate.payload->>'expires_at',
+      'proposal',v_candidate.payload,
+      'writes_performed',false
+    );
+  end if;
+
   -- A proposal is channel-bound through its authenticated source event. Invalid
   -- or missing expiry values are ignored (fail closed), never treated as unexpired.
   for v_row in
@@ -49,7 +97,7 @@ begin
            s.id as source_id,s.business_channel_id
     from public.work_events p
     join public.work_events s
-      on s.id=(p.payload->>'owner_command_source_event_id')::uuid
+      on s.id::text=(p.payload->>'owner_command_source_event_id')
      and s.business_id=p.business_id
      and s.business_member_id=p.business_member_id
      and s.event_type='owner_command_received'
@@ -173,6 +221,20 @@ begin
   end if;
 
   v_payload := coalesce(v_proposal.payload,'{}'::jsonb);
+  -- An exact replay returns the persisted result even after expiry. Inconsistent
+  -- consumption markers fail closed.
+  if (v_payload ? 'confirmation_consumed_at') or (v_confirmation_payload ? 'consumed_at') then
+    if v_payload->>'confirmation_event_id'=p_confirmation_event_id::text
+       and v_confirmation_payload->>'consumed_for_proposal_event_id'=p_proposal_event_id::text
+       and jsonb_typeof(v_payload->'confirmation_result')='object'
+       and jsonb_typeof(v_confirmation_payload->'commit_result')='object'
+       and v_payload->'confirmation_result'=v_confirmation_payload->'commit_result' then
+      return jsonb_build_object('ok',true,'status','CONFIRMATION_COMMITTED',
+        'result',v_payload->'confirmation_result','replayed',true,'writes_performed',false);
+    end if;
+    return jsonb_build_object('ok',false,'status','DENIED','reason','CONFIRMATION_OR_PROPOSAL_ALREADY_CONSUMED','writes_performed',false);
+  end if;
+
   if not (v_payload ? 'expires_at') then
     return jsonb_build_object('ok',false,'status','CONFIG_REQUIRED','reason','PROPOSAL_EXPIRY_REQUIRED','writes_performed',false);
   end if;
@@ -211,26 +273,6 @@ begin
     return jsonb_build_object('ok',false,'status','DENIED','reason','PROPOSAL_WORK_ITEM_INVALID','writes_performed',false);
   end if;
 
-  -- Exact replay of the same confirmation returns the stored outcome. A
-  -- different confirmation cannot reuse a consumed proposal.
-  if v_payload ? 'confirmation_consumed_at' then
-    if v_payload->>'confirmation_event_id'=p_confirmation_event_id::text
-       and jsonb_typeof(v_payload->'confirmation_result')='object' then
-      return jsonb_build_object('ok',true,'status','CONFIRMATION_COMMITTED',
-        'result',v_payload->'confirmation_result','replayed',true,'writes_performed',false);
-    end if;
-    return jsonb_build_object('ok',false,'status','DENIED','reason','PROPOSAL_ALREADY_CONSUMED','writes_performed',false);
-  end if;
-
-  if v_confirmation_payload ? 'consumed_at' then
-    if v_confirmation_payload->>'consumed_for_proposal_event_id'=p_proposal_event_id::text
-       and jsonb_typeof(v_confirmation_payload->'commit_result')='object' then
-      return jsonb_build_object('ok',true,'status','CONFIRMATION_COMMITTED',
-        'result',v_confirmation_payload->'commit_result','replayed',true,'writes_performed',false);
-    end if;
-    return jsonb_build_object('ok',false,'status','DENIED','reason','CONFIRMATION_ALREADY_CONSUMED','writes_performed',false);
-  end if;
-
   v_intent := v_payload->>'intent';
   if v_intent='add_note' then
     v_note := nullif(btrim(v_payload->>'note'),'');
@@ -240,7 +282,7 @@ begin
     v_result := public.vf_commit_owner_note_v1(
       p_business_id,v_proposal.work_item_id,p_member_id,v_source_id,v_note,true,p_proposal_event_id
     );
-    if v_result->>'status' not in ('NOTE_ADDED','NOTE_EXISTS') then
+    if coalesce(v_result->>'status','') not in ('NOTE_ADDED','NOTE_EXISTS') then
       return jsonb_build_object('ok',false,'status','COMMIT_REJECTED','result',v_result,'writes_performed',false);
     end if;
   elsif v_intent='schedule_action' then
@@ -256,7 +298,7 @@ begin
     v_result := public.vf_commit_owner_schedule_action_v1(
       p_business_id,v_proposal.work_item_id,p_member_id,v_source_id,v_title,v_due_at,true,p_proposal_event_id
     );
-    if v_result->>'status' not in ('ACTION_CREATED','ACTION_EXISTS') then
+    if coalesce(v_result->>'status','') not in ('ACTION_CREATED','ACTION_EXISTS') then
       return jsonb_build_object('ok',false,'status','COMMIT_REJECTED','result',v_result,'writes_performed',false);
     end if;
   else
@@ -285,7 +327,7 @@ begin
 end;
 $$;
 
-revoke all on function public.vf_resolve_pending_owner_command_proposal_v2(uuid,uuid,uuid) from public, anon, authenticated;
+revoke all on function public.vf_resolve_pending_owner_command_proposal_v2(uuid,uuid,uuid,text) from public, anon, authenticated;
 revoke all on function public.vf_commit_owner_command_confirmation_v2(uuid,uuid,uuid,uuid,uuid) from public, anon, authenticated;
 grant execute on function public.vf_resolve_pending_owner_command_proposal_v2(uuid,uuid,uuid) to service_role;
 grant execute on function public.vf_commit_owner_command_confirmation_v2(uuid,uuid,uuid,uuid,uuid) to service_role;
