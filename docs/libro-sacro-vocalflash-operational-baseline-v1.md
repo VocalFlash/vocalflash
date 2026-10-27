@@ -1199,3 +1199,12 @@ Ulteriore CI verde: run #40480990100 sul commit `bb7c3b3dc99d41bea640adcb1bfb343
 Il job ora esegue due profili isolati: (1) schema minimo con RPC di scrittura simulate per verificare la transazione del wrapper; (2) database separato con i corpi delle RPC legacy `vf_commit_owner_note_v1` e `vf_commit_owner_schedule_action_v1` recuperati dalla migrazione sorgente, con policy, permessi, tabella note/azioni e trigger di test. Anche nel secondo profilo passano nota, azione pianificata, replay identico e conflittuale, scadenza, rollback e due commit concorrenti con una sola azione.
 
 Questo è un controllo più forte, ma non è ancora una copia integrale dello schema live né un E2E su Supabase/WhatsApp. Il SQL proposto resta fuori da `supabase/migrations/`; nessuna modifica live, merge o deploy.
+
+
+## Riesame progetto owner confirmation e schema live — 27 ottobre 2026
+
+- CI sul head corrente `9dde053f67874a609d29387c5e6b4b1395a4aeb2`: run #40489729525 **success**, cinque pass API e contratto PostgreSQL isolato completati.
+- Il candidato runtime è collegato in `api/v1/assistant.js` attraverso il dispatcher WhatsApp. Le nuove RPC v2 sono però soltanto nella proposta SQL e non esistono ancora nel database live: non considerare il flusso abilitato né testato end-to-end.
+- In sola lettura: RLS attivo su `work_events`, `work_items`, `open_actions`, `appointments`, `business_members`, `business_channels`; nessuna policy diretta trovata su queste tabelle nella catalog query. Le RPC owner-command live ispezionate sono `SECURITY DEFINER`, owner postgres, `search_path=public, pg_temp`, ACL osservata `service_role` soltanto. Indici di unicità per external message ID, proposta/nota per source event e azione per source event presenti. Nessun trigger non interno trovato su `work_events`.
+- **NO-GO invariato:** schema completo isolato e baseline pre-registry da ricostruire/replayare; TTL target da decidere/verificare; staging E2E Meta → Assistant API → Supabase da eseguire con destinatario autorizzato.
+- Nessun SQL applicato, nessuna scrittura live, nessun merge o messaggio WhatsApp eseguito nel presente riesame.
