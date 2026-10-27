@@ -372,4 +372,4 @@ La run GitHub Actions **#40492732210** è terminata con **success** sul commit `
 - [ ] Pianificare integrazione branch e risolvere ESM su `main`; rieseguire CI sul branch finale.
 - [ ] Chiudere i gate #4–#8 e i flussi persistenti/outbox/media prima del pilota commerciale.
 
-La CI del commit documentale corrente va controllata dopo l'aggiornamento. Nessuna modifica live o invio reale è autorizzato da questo runbook.
+Verificare sempre i check CI sullo SHA corrente prima della promozione; un run precedente non copre commit successivi. Nessuna modifica live o invio reale è autorizzato da questo runbook.
