@@ -4,11 +4,118 @@
 -- Proposal payload must include an explicit server-generated expires_at timestamp.
 -- No default TTL is invented here; the application must be configured deliberately.
 
+create or replace function public.vf_record_owner_command_confirmation_v1(
+  p_business_id uuid,
+  p_member_id uuid,
+  p_channel_id uuid,
+  p_external_message_id text,
+  p_proposal_event_id uuid,
+  p_normalized_text text,
+  p_occurred_at timestamptz,
+  p_payload jsonb default '{}'::jsonb
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $
+declare
+  v_event_id uuid;
+  v_source_event_id text;
+  v_existing public.work_events%rowtype;
+begin
+  if p_external_message_id is null or length(btrim(p_external_message_id))=0 then
+    return jsonb_build_object('ok',false,'status','INVALID','reason','EXTERNAL_MESSAGE_ID_REQUIRED');
+  end if;
+
+  if not exists(
+    select 1 from public.business_members m
+    where m.id=p_member_id and m.business_id=p_business_id and m.is_active=true
+  ) then
+    return jsonb_build_object('ok',false,'status','DENIED','reason','MEMBER_NOT_ACTIVE');
+  end if;
+
+  if not exists(
+    select 1 from public.business_channels c
+    where c.id=p_channel_id and c.business_id=p_business_id and c.is_active=true
+  ) then
+    return jsonb_build_object('ok',false,'status','DENIED','reason','CHANNEL_NOT_ACTIVE');
+  end if;
+
+  select e.payload->>'owner_command_source_event_id'
+    into v_source_event_id
+  from public.work_events e
+  where e.id=p_proposal_event_id
+    and e.business_id=p_business_id
+    and e.business_member_id=p_member_id
+    and e.event_type='owner_command_proposal';
+
+  if v_source_event_id is null then
+    return jsonb_build_object('ok',false,'status','DENIED','reason','PROPOSAL_NOT_FOUND');
+  end if;
+
+  perform pg_advisory_xact_lock(
+    hashtextextended(p_business_id::text||':confirm:'||p_channel_id::text||':'||p_external_message_id,0)
+  );
+
+  insert into public.work_events(
+    business_id,business_member_id,business_channel_id,
+    actor_type,direction,event_type,channel_type,content_type,
+    normalized_text,external_message_id,payload,occurred_at
+  )
+  values(
+    p_business_id,p_member_id,p_channel_id,
+    'member','internal','owner_command_confirmation','whatsapp','text',
+    p_normalized_text,p_external_message_id,
+    coalesce(p_payload,'{}'::jsonb) || jsonb_build_object(
+      'proposal_event_id',p_proposal_event_id::text,
+      'owner_command_source_event_id',v_source_event_id
+    ),
+    coalesce(p_occurred_at,now())
+  )
+  on conflict do nothing
+  returning id into v_event_id;
+
+  if v_event_id is null then
+    select * into v_existing
+    from public.work_events e
+    where e.business_channel_id=p_channel_id
+      and e.external_message_id=p_external_message_id
+    limit 1;
+
+    if not found
+       or v_existing.business_id is distinct from p_business_id
+       or v_existing.business_member_id is distinct from p_member_id
+       or v_existing.business_channel_id is distinct from p_channel_id
+       or v_existing.event_type is distinct from 'owner_command_confirmation'
+       or v_existing.external_message_id is distinct from p_external_message_id
+       or v_existing.normalized_text is distinct from p_normalized_text
+       or v_existing.payload->>'proposal_event_id' is distinct from p_proposal_event_id::text
+       or v_existing.payload->>'owner_command_source_event_id' is distinct from v_source_event_id then
+      return jsonb_build_object('ok',false,'status','REPLAY_CONFLICT','reason','CONFIRMATION_BINDING_MISMATCH','writes_performed',false);
+    end if;
+
+    return jsonb_build_object(
+      'ok',true,'status','CONFIRMATION_EXISTS',
+      'confirmation_event_id',v_existing.id,'replayed',true,
+      'proposal_event_id',p_proposal_event_id
+    );
+  end if;
+
+  return jsonb_build_object(
+    'ok',true,'status','CONFIRMATION_RECORDED',
+    'confirmation_event_id',v_event_id,'replayed',false,
+    'proposal_event_id',p_proposal_event_id
+  );
+end;
+$;
+
 create or replace function public.vf_resolve_pending_owner_command_proposal_v2(
   p_business_id uuid,
   p_member_id uuid,
   p_channel_id uuid,
-  p_external_message_id text
+  p_external_message_id text,
+  p_normalized_text text
 )
 returns jsonb
 language plpgsql
@@ -59,7 +166,8 @@ begin
   if found then
     if v_existing_confirmation.business_id is distinct from p_business_id
        or v_existing_confirmation.business_member_id is distinct from p_member_id
-       or v_existing_confirmation.event_type is distinct from 'owner_command_confirmation' then
+       or v_existing_confirmation.event_type is distinct from 'owner_command_confirmation'
+       or v_existing_confirmation.normalized_text is distinct from p_normalized_text then
       return jsonb_build_object('ok',false,'status','REPLAY_CONFLICT','reason','CONFIRMATION_MESSAGE_ID_REUSED','writes_performed',false);
     end if;
     begin
@@ -333,7 +441,7 @@ begin
 end;
 $$;
 
-revoke all on function public.vf_resolve_pending_owner_command_proposal_v2(uuid,uuid,uuid,text) from public, anon, authenticated;
+revoke all on function public.vf_resolve_pending_owner_command_proposal_v2(uuid,uuid,uuid,text,text) from public, anon, authenticated;
 revoke all on function public.vf_commit_owner_command_confirmation_v2(uuid,uuid,uuid,uuid,uuid) from public, anon, authenticated;
 grant execute on function public.vf_resolve_pending_owner_command_proposal_v2(uuid,uuid,uuid,text) to service_role;
 grant execute on function public.vf_commit_owner_command_confirmation_v2(uuid,uuid,uuid,uuid,uuid) to service_role;
