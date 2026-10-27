@@ -871,3 +871,8 @@ Nessuna issue è stata chiusa automaticamente: la presenza di fix su una branch 
 7. Prima del pilota commerciale, completare benchmark audio, media-only, stato conversazionale persistente, outbox/reconciliation, onboarding/billing e revisione privacy legale.
 
 **Sicurezza del riesame:** tutte le query Supabase di questa sezione sono read-only. Nessun DDL o dato live modificato; nessuna migrazione applicata; nessun merge o deploy di produzione; nessun invio WhatsApp/SMS; nessuna variabile ambiente cambiata. Il commit documentale genererà una nuova CI: verificarne il risultato separatamente dal run citato sopra.
+
+
+## Corsia questionario/ESM — controllo separato, 27 ottobre 2026
+
+La PR #1 `questionario-e2e-v1` resta Draft su `main`. La correzione proposta aggiunge `type: module` per l'API ESM; i controlli Preview riportati nella PR hanno risposte HTTP attese per le route diagnostiche. Rimane però un problema separato: nel Preview del questionario `SUPABASE_URL` punta al progetto atteso, ma il `SUPABASE_SECRET_KEY` configurato restituisce HTTP 401. Non confondere questo problema con le variabili Assistant `VF_ASSISTANT_*`. Non ruotare o modificare chiavi senza diagnosi e approvazione esplicita. Prima di promuovere il questionario su `main`, risolvere ESM e validare la credenziale del progetto questionario su Preview, poi rieseguire i test sul branch finale. Nessuna credenziale è stata letta o modificata in questo audit.
