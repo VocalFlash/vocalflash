@@ -1260,3 +1260,28 @@ La branch `assistant-owner-command-integration-v1` è stata confrontata con `ass
 - **Issue #8 — privacy/DPA/retention:** ancora aperta; notice pre-lancio e obblighi B2B devono essere finalizzati con dati legali reali e revisione qualificata prima del pilota commerciale.
 
 Nessuna issue è stata chiusa automaticamente: la presenza di fix su una branch non equivale alla promozione su main né al superamento di tutti i criteri di accettazione.
+
+
+## Audit integrato del progetto — 27 ottobre 2026, 11:05 UTC
+
+### Stato verificato
+- **CI owner-confirmation:** run `40493167613` completata con successo sul commit `06c616e40f4aedc47b76eb19eb8678b17fa9cfc3`: cinque pass Assistant API e contratto PostgreSQL transazionale verdi. È una prova isolata del candidato, non una prova E2E o di parità con lo schema live.
+- **Supabase live, sola lettura:** 15 migrazioni registrate; 0 utenti Auth, 0 membri business, 1 work item, 4 work events, 1 workflow attivo, 1 policy attiva, 14 voci di vocabolario attive; 0 eventi owner-command di tipo proposta, conferma o ricevuto. Non creare artificialmente identità o eventi.
+- **RPC live:** presenti le versioni legacy `vf_record_owner_command_confirmation_v1`, `vf_commit_owner_note_v1` e `vf_commit_owner_schedule_action_v1`; assenti le RPC candidate `vf_resolve_pending_owner_command_proposal_v2` e `vf_commit_owner_command_confirmation_v2`. La proposta SQL non è applicata.
+- **Sicurezza DB:** RLS attivo ma non forzato sulle tabelle operative esaminate (`work_events`, `work_items`, `open_actions`, `appointments`, `business_members`, `business_channels`); la catalog query rileva zero policy dirette su queste tabelle. Le RPC legacy esaminate sono `SECURITY DEFINER`, proprietario `postgres`, `search_path=public, pg_temp`, con privilegio EXECUTE osservato. Quindi RLS da solo non dimostra l'isolamento tenant per queste RPC: controlli espliciti business/member/channel e ACL server-only devono restare parte del contratto e dei test.
+- **Idempotenza/schema:** indici univoci live confermati su canale + external message ID, source-event per proposta/nota e source-event per azione; nessun trigger non interno trovato su `work_events`; trigger `updated_at` su canali, membri, azioni e pratiche.
+- **Configurazione Vercel, senza decifrare segreti:** `VF_ASSISTANT_SUPABASE_URL`, `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS` sono configurate per Preview del branch `assistant-auth-v1`, non per `owner-command-atomic-confirmation-v3`; `VF_ASSISTANT_SUPABASE_SECRET_KEY` è presente anche in Development. `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non è presente. Le variabili generiche `SUPABASE_URL`/`SUPABASE_SECRET_KEY` non sostituiscono i nomi `VF_ASSISTANT_*` letti da `api/v1/assistant.js`. Preview non pronto per E2E; nessun segreto letto o modificato.
+- **PR/branch:** PR #1 ESM su `main`, #3 customer pipeline su `assistant-auth-v1`, #9 Auth SMS/Bird su `main`, #10 owner confirmation su `assistant-conversation-photo-v1` sono Draft. PR #2 è stata unita a `assistant-auth-v1`, non prova un rilascio su `main`. La catena è impilata e divergente: non fare merge diretti senza riconciliare base, ESM e CI sul risultato finale.
+- **Issue aperte di progetto:** #4 approvazione/costo ambiente Supabase isolato; #5 benchmark di trascrizione italiana; #6 readiness dipendenze; #7 standardizzazione chiavi Supabase; #8 privacy/DPA/retention/subprocessor. Per #6 e #7 esistono correzioni e test nel branch di lavoro, ma non sono chiuse finché non sono integrate e verificate sulla catena di rilascio.
+- **Preview:** il progetto Vercel riporta un deployment `READY`, ma questo non dimostra che il Preview della branch owner-confirmation abbia le variabili necessarie né che l'E2E funzioni.
+
+### Decisione e prossimi passi obbligatori
+1. Tenere PR #10 Draft e il rilascio **NO-GO**.
+2. Recuperare il baseline storico pre-registry e riconciliare le 15 migrazioni con le sorgenti; costruire un database isolato a schema completo soltanto dopo approvazione esplicita del costo.
+3. Eseguire replay completo delle migrazioni e i test PostgreSQL della proposta su schema completo; verificare RPC, policy, grants, funzioni `SECURITY DEFINER`, indici e trigger.
+4. Scegliere esplicitamente il TTL, poi associare le sole variabili necessarie al Preview corretto senza copiare segreti tra branch automaticamente.
+5. Creare un'identità owner sintetica/verificata soltanto con autorizzazione, quindi E2E staging Meta → API → Supabase con destinatario autorizzato.
+6. Risolvere l'ordine di integrazione PR #1/#3/#9/#10 e rieseguire CI sul branch finale; non chiudere automaticamente issue #4–#8.
+7. Prima del pilota commerciale, completare benchmark audio, media-only, stato conversazionale persistente, outbox/reconciliation, onboarding/billing e revisione privacy legale.
+
+**Sicurezza del riesame:** tutte le query Supabase di questa sezione sono read-only. Nessun DDL o dato live modificato; nessuna migrazione applicata; nessun merge o deploy di produzione; nessun invio WhatsApp/SMS; nessuna variabile ambiente cambiata. Il commit documentale genererà una nuova CI: verificarne il risultato separatamente dal run citato sopra.
