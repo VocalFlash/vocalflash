@@ -794,3 +794,16 @@ La PR #10 è ancora Draft e la CI sul head `9dde053f67874a609d29387c5e6b4b1395a4
 Verifiche read-only aggiuntive: RLS attivo sulle sei tabelle operative ispezionate, nessuna policy diretta trovata per esse; RPC owner-command esistenti con `SECURITY DEFINER`, proprietario postgres e `search_path=public, pg_temp`; ACL osservata limitata a `service_role`. Indici di deduplica/replay presenti; trigger non interni osservati solo per aggiornare `updated_at` su quattro tabelle, non su `work_events`.
 
 **Gate ancora aperti:** baseline pre-registry e replay integrale in DB isolato; compatibilità su schema completo; configurazione e verifica del valore TTL nel target; E2E staging autorizzato con destinatario di test. La proposta SQL resta in `docs/proposed-migrations/`; nessuna modifica live, merge o rilascio di produzione.
+
+
+## Inventario complessivo PR/branch — 27 ottobre 2026
+
+Riesame read-only delle PR aperte nel repository:
+- **PR #1 — ESM su main:** ancora Draft; `main/package.json` non contiene `"type": "module"`, mentre `assistant-auth-v1` e `assistant-conversation-photo-v1` sì. Prima di promuovere l'API va risolta esplicitamente la modalità ESM su main (PR #1 o modifica equivalente verificata), senza assumere che il fix sia già entrato in main.
+- **PR #3 — pipeline conversazioni/nuovo lavoro:** Draft e base `assistant-auth-v1`. I check osservati sul suo head sono verdi, ma la branch è una linea di lavoro molto divergente da main e il suo merge path va riconciliato.
+- **PR #9 — Supabase Auth SMS Hook/Bird:** Draft; cinque pass Deno duplicati risultano verdi sul head noto (11 test per pass). Non sono stati verificati deploy Supabase, configurazione Auth hook, sender/account Bird o invio OTP reale; ogni costo e attivazione richiede approvazione esplicita.
+- **PR #10 — conferma atomica titolare:** Draft, basata su `assistant-conversation-photo-v1` (la branch della PR #3). Non è una PR indipendente da main: prima del rilascio bisogna riconciliare la catena di branch e il target base, non unire direttamente alla cieca.
+
+La comparazione GitHub ha rilevato `assistant-auth-v1` a **91 commit avanti e 1 indietro rispetto a main**, e `assistant-conversation-photo-v1` a **423 commit avanti e 3 indietro rispetto a assistant-auth-v1**. Questo non è di per sé un errore funzionale, ma è un rischio concreto di promozione: definire una sequenza di integrazione, aggiornare le basi e rieseguire CI sul risultato finale prima di qualunque merge.
+
+**Ordine di lavoro suggerito:** (1) fissare e verificare la strategia ESM/base su main; (2) fare review e integrazione controllata della pipeline PR #3; (3) mantenere PR #10 subordinata a schema SQL function-only, baseline/replay, TTL ed E2E; (4) tenere PR #9 separata con gate di costo e attivazione SMS. Nessuna PR è stata unita da questo audit.
