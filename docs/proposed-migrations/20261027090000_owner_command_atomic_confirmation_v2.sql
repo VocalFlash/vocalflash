@@ -131,6 +131,7 @@ declare
   v_existing_confirmation public.work_events%rowtype;
   v_existing_proposal_id uuid;
   v_count integer := 0;
+  v_scanned integer := 0;
   v_proposal_id uuid;
   v_source_event_id uuid;
   v_work_item_id uuid;
@@ -223,6 +224,7 @@ begin
     order by p.occurred_at desc
     limit 50
   loop
+    v_scanned := v_scanned + 1;
     begin
       v_expiry := (v_row.payload->>'expires_at')::timestamptz;
     exception when others then
@@ -233,6 +235,13 @@ begin
       v_candidate := v_row;
     end if;
   end loop;
+
+  -- The query is deliberately bounded. If it reaches the cap, older proposals
+  -- may exist outside the window, so never treat one in-window match as unique.
+  if v_scanned >= 50 then
+    return jsonb_build_object('ok',false,'status','AMBIGUOUS_PENDING_PROPOSAL',
+      'reason','CANDIDATE_SCAN_LIMIT_REACHED','writes_performed',false);
+  end if;
 
   if v_count=0 then
     return jsonb_build_object('ok',true,'status','NO_PENDING_PROPOSAL','writes_performed',false);
