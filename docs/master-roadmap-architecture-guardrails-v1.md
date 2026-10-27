@@ -835,3 +835,14 @@ La run GitHub Actions **#40492732210** è terminata con **success** sul commit `
 ## Riconciliazione branch legacy — 27 ottobre 2026
 
 La branch `assistant-owner-command-integration-v1` è stata confrontata con `assistant-conversation-photo-v1`: risulta 439 commit indietro e non contiene commit unici rispetto alla branch più recente. Trattarla come branch legacy/stale, non come sorgente da integrare o base di rilascio. La branch `main` risulta attualmente senza protezione GitHub secondo l'inventario API; nessuna regola è stata modificata. Prima di una promozione reale, definire la sequenza di integrazione e i controlli obbligatori sul branch finale.
+
+
+## Riconciliazione issue aperte di progetto — 27 ottobre 2026
+
+- **Issue #6 — readiness Assistant:** nel branch di lavoro il codice ora chiama `checkAssistantReadiness`, che controlla configurazione AI/routing/DB e fa una probe Supabase read-only con timeout; i test coprono config mancante, errore HTTP, timeout e chiavi moderne/legacy. L'issue resta aperta finché non è verificata la coerenza con la readiness del bot e la correzione non è promossa attraverso la catena branch.
+- **Issue #7 — credenziali Supabase:** nel branch di lavoro i moduli ispezionati (ingest, dispatcher, new-work e owner persistence) usano `supabaseRestHeaders`, che non costruisce Bearer JWT da una moderna chiave `sb_secret_`; ci sono test mirati. L'issue resta aperta finché la verifica cross-module completa e il percorso finale di rilascio non sono chiusi.
+- **Issue #4 — database di sviluppo isolato:** ancora bloccata; nessun branch Supabase a pagamento creato. Ricalcolare il prezzo corrente e chiedere approvazione prima di creare risorse.
+- **Issue #5 — corpus regressione trascrizione italiana:** ancora aperta; i casi storici “sopralluogo”, “Via Etnea” e “controllare le misure del locale” non sono ancora un benchmark ripetibile revisionato. Non sostituire il percorso audio funzionante prima del benchmark.
+- **Issue #8 — privacy/DPA/retention:** ancora aperta; notice pre-lancio e obblighi B2B devono essere finalizzati con dati legali reali e revisione qualificata prima del pilota commerciale.
+
+Nessuna issue è stata chiusa automaticamente: la presenza di fix su una branch non equivale alla promozione su main né al superamento di tutti i criteri di accettazione.
