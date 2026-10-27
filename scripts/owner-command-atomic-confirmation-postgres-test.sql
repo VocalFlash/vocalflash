@@ -15,9 +15,17 @@ DECLARE
   v_count integer;
   v_due timestamptz;
 BEGIN
-  INSERT INTO public.business_members(id,business_id,is_active) VALUES(v_member,v_business,true);
+  INSERT INTO public.business_members(id,business_id,is_active,permissions)
+  VALUES(v_member,v_business,true,jsonb_build_object(
+    'version',1,
+    'grants',jsonb_build_array('add_note','schedule_action'),
+    'work_items',jsonb_build_object('mode','business','ids',jsonb_build_array())
+  ));
   INSERT INTO public.business_channels(id,business_id,is_active) VALUES(v_channel,v_business,true);
   INSERT INTO public.work_items(id,business_id,lifecycle_status) VALUES(v_work,v_business,'open');
+  INSERT INTO public.assistant_policies(business_id,scope,policy_key,autonomy_mode,is_active)
+  VALUES(v_business,'business','add_note','confirm',true),
+        (v_business,'business','schedule_action','confirm',true);
 
   -- Successful note commit, exact replay and conflicting external-message replay.
   v_source := '10000000-0000-4000-8000-000000000101';
