@@ -191,3 +191,12 @@ Durante il riesame è emerso un caso limite reale: il resolver leggeva al massim
 ## Esito CI del fix limite scansione — 27 ottobre 2026
 
 La run GitHub Actions **#40492732210** è terminata con **success** sul commit `7cbf6c357e0f29f9fa97f11d1e9cd2a6121a024b`: cinque pass Assistant API e il job PostgreSQL transazionale sono verdi. Il job PostgreSQL ha caricato il SQL proposto in due database effimeri, inclusa la fixture con le RPC legacy recuperate; il nuovo caso con 51 proposte e limite di scansione ha superato il controllo fail-closed. Questo non equivale a un test sullo schema completo live o a un E2E Meta/WhatsApp. Nessuna migrazione live applicata.
+
+
+## Verifica conclusiva del target — 27 ottobre 2026
+
+La run #40493167613 è verde sul pre-audit head `06c616e40f4aedc47b76eb19eb8678b17fa9cfc3` (cinque pass Assistant API e test PostgreSQL transazionale). Le query live sono rimaste read-only. Sono confermati 0 eventi owner-command e l'assenza delle due RPC v2 proposte; il flusso non è abilitato sul database target.
+
+Nota sicurezza: RLS è attivo ma non forzato e non ci sono policy dirette sulle sei tabelle operative ispezionate. Le RPC legacy sono `SECURITY DEFINER`, owner `postgres`, `search_path=public, pg_temp`; la sicurezza tenant non può essere dedotta dalla sola presenza di RLS. Verificare i controlli business/member/channel e i grant sullo schema completo isolato. L'inventario Preview non espone segreti: variabili `VF_ASSISTANT_*` associate al branch `assistant-auth-v1`, TTL assente per il candidato.
+
+Gate invariati: baseline storico, replay migrazioni, schema completo isolato, TTL esplicito, Preview configurato con approvazione, owner autorizzato e E2E Meta/API/Supabase. Nessuna modifica live.
