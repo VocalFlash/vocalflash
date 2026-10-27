@@ -139,3 +139,13 @@ Questo è un controllo più forte, ma non è ancora una copia integrale dello sc
 - Valutare il rilascio come **migrazione SQL function-only**, non come migrazione strutturale, mantenendo la versione e i test tracciabili.
 - Prima di promuoverla, verificare compatibilità con schema/policy/grants completi, provenienza del registro, chiamanti e rollback; configurare esplicitamente `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS`; completare staging E2E.
 - Fino al completamento dei gate, mantenere `ATOMIC_CONFIRMATION_NOT_ENABLED` e lo stato **NO-GO**. Nessun merge, deploy o SQL live autorizzato da questa nota.
+
+
+## Riesame live di funzioni, RLS, indici e CI — 27 ottobre 2026
+
+- CI run #40489729525: success sul head PR `9dde053f67874a609d29387c5e6b4b1395a4aeb2`, inclusi cinque pass API e contratto PostgreSQL isolato.
+- Le nuove RPC `vf_resolve_pending_owner_command_proposal_v2` e `vf_commit_owner_command_confirmation_v2` non risultano installate nel live; SQL proposto ancora fuori da `supabase/migrations/`.
+- RLS attivo sulle sei tabelle operative esaminate; nessuna policy diretta trovata nella query di catalogo. Le RPC owner-command live osservate sono `SECURITY DEFINER`, proprietario postgres, `search_path=public, pg_temp`, ACL `service_role`. Indici univoci esistenti confermati per deduplica dei messaggi e idempotenza per source event. Trigger non interni su `work_events`: nessuno; trigger `updated_at` presenti su canali, membri, azioni e pratiche.
+- Queste verifiche sono read-only e non sostituiscono una prova su schema completo: il baseline anteriore alla prima migrazione registrata e il replay integrale restano aperti. TTL target non verificato e staging E2E non eseguito.
+
+**Esito:** nessuna migrazione strutturale appare necessaria per il design corrente; resta necessario un rilascio SQL function-only versionato, subordinato ai gate elencati. Nessuna modifica al live.
