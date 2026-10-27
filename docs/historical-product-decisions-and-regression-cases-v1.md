@@ -81,3 +81,13 @@ This is an early signal, not statistically representative market validation. It 
 - Persistent multi-turn state, atomic proposal-bound confirmation, durable outbound outbox/reconciliation, full media-only ingestion, populated pilot configuration, and combined staging E2E remain release gates.
 - Do not create a Supabase development branch until its current cost is recalculated and approved; the previous estimate is historical only.
 - Do not merge/deploy or alter production as part of this planning record.
+
+
+## Refresh progetto e dipendenze — 27 ottobre 2026
+
+- PR #1 ESM resta Draft su `main`; #3 customer pipeline resta Draft su `assistant-auth-v1`; #9 Auth SMS/Bird resta Draft su `main`; #10 owner confirmation resta Draft su `assistant-conversation-photo-v1`. PR #2 è stata unita a `assistant-auth-v1`, non a `main`.
+- La CI owner-confirmation è passata sul pre-audit head `06c616e40f4aedc47b76eb19eb8678b17fa9cfc3` (run #40493167613), ma resta una prova su DB effimeri e schema minimo, non E2E.
+- L'inventario Vercel senza decifrare segreti conferma che le variabili Preview `VF_ASSISTANT_*` e `VOCALFLASH_ASSISTANT_API_KEYS` sono associate a `assistant-auth-v1`; il TTL richiesto non è presente. Il Preview owner-confirmation non è pronto per E2E.
+- Stato live read-only: 0 Auth users, 0 membri, 1 workflow attivo, 1 policy attiva, 14 vocaboli, 1 work item, 4 eventi e 0 eventi owner-command.
+- Restano aperti: baseline/replay migrazioni, schema parity, TTL e ambiente staging, E2E autorizzato, outbox/reconciliation, stato multi-turn persistente, media-only, benchmark trascrizione italiano, readiness/credential consistency sulla catena finale, privacy/DPA/retention, onboarding/billing e strategia di integrazione branch.
+- Non cambiare il percorso di trascrizione funzionante senza benchmark ripetibile; non creare database a pagamento senza nuova quotazione e approvazione; non attivare SMS/Bird, non inviare OTP, non modificare segreti, non fare merge/deploy di produzione.
