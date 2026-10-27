@@ -679,3 +679,8 @@ La verifica read-only ha confermato RLS attivo e nessuna policy diretta rilevata
 - Esistono variabili generiche `SUPABASE_URL`/`SUPABASE_SECRET_KEY`, ma il codice `api/v1/assistant.js` usa esplicitamente le variabili `VF_ASSISTANT_*`: le generiche non sostituiscono automaticamente quelle attese.
 
 **Conseguenza:** il Preview del branch candidato non è configurato per eseguire correttamente il percorso Assistant DB/owner confirmation. Senza le variabili `VF_ASSISTANT_*` il codice risponde con errore di configurazione DB; senza TTL la creazione della proposta fallisce chiusa. Nessun valore è stato decifrato, nessuna variabile è stata modificata. Prima dell'E2E occorre approvare e configurare esplicitamente lo scope Preview corretto e scegliere un TTL; non riutilizzare automaticamente segreti di un altro branch.
+
+
+## Nuova regola fail-closed — scansione limitata delle proposte, 27 ottobre 2026
+
+Un limite tecnico alla ricerca non può essere interpretato come prova di unicità. Se il resolver raggiunge il tetto di 50 proposte esaminate, deve restituire ambiguità e nessuna azione, anche se tra le righe viste compare una sola proposta valida. La patch e il test per 51 proposte sono stati aggiunti alla PR #10; attendere la CI sul nuovo head prima di considerare il fix verificato.
