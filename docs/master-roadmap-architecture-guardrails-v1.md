@@ -876,3 +876,11 @@ Nessuna issue è stata chiusa automaticamente: la presenza di fix su una branch 
 ## Corsia questionario/ESM — controllo separato, 27 ottobre 2026
 
 La PR #1 `questionario-e2e-v1` resta Draft su `main`. La correzione proposta aggiunge `type: module` per l'API ESM; i controlli Preview riportati nella PR hanno risposte HTTP attese per le route diagnostiche. Rimane però un problema separato: nel Preview del questionario `SUPABASE_URL` punta al progetto atteso, ma il `SUPABASE_SECRET_KEY` configurato restituisce HTTP 401. Non confondere questo problema con le variabili Assistant `VF_ASSISTANT_*`. Non ruotare o modificare chiavi senza diagnosi e approvazione esplicita. Prima di promuovere il questionario su `main`, risolvere ESM e validare la credenziale del progetto questionario su Preview, poi rieseguire i test sul branch finale. Nessuna credenziale è stata letta o modificata in questo audit.
+
+
+## Refresh advisor Supabase — 27 ottobre 2026, 11:17 UTC
+
+- Advisor Security: `rls_enabled_no_policy` = **15 tabelle** (livello INFO), tutte con RLS attivo ma senza policy; nessuna policy è stata aggiunta. Va documentato e testato il modello di accesso server-only, specialmente per le RPC `SECURITY DEFINER`.
+- Advisor Performance: **18 foreign key senza indice di copertura** e **26 indici segnalati inutilizzati** (livello INFO). Non aggiungere o rimuovere indici in massa: confrontare ogni FK con gli indici composti esistenti, i piani di query e il carico previsto, poi validare su ambiente isolato.
+- L'elenco dei branch Supabase è vuoto: nessun ambiente di sviluppo isolato esistente. Non crearne uno senza nuova quotazione e approvazione esplicita del costo.
+- Le osservazioni sono consultive; nessun DDL, indice, policy o dato è stato modificato.
