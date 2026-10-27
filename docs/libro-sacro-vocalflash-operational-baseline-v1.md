@@ -1284,7 +1284,7 @@ Nessuna issue è stata chiusa automaticamente: la presenza di fix su una branch 
 6. Risolvere l'ordine di integrazione PR #1/#3/#9/#10 e rieseguire CI sul branch finale; non chiudere automaticamente issue #4–#8.
 7. Prima del pilota commerciale, completare benchmark audio, media-only, stato conversazionale persistente, outbox/reconciliation, onboarding/billing e revisione privacy legale.
 
-**Sicurezza del riesame:** tutte le query Supabase di questa sezione sono read-only. Nessun DDL o dato live modificato; nessuna migrazione applicata; nessun merge o deploy di produzione; nessun invio WhatsApp/SMS; nessuna variabile ambiente cambiata. Il commit documentale genererà una nuova CI: verificarne il risultato separatamente dal run citato sopra.
+**Sicurezza del riesame:** tutte le query Supabase di questa sezione sono read-only. Nessun DDL o dato live modificato; nessuna migrazione applicata; nessun merge o deploy di produzione; nessun invio WhatsApp/SMS; nessuna variabile ambiente cambiata. I check CI sono legati allo SHA esatto: verificare sempre i check della PR sullo head corrente prima di qualsiasi promozione; un run precedente non copre commit successivi.
 
 
 ## Corsia questionario/ESM — controllo separato, 27 ottobre 2026
