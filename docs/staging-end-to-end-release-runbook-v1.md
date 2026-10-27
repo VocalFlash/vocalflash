@@ -352,3 +352,8 @@ Questo è un controllo più forte, ma non è ancora una copia integrale dello sc
 Durante il riesame è emerso un caso limite reale: il resolver leggeva al massimo 50 proposte ma, se trovava una sola proposta valida in quelle 50 righe, poteva dichiararla univoca senza sapere se esistessero altre proposte valide oltre il limite. È stato corretto il SQL proposto: se la scansione raggiunge 50 righe, restituisce ora `AMBIGUOUS_PENDING_PROPOSAL` con `CANDIDATE_SCAN_LIMIT_REACHED` e non registra né consuma alcuna conferma. È stato aggiunto un caso PostgreSQL che crea 51 proposte, con una proposta valida dentro la finestra e una più vecchia oltre il limite, per provare il fail-closed.
 
 **Stato prova:** modifica e test aggiunti al branch; il risultato CI sul nuovo head è ancora da attendere. Non è stato eseguito SQL live e non è stata cambiata alcuna configurazione ambiente.
+
+
+## Esito CI del fix limite scansione — 27 ottobre 2026
+
+La run GitHub Actions **#40492732210** è terminata con **success** sul commit `7cbf6c357e0f29f9fa97f11d1e9cd2a6121a024b`: cinque pass Assistant API e il job PostgreSQL transazionale sono verdi. Il job PostgreSQL ha caricato il SQL proposto in due database effimeri, inclusa la fixture con le RPC legacy recuperate; il nuovo caso con 51 proposte e limite di scansione ha superato il controllo fail-closed. Questo non equivale a un test sullo schema completo live o a un E2E Meta/WhatsApp. Nessuna migrazione live applicata.
