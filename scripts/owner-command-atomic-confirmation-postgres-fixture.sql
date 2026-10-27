@@ -25,6 +25,15 @@ CREATE TABLE public.work_items(
   business_id uuid NOT NULL,
   lifecycle_status text NOT NULL DEFAULT 'open'
 );
+CREATE TABLE public.assistant_policies(
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id uuid NOT NULL,
+  workflow_id uuid,
+  scope text NOT NULL DEFAULT 'business',
+  policy_key text NOT NULL,
+  autonomy_mode text NOT NULL,
+  is_active boolean NOT NULL DEFAULT true
+);
 CREATE TABLE public.work_events(
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   business_id uuid NOT NULL,
