@@ -156,3 +156,15 @@ Questo è un controllo più forte, ma non è ancora una copia integrale dello sc
 - Valutare il rilascio come **migrazione SQL function-only**, non come migrazione strutturale, mantenendo la versione e i test tracciabili.
 - Prima di promuoverla, verificare compatibilità con schema/policy/grants completi, provenienza del registro, chiamanti e rollback; configurare esplicitamente `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS`; completare staging E2E.
 - Fino al completamento dei gate, mantenere `ATOMIC_CONFIRMATION_NOT_ENABLED` e lo stato **NO-GO**. Nessun merge, deploy o SQL live autorizzato da questa nota.
+
+
+## Riesame incrociato progetto e schema live — 27 ottobre 2026
+
+- [PASS] La run CI `40489729525` è completata con successo sul head PR `9dde053f67874a609d29387c5e6b4b1395a4aeb2`: cinque pass Assistant API e il job PostgreSQL transazionale risultano verdi.
+- [PASS] Tracciato il collegamento runtime nel repository: `api/v1/assistant.js` costruisce le dipendenze owner e invoca `processOwnerCommandMessage` attraverso `dispatchAssistantWhatsappMessage`. Il flusso è quindi collegato al dispatcher del candidato, ma non è pronto per l'uso finché le nuove RPC non sono distribuite nel database target.
+- [PASS read-only] Le tabelle `work_events`, `work_items`, `open_actions`, `appointments`, `business_members` e `business_channels` hanno RLS attivo; la catalog query non ha trovato policy dirette su queste sei tabelle. Le funzioni live ispezionate sono `SECURITY DEFINER`, proprietario `postgres`, con `search_path=public, pg_temp`; le RPC owner-command elencate risultano eseguibili da `service_role`, non da `anon`/ruoli autenticati nell'ACL osservata. Non cambiare questo modello senza revisione.
+- [PASS read-only] Confermati l'indice univoco `work_events_external_message_uidx` su canale + external message ID e gli indici univoci per source event su proposta/nota e azione. I trigger osservati sulle tabelle rilevanti sono aggiornamenti `updated_at` su `business_channels`, `business_members`, `open_actions` e `work_items`; nessun trigger non interno è stato rilevato su `work_events`.
+- [BLOCKED] Le funzioni `vf_resolve_pending_owner_command_proposal_v2` e `vf_commit_owner_command_confirmation_v2` non sono presenti nel database live; la proposta SQL resta non applicata. Un candidato runtime invocato contro il live prima della distribuzione delle nuove RPC fallirebbe chiuso/errore di persistenza, senza prova di un effetto valido.
+- [BLOCKED] I test PostgreSQL passano su schema minimo isolato con corpi delle RPC legacy recuperati, non su copia completa dello schema live; il baseline pre-registry non è ancora disponibile; TTL target non verificato; E2E Meta → Render/Vercel → Assistant API → Supabase non eseguito.
+
+**Decisione:** mantenere Draft e NO-GO rilascio. Nessun DDL o dato live modificato, nessuna migrazione applicata e nessun messaggio WhatsApp inviato durante questo riesame.
