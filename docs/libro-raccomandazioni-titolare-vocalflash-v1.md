@@ -661,3 +661,10 @@ Questo è un controllo più forte, ma non è ancora una copia integrale dello sc
 - Valutare il rilascio come **migrazione SQL function-only**, non come migrazione strutturale, mantenendo la versione e i test tracciabili.
 - Prima di promuoverla, verificare compatibilità con schema/policy/grants completi, provenienza del registro, chiamanti e rollback; configurare esplicitamente `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS`; completare staging E2E.
 - Fino al completamento dei gate, mantenere `ATOMIC_CONFIRMATION_NOT_ENABLED` e lo stato **NO-GO**. Nessun merge, deploy o SQL live autorizzato da questa nota.
+
+
+## Nuova evidenza operativa — owner confirmation, 27 ottobre 2026
+
+Prima di un E2E, verificare che il target disponga delle RPC v2: il runtime del candidato è collegato a `api/v1/assistant.js`, ma le RPC proposte non sono ancora nel live. Se manca una RPC, il test deve essere considerato bloccato, non un test funzionale superato. Non provare il flusso con identità o destinatari reali senza autorizzazione specifica.
+
+La verifica read-only ha confermato RLS attivo e nessuna policy diretta rilevata sulle sei tabelle operative controllate; le funzioni owner-command esistenti sono `SECURITY DEFINER`, owner postgres e `search_path=public, pg_temp`, con ACL osservata per `service_role`. Preservare l'accesso server-only e rivalutare ogni grant/policy nella prova su schema completo. CI verde su head PR `9dde053f67874a609d29387c5e6b4b1395a4aeb2` (run #40489729525) non sostituisce compatibilità schema completa né E2E.
