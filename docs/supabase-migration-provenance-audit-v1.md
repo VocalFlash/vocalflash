@@ -158,3 +158,11 @@ Le 15 migrazioni risultano registrate nel database live. Non è stato recuperato
 La query read-only conferma RLS abilitato ma non forzato e zero policy dirette su `work_events`, `work_items`, `open_actions`, `appointments`, `business_members`, `business_channels`. Le RPC legacy ispezionate sono `SECURITY DEFINER`, owner postgres, `search_path=public, pg_temp`, privilegio EXECUTE osservato. Indici univoci per deduplica e source-event presenti; nessun trigger non interno su `work_events`. La verifica su schema completo deve provare i controlli espliciti di business/member/channel e gli ACL, non affidarsi alla sola RLS.
 
 CI #40493167613 ha passato il contratto PostgreSQL isolato e i cinque pass API sul pre-audit head `06c616e40f4aedc47b76eb19eb8678b17fa9cfc3`. Restano aperti schema parity, baseline/replay, TTL e staging E2E; nessuna migrazione live applicata.
+
+
+## Refresh advisor Supabase — 27 ottobre 2026, 11:17 UTC
+
+- Advisor Security: `rls_enabled_no_policy` = **15 tabelle** (livello INFO), tutte con RLS attivo ma senza policy; nessuna policy è stata aggiunta. Va documentato e testato il modello di accesso server-only, specialmente per le RPC `SECURITY DEFINER`.
+- Advisor Performance: **18 foreign key senza indice di copertura** e **26 indici segnalati inutilizzati** (livello INFO). Non aggiungere o rimuovere indici in massa: confrontare ogni FK con gli indici composti esistenti, i piani di query e il carico previsto, poi validare su ambiente isolato.
+- L'elenco dei branch Supabase è vuoto: nessun ambiente di sviluppo isolato esistente. Non crearne uno senza nuova quotazione e approvazione esplicita del costo.
+- Le osservazioni sono consultive; nessun DDL, indice, policy o dato è stato modificato.
