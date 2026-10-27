@@ -750,3 +750,14 @@ Stato non ancora GO: CI del draft da attendere; SQL non eseguito su PostgreSQL i
 - La registrazione di conferma rifiuta ora il riuso conflittuale dell'identificativo esterno confrontando attività, membro, canale, tipo evento, testo, proposta e sorgente. La persistenza verifica anche il testo nel replay.
 - Il SQL proposto rimane in `docs/proposed-migrations/`; il manifesto recuperato delle 15 migrazioni non è stato alterato. Nessuna scrittura Supabase live, merge, deploy o invio WhatsApp.
 - **NO-GO rilascio:** mancano ancora baseline storica autorevole, test transazionali/concorrenza/rollback su PostgreSQL isolato e staging E2E. `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non è stata verificata nel target e non ha un default nel codice: il runtime fallisce chiuso senza proposta finché la durata non viene decisa e configurata esplicitamente.
+
+
+## Risultato PostgreSQL isolato — 27 ottobre 2026
+
+Il commit applicativo `fb181f162ee3fa3351f45761fc397d53b9dc120d` ha superato GitHub Actions run #40480060789: **tutti i cinque pass JavaScript e il job PostgreSQL isolato sono verdi**.
+
+Il job PostgreSQL ha caricato il SQL proposto su PostgreSQL 16 effimero e ha superato: commit nota, commit azione pianificata, replay identico, replay conflittuale, conferma scaduta, rollback dopo errore simulato, consumo monouso sotto due commit concorrenti e controllo privilegi `service_role`/ `anon`.
+
+**Limite del test:** il job usa uno schema minimo e mock delle due RPC di scrittura preesistenti; prova la sintassi e l'atomicità del wrapper proposto, ma non sostituisce l'esecuzione contro lo schema completo e le policy reali di VocalFlash. Nessuna migrazione è stata applicata a Supabase live. Il SQL resta in `docs/proposed-migrations/` finché baseline storica e provenienza non saranno risolte.
+
+Il gate di rilascio resta NO-GO: baseline storica non recuperata; integrazione con lo schema completo da verificare; staging E2E WhatsApp da eseguire; valore di `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non verificato nel target e senza default nel codice. Se la variabile manca, il runtime non crea la proposta.
