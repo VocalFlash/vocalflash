@@ -373,3 +373,24 @@ La run GitHub Actions **#40492732210** è terminata con **success** sul commit `
 - [ ] Chiudere i gate #4–#8 e i flussi persistenti/outbox/media prima del pilota commerciale.
 
 Verificare sempre i check CI sullo SHA corrente prima della promozione; un run precedente non copre commit successivi. Nessuna modifica live o invio reale è autorizzato da questo runbook.
+
+
+## Gate aggiuntivo — configurazione credenziali Preview/staging, 27 ottobre 2026
+
+### Inventario attuale
+- Vercel progetto `vocalflash`, Preview branch `owner-command-atomic-confirmation-v3`: `VF_ASSISTANT_SUPABASE_URL` presente; `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS=600` presente.
+- `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS` non risultano configurate su questo branch. Sono presenti sul Preview di `assistant-auth-v1`; non copiare automaticamente.
+- Supabase `VocalFlash Assistant`: ACTIVE_HEALTHY, nessun branch Supabase esistente. L'isolamento dati è ancora da dimostrare.
+- Render staging `vocalflash-bot-staging`: branch `multivocale-runtime-v2`, auto-deploy OFF, piano Free; nessun aggiornamento env o deploy eseguito.
+
+### Checklist
+- [x] Inventario Vercel eseguito senza decifrare segreti.
+- [x] Corretto il dato storico sul TTL: presente con valore `600` sul branch candidato.
+- [ ] Confermare target Supabase isolato e autorizzato per test con scritture; non migrare o scrivere sul progetto attuale finché questo gate è aperto.
+- [ ] Verificare codice e readiness del bot per la variabile Assistant key e storage API, senza mostrare segreti.
+- [ ] Solo dopo l'isolamento, configurare il segreto server-to-server coerente su Vercel Preview e Render staging; non modificare Production o `assistant-auth-v1`.
+- [ ] Coordinare l'eventuale restart/deploy Render in un'unica finestra per contenere il consumo delle ore Free.
+- [ ] Verificare health/readiness e 401/200 con test autorizzati, senza inviare messaggi WhatsApp reali; registrare gli esiti reali.
+- [ ] Eseguire E2E completo solo dopo approvazione del target dati e con identità/destinatario sintetici.
+
+Nessuna voce marcata come completata equivale a un E2E runtime. Nessuna modifica live, merge o invio reale è autorizzato da questo runbook.
