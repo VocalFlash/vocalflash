@@ -141,3 +141,18 @@ Ulteriore CI verde: run #40480990100 sul commit `bb7c3b3dc99d41bea640adcb1bfb343
 Il job ora esegue due profili isolati: (1) schema minimo con RPC di scrittura simulate per verificare la transazione del wrapper; (2) database separato con i corpi delle RPC legacy `vf_commit_owner_note_v1` e `vf_commit_owner_schedule_action_v1` recuperati dalla migrazione sorgente, con policy, permessi, tabella note/azioni e trigger di test. Anche nel secondo profilo passano nota, azione pianificata, replay identico e conflittuale, scadenza, rollback e due commit concorrenti con una sola azione.
 
 Questo è un controllo più forte, ma non è ancora una copia integrale dello schema live né un E2E su Supabase/WhatsApp. Il SQL proposto resta fuori da `supabase/migrations/`; nessuna modifica live, merge o deploy.
+
+
+## Conclusione verifica migrazione — 27 ottobre 2026
+
+### Risultato verificato
+- Il file proposto `docs/proposed-migrations/20261027090000_owner_command_atomic_confirmation_v2.sql` contiene soltanto tre `CREATE OR REPLACE FUNCTION` e i relativi `REVOKE`/`GRANT` per i ruoli; non contiene `CREATE/ALTER TABLE`, nuove colonne, indici, trigger o nuove tabelle.
+- Quindi, con il disegno attuale, **non emerge la necessità di una migrazione strutturale dello schema**: i metadati di scadenza/consumo sono conservati nel `payload` JSONB già presente in `public.work_events`.
+- Questo non significa che si possa abilitare la conferma senza alcun rilascio SQL. Le RPC live attuali non verificano e consumano la conferma nella stessa transazione dell'effetto; per attivare il flusso in sicurezza è necessario distribuire una modifica versionata delle funzioni DB (oppure un contratto SQL equivalente verificato). Eseguire SQL manuale fuori versione non è la strada raccomandata.
+- Le funzioni esistenti e gli indici live sono stati ispezionati in sola lettura. La proposta resta fuori da `supabase/migrations/`; nessuna scrittura Supabase live è stata eseguita.
+
+### Decisione operativa
+- Non aggiungere tabelle/colonne e non applicare la proposta al live in questa fase.
+- Valutare il rilascio come **migrazione SQL function-only**, non come migrazione strutturale, mantenendo la versione e i test tracciabili.
+- Prima di promuoverla, verificare compatibilità con schema/policy/grants completi, provenienza del registro, chiamanti e rollback; configurare esplicitamente `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS`; completare staging E2E.
+- Fino al completamento dei gate, mantenere `ATOMIC_CONFIRMATION_NOT_ENABLED` e lo stato **NO-GO**. Nessun merge, deploy o SQL live autorizzato da questa nota.
