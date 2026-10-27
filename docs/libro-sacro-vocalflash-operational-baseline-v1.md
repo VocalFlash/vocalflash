@@ -1298,3 +1298,20 @@ La PR #1 `questionario-e2e-v1` resta Draft su `main`. La correzione proposta agg
 - Advisor Performance: **18 foreign key senza indice di copertura** e **26 indici segnalati inutilizzati** (livello INFO). Non aggiungere o rimuovere indici in massa: confrontare ogni FK con gli indici composti esistenti, i piani di query e il carico previsto, poi validare su ambiente isolato.
 - L'elenco dei branch Supabase è vuoto: nessun ambiente di sviluppo isolato esistente. Non crearne uno senza nuova quotazione e approvazione esplicita del costo.
 - Le osservazioni sono consultive; nessun DDL, indice, policy o dato è stato modificato.
+
+
+## Registro operativo — audit credenziali e isolamento, 27 ottobre 2026
+
+**Fatto e verificato**
+- Inventario Vercel del branch Preview `owner-command-atomic-confirmation-v3` eseguito senza decifrare valori segreti.
+- Presenti: `VF_ASSISTANT_SUPABASE_URL=https://tkfyfqgtumoeywlqzmdt.supabase.co` e `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS=600`.
+- Assenti dal branch candidato: `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS`. Le variabili omonime risultano sul Preview di `assistant-auth-v1`, non su questo branch; non sono state copiate.
+- Supabase `VocalFlash Assistant` risulta ACTIVE_HEALTHY, ma non esistono branch Supabase. L'isolamento del DB non è dimostrato. Nessuna query di scrittura, migrazione o modifica dati è stata eseguita.
+- Render staging è `vocalflash-bot-staging`, branch `multivocale-runtime-v2`, auto-deploy OFF, Free. Nessun env update, deploy o restart.
+- Nessun segreto è stato letto, creato, esposto o modificato. Nessuna modifica a Production, nessun merge, nessun messaggio WhatsApp reale.
+
+**Correzione di stato**
+Una nota precedente indicava TTL assente sul candidato. L'inventario corrente la mostra invece presente con valore `600`; prevale il controllo corrente.
+
+**Gate ancora bloccante**
+Non aggiungere la secret Supabase al candidato né eseguire E2E con scritture finché non è confermato un database isolato. Non usare chiavi anon/publishable come segreto server-side e non riutilizzare automaticamente la variabile generica `SUPABASE_SECRET_KEY`. Dopo aver chiarito l'isolamento, completare l'autenticazione server-to-server Preview/staging e pianificare l'eventuale restart Render per limitare consumo delle ore Free.
