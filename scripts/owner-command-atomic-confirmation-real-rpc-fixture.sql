@@ -537,11 +537,6 @@ begin
 end;
 $$;
 
-revoke all on function public.vf_record_owner_command_confirmation_v1(uuid,uuid,uuid,text,uuid,text,timestamptz,jsonb)
-from public,anon,authenticated;
-grant execute on function public.vf_record_owner_command_confirmation_v1(uuid,uuid,uuid,text,uuid,text,timestamptz,jsonb)
-to service_role;
-
 revoke all on function public.vf_commit_owner_schedule_action_v1(uuid,uuid,uuid,uuid,text,timestamptz,boolean,uuid)
 from public,anon,authenticated;
 grant execute on function public.vf_commit_owner_schedule_action_v1(uuid,uuid,uuid,uuid,text,timestamptz,boolean,uuid)
