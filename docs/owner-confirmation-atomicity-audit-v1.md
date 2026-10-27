@@ -98,3 +98,17 @@ NO-GO conferma titolare. I punti sopra sono piano operativo, non implementazione
 ## Riscontro schema live aggiuntivo — 26 ottobre 2026, sola lettura
 
 L'inventario delle colonne di public.work_events conferma che la tabella ha occurred_at e created_at, ma non una colonna dedicata expires_at o consumed_at. Le proposte/conferme sono eventi con payload JSONB. Questo non prova che nel payload non esista alcuna convenzione, quindi prima di implementare occorre cercare e validare le convenzioni effettive nei payload e in tutti i chiamanti; non inventare una scadenza o uno stato di consumo. Se il modello attuale non offre una rappresentazione affidabile di scadenza/consumo, la migrazione forward dovrà introdurre un modello esplicito e atomico, provato soltanto nel database isolato. Nessuna scrittura è stata eseguita.
+
+
+## Implementazione isolata v2 — 27 ottobre 2026
+
+È stato aperto il draft PR #10, branch `owner-command-atomic-confirmation-v3`, sopra il branch di lavoro aggiornato. Nessun merge, deploy o SQL live.
+
+### Modifiche nel draft
+- Il runtime non registra più una conferma come un normale evento ricevuto: prima risolve una proposta pendente per attività, membro e canale, poi registra la conferma associata e invoca la RPC atomica.
+- La proposta richiede un `expires_at` generato dal runtime. La durata non ha un default: se `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non è configurata, il runtime restituisce `CONFIG_REQUIRED` e non registra una proposta.
+- Il file SQL proposto aggiunge un resolver che rifiuta proposte mancanti/ambigue e una RPC che blocca proposta e conferma, verifica binding e scadenza, esegue una sola azione supportata e registra il consumo nello stesso transaction scope. I replay esatti restituiscono il risultato già registrato; i conflitti vengono rifiutati.
+- Il SQL è in `docs/proposed-migrations/`, non in `supabase/migrations/`: il manifesto verificato delle 15 migrazioni recuperate resta invariato.
+
+### Gate ancora obbligatori
+La CI del draft PR #10 è in coda al momento della registrazione. Il SQL non è stato eseguito su PostgreSQL isolato: non considerarlo validato né pronto per migrazione. Prima di promuovere il file occorre recuperare la baseline storica, testare transazioni/concorrenza/replay/rollback su database isolato e riconciliare la migrazione forward con il registro live. La configurazione della TTL richiede ancora una decisione esplicita; finché non viene impostata il flusso resta fail-closed.
