@@ -818,3 +818,10 @@ La comparazione GitHub ha rilevato `assistant-auth-v1` a **91 commit avanti e 1 
 - Esistono variabili generiche `SUPABASE_URL`/`SUPABASE_SECRET_KEY`, ma il codice `api/v1/assistant.js` usa esplicitamente le variabili `VF_ASSISTANT_*`: le generiche non sostituiscono automaticamente quelle attese.
 
 **Conseguenza:** il Preview del branch candidato non è configurato per eseguire correttamente il percorso Assistant DB/owner confirmation. Senza le variabili `VF_ASSISTANT_*` il codice risponde con errore di configurazione DB; senza TTL la creazione della proposta fallisce chiusa. Nessun valore è stato decifrato, nessuna variabile è stata modificata. Prima dell'E2E occorre approvare e configurare esplicitamente lo scope Preview corretto e scegliere un TTL; non riutilizzare automaticamente segreti di un altro branch.
+
+
+## Correzione da review avversaria — limite scansione proposte, 27 ottobre 2026
+
+Durante il riesame è emerso un caso limite reale: il resolver leggeva al massimo 50 proposte ma, se trovava una sola proposta valida in quelle 50 righe, poteva dichiararla univoca senza sapere se esistessero altre proposte valide oltre il limite. È stato corretto il SQL proposto: se la scansione raggiunge 50 righe, restituisce ora `AMBIGUOUS_PENDING_PROPOSAL` con `CANDIDATE_SCAN_LIMIT_REACHED` e non registra né consuma alcuna conferma. È stato aggiunto un caso PostgreSQL che crea 51 proposte, con una proposta valida dentro la finestra e una più vecchia oltre il limite, per provare il fail-closed.
+
+**Stato prova:** modifica e test aggiunti al branch; il risultato CI sul nuovo head è ancora da attendere. Non è stato eseguito SQL live e non è stata cambiata alcuna configurazione ambiente.
