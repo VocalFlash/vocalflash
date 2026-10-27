@@ -785,3 +785,12 @@ Questo è un controllo più forte, ma non è ancora una copia integrale dello sc
 - Valutare il rilascio come **migrazione SQL function-only**, non come migrazione strutturale, mantenendo la versione e i test tracciabili.
 - Prima di promuoverla, verificare compatibilità con schema/policy/grants completi, provenienza del registro, chiamanti e rollback; configurare esplicitamente `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS`; completare staging E2E.
 - Fino al completamento dei gate, mantenere `ATOMIC_CONFIRMATION_NOT_ENABLED` e lo stato **NO-GO**. Nessun merge, deploy o SQL live autorizzato da questa nota.
+
+
+## Riesame integrato owner confirmation — 27 ottobre 2026
+
+La PR #10 è ancora Draft e la CI sul head `9dde053f67874a609d29387c5e6b4b1395a4aeb2` è verde (run #40489729525: cinque pass API + contratto PostgreSQL isolato). Il runtime candidato è collegato a `api/v1/assistant.js` tramite il dispatcher WhatsApp; ciò non abilita il rilascio perché le nuove RPC SQL non esistono ancora nel Supabase live.
+
+Verifiche read-only aggiuntive: RLS attivo sulle sei tabelle operative ispezionate, nessuna policy diretta trovata per esse; RPC owner-command esistenti con `SECURITY DEFINER`, proprietario postgres e `search_path=public, pg_temp`; ACL osservata limitata a `service_role`. Indici di deduplica/replay presenti; trigger non interni osservati solo per aggiornare `updated_at` su quattro tabelle, non su `work_events`.
+
+**Gate ancora aperti:** baseline pre-registry e replay integrale in DB isolato; compatibilità su schema completo; configurazione e verifica del valore TTL nel target; E2E staging autorizzato con destinatario di test. La proposta SQL resta in `docs/proposed-migrations/`; nessuna modifica live, merge o rilascio di produzione.
