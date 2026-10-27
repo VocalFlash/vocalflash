@@ -720,3 +720,14 @@ La PR #1 `questionario-e2e-v1` resta Draft su `main`. La correzione proposta agg
 - Advisor Performance: **18 foreign key senza indice di copertura** e **26 indici segnalati inutilizzati** (livello INFO). Non aggiungere o rimuovere indici in massa: confrontare ogni FK con gli indici composti esistenti, i piani di query e il carico previsto, poi validare su ambiente isolato.
 - L'elenco dei branch Supabase è vuoto: nessun ambiente di sviluppo isolato esistente. Non crearne uno senza nuova quotazione e approvazione esplicita del costo.
 - Le osservazioni sono consultive; nessun DDL, indice, policy o dato è stato modificato.
+
+
+## Verifica configurazione credenziali Assistant — 27 ottobre 2026
+
+- Audit Vercel eseguito sul progetto `vocalflash`, limitato al branch Preview `owner-command-atomic-confirmation-v3`, senza decifrare o leggere valori segreti.
+- Confermate presenti sul branch candidato: `VF_ASSISTANT_SUPABASE_URL=https://tkfyfqgtumoeywlqzmdt.supabase.co` e `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS=600`. Correggere le annotazioni precedenti che riportavano TTL assente: l'inventario corrente la mostra presente e branch-specific.
+- Non risultano sul branch candidato `VF_ASSISTANT_SUPABASE_SECRET_KEY` né `VOCALFLASH_ASSISTANT_API_KEYS`. Entrambe esistono invece nel Preview branch `assistant-auth-v1`; non sono state copiate né sovrascritte.
+- Il progetto Supabase `VocalFlash Assistant` è ACTIVE_HEALTHY ma l'elenco dei branch Supabase è vuoto. Non è quindi provato che il database puntato sia isolato dal live. Le chiavi pubbliche/anon non sono sostituti della secret server-side; non riutilizzare automaticamente `SUPABASE_SECRET_KEY`.
+- Render `vocalflash-bot-staging` è sul branch `multivocale-runtime-v2`, auto-deploy OFF, piano Free. Nessuna variabile Render è stata cambiata e nessun deploy/restart è stato richiesto.
+- Decisione di sicurezza: non creare/copiare ancora credenziali DB o avviare test con scritture finché non è chiarito l'isolamento del database. Nessun segreto è stato generato, letto, mostrato o modificato in questa verifica; nessuna modifica a Production, nessun merge e nessun invio WhatsApp.
+- Prossimo gate: confermare un target Supabase realmente isolato (senza creare risorse a pagamento senza approvazione); poi verificare il contratto di autenticazione API↔bot e configurare insieme la chiave dedicata solo sui target Preview/staging, pianificando consapevolmente l'eventuale restart Render.
