@@ -884,3 +884,22 @@ La PR #1 `questionario-e2e-v1` resta Draft su `main`. La correzione proposta agg
 - Advisor Performance: **18 foreign key senza indice di copertura** e **26 indici segnalati inutilizzati** (livello INFO). Non aggiungere o rimuovere indici in massa: confrontare ogni FK con gli indici composti esistenti, i piani di query e il carico previsto, poi validare su ambiente isolato.
 - L'elenco dei branch Supabase è vuoto: nessun ambiente di sviluppo isolato esistente. Non crearne uno senza nuova quotazione e approvazione esplicita del costo.
 - Le osservazioni sono consultive; nessun DDL, indice, policy o dato è stato modificato.
+
+
+## Roadmap aggiornata — credenziali Preview e isolamento DB, 27 ottobre 2026
+
+### Stato completato
+- [x] Inventario Vercel branch-specific per `owner-command-atomic-confirmation-v3`, senza leggere o decifrare segreti.
+- [x] Confermate `VF_ASSISTANT_SUPABASE_URL` corretta per il progetto Assistant e `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS=600` presenti sul branch candidato.
+- [x] Identificate come mancanti sul candidato `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS`; le omonime sul branch `assistant-auth-v1` sono state preservate e non copiate.
+- [x] Verificato che Supabase `VocalFlash Assistant` è ACTIVE_HEALTHY ma non ha branch isolati. Verificato anche lo stato del servizio Render staging senza modificarlo.
+
+### PENDING / blocchi
+1. **Isolamento database:** stabilire se il progetto Supabase attuale è autorizzato per test con scritture. Al momento non è provato che sia isolato; non eseguire migrazioni, scritture o E2E mutanti. Non creare branch/progetti potenzialmente a pagamento senza approvazione esplicita del costo.
+2. **Autenticazione API↔bot:** verificare nel codice e nel runtime il nome e il formato della chiave dedicata. Poi creare/registrare lo stesso segreto solo nei target Preview/staging necessari, senza inviarlo in chat e senza alterare Production o `assistant-auth-v1`.
+3. **Render Free:** valutare il momento del salvataggio, perché una modifica env può richiedere un nuovo deploy/restart. Auto-deploy è OFF; non avviare deploy fino al gate precedente.
+4. **Verifica runtime:** dopo configurazione, testare health/readiness e autenticazione senza invii WhatsApp reali; le prove automatizzate non equivalgono a un E2E runtime.
+5. **Documentazione:** la precedente indicazione “TTL assente sul candidato” è superata; inventario attuale: TTL presente a `600`.
+
+### Guardrail invariati
+Nessun merge, deploy Production, scrittura Supabase live, migrazione live, invio WhatsApp reale o uso di chiavi pubbliche come segreti.
