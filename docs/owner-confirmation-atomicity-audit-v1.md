@@ -106,7 +106,7 @@ L'inventario delle colonne di public.work_events conferma che la tabella ha occu
 
 ### Modifiche nel draft
 - Il runtime non registra più una conferma come un normale evento ricevuto: prima risolve una proposta pendente per attività, membro e canale, poi registra la conferma associata e invoca la RPC atomica.
-- La proposta richiede un `expires_at` generato dal runtime. La durata non ha un default: se `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non è configurata, il runtime restituisce `CONFIG_REQUIRED` e non registra una proposta.
+- La proposta richiede un `expires_at` generato dal runtime. La durata non ha un default: se `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non è stata verificata nel target, il runtime restituisce `CONFIG_REQUIRED` e non registra una proposta.
 - Il file SQL proposto aggiunge un resolver che rifiuta proposte mancanti/ambigue e una RPC che blocca proposta e conferma, verifica binding e scadenza, esegue una sola azione supportata e registra il consumo nello stesso transaction scope. I replay esatti restituiscono il risultato già registrato; i conflitti vengono rifiutati.
 - Il SQL è in `docs/proposed-migrations/`, non in `supabase/migrations/`: il manifesto verificato delle 15 migrazioni recuperate resta invariato.
 
@@ -120,4 +120,4 @@ La CI del draft PR #10 è in coda al momento della registrazione. Il SQL non è 
 - GitHub Actions run #40479095192 sul medesimo head: **success**, tutti e cinque i job/pass completati con successo. Comprende i test runtime aggiunti e i controlli statici del contratto SQL; non è un'esecuzione SQL su PostgreSQL.
 - La registrazione di conferma rifiuta ora il riuso conflittuale dell'identificativo esterno confrontando attività, membro, canale, tipo evento, testo, proposta e sorgente. La persistenza verifica anche il testo nel replay.
 - Il SQL proposto rimane in `docs/proposed-migrations/`; il manifesto recuperato delle 15 migrazioni non è stato alterato. Nessuna scrittura Supabase live, merge, deploy o invio WhatsApp.
-- **NO-GO rilascio:** mancano ancora baseline storica autorevole, test transazionali/concorrenza/rollback su PostgreSQL isolato e staging E2E. `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non è configurata e non ha un default: il runtime fallisce chiuso senza proposta finché la durata non viene decisa e configurata esplicitamente.
+- **NO-GO rilascio:** mancano ancora baseline storica autorevole, test transazionali/concorrenza/rollback su PostgreSQL isolato e staging E2E. `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non è stata verificata nel target e non ha un default nel codice: il runtime fallisce chiuso senza proposta finché la durata non viene decisa e configurata esplicitamente.
