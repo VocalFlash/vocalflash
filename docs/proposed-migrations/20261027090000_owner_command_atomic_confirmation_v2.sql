@@ -57,9 +57,9 @@ begin
     and external_message_id=p_external_message_id
   limit 1;
   if found then
-    if v_existing_confirmation.business_id<>p_business_id
-       or v_existing_confirmation.business_member_id<>p_member_id
-       or v_existing_confirmation.event_type<>'owner_command_confirmation' then
+    if v_existing_confirmation.business_id is distinct from p_business_id
+       or v_existing_confirmation.business_member_id is distinct from p_member_id
+       or v_existing_confirmation.event_type is distinct from 'owner_command_confirmation' then
       return jsonb_build_object('ok',false,'status','REPLAY_CONFLICT','reason','CONFIRMATION_MESSAGE_ID_REUSED','writes_performed',false);
     end if;
     begin
