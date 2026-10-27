@@ -684,3 +684,8 @@ La verifica read-only ha confermato RLS attivo e nessuna policy diretta rilevata
 ## Nuova regola fail-closed — scansione limitata delle proposte, 27 ottobre 2026
 
 Un limite tecnico alla ricerca non può essere interpretato come prova di unicità. Se il resolver raggiunge il tetto di 50 proposte esaminate, deve restituire ambiguità e nessuna azione, anche se tra le righe viste compare una sola proposta valida. La patch e il test per 51 proposte sono stati aggiunti alla PR #10; attendere la CI sul nuovo head prima di considerare il fix verificato.
+
+
+## Esito CI del fix limite scansione — 27 ottobre 2026
+
+La run GitHub Actions **#40492732210** è terminata con **success** sul commit `7cbf6c357e0f29f9fa97f11d1e9cd2a6121a024b`: cinque pass Assistant API e il job PostgreSQL transazionale sono verdi. Il job PostgreSQL ha caricato il SQL proposto in due database effimeri, inclusa la fixture con le RPC legacy recuperate; il nuovo caso con 51 proposte e limite di scansione ha superato il controllo fail-closed. Questo non equivale a un test sullo schema completo live o a un E2E Meta/WhatsApp. Nessuna migrazione live applicata.
