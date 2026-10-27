@@ -100,3 +100,14 @@ The earlier snapshot above is historical; the current counts differ. Direct SELE
 - Existing counts for `work_items` (1), `work_events` (4), and `event_routing_decisions` (2) remain as observed by the same count query.
 
 No row content containing names, phone numbers, customer messages, or external account identifiers was retrieved. No data was inserted, updated, or deleted. The staging workflow/policy setup is more complete than the 22 October snapshot, but **zero business members** remains a decisive blocker; do not fabricate one or run a real owner flow without a verified Auth identity and explicit pilot authorization. The active policy's `confirm` mode does not override the runtime's `ATOMIC_CONFIRMATION_NOT_ENABLED` guard.
+
+
+## Refresh di stato live e ambiente candidato — 27 ottobre 2026
+
+Read-only Supabase: 0 Auth users, 0 business members, 1 work item, 4 work events, 1 workflow attivo, 1 policy attiva, 14 termini di vocabolario attivi; 0 eventi owner-command proposta/conferma/ricevuto. Non esiste quindi una identità owner valida né un caso reale da confermare; non fabbricare utenti o eventi.
+
+Le nuove RPC owner-confirmation v2 non risultano installate nel database live. Le sei tabelle operative ispezionate hanno RLS abilitato ma non forzato e nessuna policy diretta nella catalog query; le RPC legacy esaminate sono `SECURITY DEFINER`, proprietario postgres e `search_path=public, pg_temp`. La verifica deve includere esplicitamente i controlli tenant/member/channel delle funzioni e gli ACL.
+
+L'inventario Vercel, eseguito senza decifrare segreti, mostra che le variabili Preview `VF_ASSISTANT_SUPABASE_URL`, `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS` sono associate al branch `assistant-auth-v1`, non alla branch owner-confirmation; `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non è presente. Non eseguire l'E2E fino a quando l'ambiente non è configurato con approvazione esplicita.
+
+CI #40493167613 è passata sul pre-audit head `06c616e40f4aedc47b76eb19eb8678b17fa9cfc3` (cinque pass API e contratto PostgreSQL isolato). Questo non prova la parità con schema completo, il Preview configurato o il percorso Meta/WhatsApp. Il baseline pre-registry, il replay completo e i gate legali/privacy restano aperti.
