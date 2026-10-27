@@ -694,3 +694,16 @@ La run GitHub Actions **#40492732210** è terminata con **success** sul commit `
 ## Riconciliazione branch legacy — 27 ottobre 2026
 
 La branch `assistant-owner-command-integration-v1` è stata confrontata con `assistant-conversation-photo-v1`: risulta 439 commit indietro e non contiene commit unici rispetto alla branch più recente. Trattarla come branch legacy/stale, non come sorgente da integrare o base di rilascio. La branch `main` risulta attualmente senza protezione GitHub secondo l'inventario API; nessuna regola è stata modificata. Prima di una promozione reale, definire la sequenza di integrazione e i controlli obbligatori sul branch finale.
+
+
+## Audit integrato 360° — 27 ottobre 2026
+
+Priorità operative confermate:
+1. Non rilasciare owner confirmation finché la RPC v2 non è distribuita in un ambiente isolato e verificata su schema completo; la CI isolata è verde sul pre-audit head `06c616e40f4aedc47b76eb19eb8678b17fa9cfc3` (run #40493167613), ma non è E2E.
+2. Non applicare SQL live: le 15 migrazioni sono registrate, ma manca il baseline pre-registry e il replay integrale. La soluzione corrente è function-only, non strutturale.
+3. Non eseguire E2E nel Preview owner-confirmation finché non si approvano e configurano esplicitamente le variabili `VF_ASSISTANT_*` per quel branch e un valore di `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS`. Inventario senza decifrare segreti: le variabili Preview rilevanti sono associate a `assistant-auth-v1`; il TTL manca.
+4. Non creare una identità owner fittizia: live/staging verificato con 0 utenti Auth e 0 membri business; 1 workflow, 1 policy, 14 termini attivi, 1 work item e 4 eventi; nessun evento owner-command.
+5. Risolvere il percorso di promozione delle PR impilate e l'ESM su `main`; mantenere PR #1/#3/#9/#10 Draft e non interpretare la PR #2 unita a `assistant-auth-v1` come rilascio in produzione.
+6. Tenere aperti i gate #4 ambiente isolato/costo, #5 benchmark italiano, #6 readiness, #7 credenziali Supabase e #8 privacy/DPA/retention finché i criteri non sono provati sul target finale.
+
+La review live ha inoltre confermato RLS attivo ma non forzato e zero policy dirette sulle sei tabelle operative ispezionate. Le RPC legacy esaminate sono `SECURITY DEFINER` con owner `postgres`; i controlli espliciti business/member/channel e le ACL server-only sono quindi essenziali e vanno testati su schema completo. Nessun segreto è stato decifrato o cambiato; nessun SQL live, merge, deploy o messaggio è stato eseguito.
