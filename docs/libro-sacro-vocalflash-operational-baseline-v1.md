@@ -1244,3 +1244,8 @@ Durante il riesame è emerso un caso limite reale: il resolver leggeva al massim
 ## Esito CI del fix limite scansione — 27 ottobre 2026
 
 La run GitHub Actions **#40492732210** è terminata con **success** sul commit `7cbf6c357e0f29f9fa97f11d1e9cd2a6121a024b`: cinque pass Assistant API e il job PostgreSQL transazionale sono verdi. Il job PostgreSQL ha caricato il SQL proposto in due database effimeri, inclusa la fixture con le RPC legacy recuperate; il nuovo caso con 51 proposte e limite di scansione ha superato il controllo fail-closed. Questo non equivale a un test sullo schema completo live o a un E2E Meta/WhatsApp. Nessuna migrazione live applicata.
+
+
+## Riconciliazione branch legacy — 27 ottobre 2026
+
+La branch `assistant-owner-command-integration-v1` è stata confrontata con `assistant-conversation-photo-v1`: risulta 439 commit indietro e non contiene commit unici rispetto alla branch più recente. Trattarla come branch legacy/stale, non come sorgente da integrare o base di rilascio. La branch `main` risulta attualmente senza protezione GitHub secondo l'inventario API; nessuna regola è stata modificata. Prima di una promozione reale, definire la sequenza di integrazione e i controlli obbligatori sul branch finale.
