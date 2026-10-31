@@ -784,3 +784,14 @@ La PR #1 `questionario-e2e-v1` resta Draft su `main`. La correzione proposta agg
 7. Mantenere aperti i gate per persistenza conversazionale, outbox e riconciliazione delivery, round-trip Storage reale, restart/recovery MultiVocale, media-only, benchmark audio italiano e privacy/DPA/retention.
 
 **Perimetro delle azioni:** solo letture GitHub/Vercel/Supabase/Render e analisi statica. Nessun segreto letto o modificato; nessun DDL/DML o migration; nessuna modifica env; nessun deploy/restart Render; nessun merge o Production deploy; nessun invio WhatsApp/SMS.
+
+
+## Chiusura verifiche successive e vincolo ore Render — 31 ottobre 2026
+
+- Correzione dell'istantanea CI: la run [#41200935062](https://github.com/VocalFlash/vocalflash/actions/runs/41200935062), inizialmente osservata in coda, è stata ricontrollata a completamento ed è **success** sullo SHA esatto `08828fcd136e36d76680922daaec7eac1abfcc1b`. Tutti i sei job osservati (cinque Assistant API + contratto PostgreSQL transazionale) sono completati con successo.
+- Il deployment Vercel Preview dello stesso SHA è stato ricontrollato ed è **READY**. Resta solo Preview documentale/candidato: non prova runtime autenticato, connessione Supabase, Storage round-trip o Production.
+- Render: confermati servizio Free, auto-deploy OFF, branch `multivocale-runtime-v2`; il deploy live è ancora `34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5` del 4 ottobre 2026. Non sono stati triggerati deploy, restart, build o chiamate che risveglino il servizio.
+- **Vincolo consumo Render:** ultimo dato disponibile registrato nel precedente checkpoint: 621/750 ore Free consumate, 129 ore residue. Questo numero è storico e non è stato possibile verificarne il saldo aggiornato dal pannello account tramite gli strumenti disponibili. Trattare 129 ore come tetto prudenziale massimo noto, non come saldo garantito. Prima di qualsiasi attività che possa consumare ore, rilevare il saldo corrente nel dashboard Render.
+- Regola operativa vincolante: niente deploy/restart Render per aggiornamenti documentali o test che possono essere eseguiti in CI locale/effimera; raggruppare tutte le modifiche env in una sola finestra, fare un solo restart controllato solo dopo DB isolato, credenziali scoped e test pronti; usare il servizio staging solo per test integrati brevi e mirati. Nessun test di polling, loop o carico continuativo su Render Free.
+- I gate di rilascio non cambiano: nessun branch Supabase isolato; nessuna secret/API key dedicata sul Preview candidato; nessuna prova che le env richieste siano presenti su Render; nessun round-trip Storage reale; nessun deploy del nuovo head bot. Quindi E2E mutante e rilascio restano **NO-GO**.
+- Nessuna modifica a codice runtime, variabili, database, deploy Render, merge o Production è stata eseguita in questa fase. Sono state completate letture di stato e aggiornamento documentale soltanto.
