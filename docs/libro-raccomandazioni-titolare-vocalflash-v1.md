@@ -731,3 +731,56 @@ La PR #1 `questionario-e2e-v1` resta Draft su `main`. La correzione proposta agg
 - Render `vocalflash-bot-staging` è sul branch `multivocale-runtime-v2`, auto-deploy OFF, piano Free. Nessuna variabile Render è stata cambiata e nessun deploy/restart è stato richiesto.
 - Decisione di sicurezza: non creare/copiare ancora credenziali DB o avviare test con scritture finché non è chiarito l'isolamento del database. Nessun segreto è stato generato, letto, mostrato o modificato in questa verifica; nessuna modifica a Production, nessun merge e nessun invio WhatsApp.
 - Prossimo gate: confermare un target Supabase realmente isolato (senza creare risorse a pagamento senza approvazione); poi verificare il contratto di autenticazione API↔bot e configurare insieme la chiave dedicata solo sui target Preview/staging, pianificando consapevolmente l'eventuale restart Render.
+
+
+## Riesame autonomo completo e aggiornamento stato — 31 ottobre 2026
+
+### Evidenze verificate in questa sessione
+
+**GitHub / CI**
+- PR API #10 è ancora aperta e Draft; base `assistant-conversation-photo-v1`, head `owner-command-atomic-confirmation-v3`, SHA corrente `acbb440194f910210d9010f381bb66e2b032fc70`. La CI sullo SHA esatto ha concluso con successo: run [#40584486714](https://github.com/VocalFlash/vocalflash/actions/runs/40584486714), cinque pass Assistant API e job PostgreSQL transaction-contract verdi. Il job include schema minimo isolato, corpi delle RPC legacy recuperate e test di concorrenza/single-use. Non è schema parity completo né E2E Supabase/Meta.
+- PR API #3 è ancora Draft, base `assistant-auth-v1`, head `assistant-conversation-photo-v1`, SHA `737d42184f618ff6abc009df7af241f30d29131a`; CI run #40400561646 è success sul relativo head. La PR resta impilata e non integrata in `main`.
+- PR bot #2 è ancora Draft, base `multivocale-runtime-v2`, head `assistant-conversation-photo-v1`, SHA `73dd4516c704d7dbdff08906cb594a8b152b0040`; CI run #40494481293 è success. Il run automatizzato usa Redis effimero; la documentazione precedente registra 62 test OK. Non prova restart Render, storage reale o delivery Meta.
+- Il Preview Vercel del commit documentale API #10 `acbb440194f910210d9010f381bb66e2b032fc70` è READY: deployment `dpl_9NcqL9viTRYMd44jgzHguhAA8vPC`. È un build Preview, non una verifica runtime dell'API o un rilascio Production.
+
+**Vercel — inventario senza decifrare segreti**
+- Sul Preview branch `owner-command-atomic-confirmation-v3` risultano presenti `VF_ASSISTANT_SUPABASE_URL` e `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS=600`.
+- Sul medesimo branch non risultano `VF_ASSISTANT_SUPABASE_SECRET_KEY` né `VOCALFLASH_ASSISTANT_API_KEYS`. L'API richiede entrambe per autenticazione e accesso DB; l'endpoint health richiede inoltre `OPENAI_API_KEY` e `VOCALFLASH_API_KEYS`.
+- Il percorso storage richiede anche configurazione server-side del bucket e mappatura scope `VOCALFLASH_ASSISTANT_API_KEY_SCOPES`; non è stata dimostrata la configurazione runtime di tali dipendenze sul target candidato.
+- Nessun segreto è stato decifrato, generato, copiato o modificato. Nessuna variabile Vercel è stata modificata.
+
+**Supabase — sola lettura**
+- Progetto `VocalFlash Assistant` (`tkfyfqgtumoeywlqzmdt`) è ACTIVE_HEALTHY, PostgreSQL 17.6. Il secondo progetto dell'organizzazione `VocalFlash's Project` (`miavlccjtknaemnmjoqb`) risulta INACTIVE; non è stato assunto come staging né ripristinato.
+- `list_branches` restituisce ancora zero branch di sviluppo sul progetto Assistant. L'isolamento del database non è dimostrato: non eseguire scritture o migrazioni su questo target come se fosse staging.
+- Registro migrazioni live: 15 versioni, fino a `customer_whatsapp_replay_conflict_v1`.
+- La query catalogo conferma 15 tabelle `public` con RLS abilitato e zero policy dirette su ciascuna. Questo è coerente solo con un modello server-side se i GRANT e le RPC sono rigorosamente limitati; la verifica completa dei GRANT non è stata conclusa in questa sessione. Non aggiungere policy generiche e non esporre accesso client per eliminare l'avviso.
+- Advisor aggiornati il 31 ottobre 2026: Security `rls_enabled_no_policy` = 15 (INFO); Performance = 18 FK senza indice di copertura e 26 indici segnalati inutilizzati (INFO). Non creare/eliminare indici in massa: verificare gli indici composti esistenti e i piani di query su un database isolato.
+- Conteggi read-only: 0 utenti Auth, 0 membri business, 1 business, 1 work item e 4 work events. Non creare identità owner fittizie né usare questi dati come prova di staging sintetico.
+- Le RPC legacy owner-command e le RPC candidate v2 non sono state installate/abilitate da questa sessione. Nessuna query DDL/DML, migrazione o modifica dati è stata eseguita.
+
+**Render staging**
+- Servizio `vocalflash-bot-staging`: branch `multivocale-runtime-v2`, piano Free, auto-deploy OFF, regione Oregon, URL staging noto.
+- Il deployment attualmente live è ancora il commit `34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5` del 4 ottobre 2026. Non corrisponde all'head bot della PR #2. Quindi il codice candidato non è dimostrato in esecuzione su Render.
+- La lettura corrente delle variabili Render non è disponibile tramite l'inventario esposto in questa sessione; non dichiarare configurati `META_APP_SECRET`, Assistant API key/URL, storage URL/key, Redis o token WhatsApp.
+- Nessuna env Render modificata, nessun deploy/restart eseguito. Auto-deploy OFF resta utile per evitare riavvii involontari e contenere il consumo del piano Free.
+
+### Riesame del codice e dipendenze
+- `api/v1/assistant.js` autentica con `VOCALFLASH_ASSISTANT_API_KEYS`; usa `VF_ASSISTANT_SUPABASE_URL` e `VF_ASSISTANT_SUPABASE_SECRET_KEY`; la readiness controlla anche `OPENAI_API_KEY` e `VOCALFLASH_API_KEYS`. L'assenza della API key e della secret DB sul branch impedisce una prova runtime autenticata completa.
+- `api/v1/multivocale-storage.js` fallisce chiuso se manca la mappatura scope della chiave; applica namespace separati agli oggetti e rifiuta download/cancellazioni cross-scope. Il suo health verifica la creazione della signed-upload URL, non un round-trip upload/download/delete: mantenere separati i due livelli di evidenza.
+- `customer_text_bridge.py` inoltra testo ordinario alla Assistant API con `VOCALFLASH_ASSISTANT_API_URL` e `VOCALFLASH_ASSISTANT_API_KEY`; `app_customer.py` verifica Redis, Assistant, storage, configurazione WhatsApp e chiave trascrizione al boot. La verifica del codice non dimostra che tali variabili siano impostate nel servizio Render live.
+- Il runtime owner-command richiede identità verificata e dipendenze di persistenza; in assenza delle funzioni di resolve/record/commit atomico restituisce `ATOMIC_CONFIRMATION_NOT_ENABLED` senza scritture. Il TTL 600 è configurato sul Preview branch, ma non rende disponibili la secret DB o la API key mancanti.
+- Nessuna modifica applicativa è stata fatta in questo audit: i test esistenti sono verdi, ma non è sicuro tentare un fix runtime o E2E mutante senza database isolato e credenziali correttamente scoped.
+
+### Decisione operativa aggiornata
+
+**NO-GO per E2E mutante e rilascio; GO per ulteriori verifiche statiche e preparazione isolata.**
+
+1. Non usare il progetto Supabase ACTIVE_HEALTHY come staging finché l'isolamento non è provato; il progetto alternativo è INACTIVE e non è stato ripristinato.
+2. Prima di creare un branch/progetto Supabase, aggiornare il preventivo e ottenere approvazione esplicita del costo. Nessuna risorsa a pagamento è stata creata.
+3. Dopo disponibilità di un DB isolato, verificare il replay completo delle 15 migrazioni e il baseline pre-registry; quindi testare le RPC candidate sullo schema completo, grants, RLS, tenant binding, rollback e concorrenza.
+4. Configurare un'unica chiave server-to-server dedicata solo sul Preview branch e Render staging, con scope separati e senza toccare Production o `assistant-auth-v1`; aggiungere la secret DB solo del progetto isolato. Prima controllare l'inventario e poi pianificare un solo restart Render.
+5. Portare il bot sul commit candidato solo dopo i gate, con deploy manuale staging e test di firma webhook. Non inviare messaggi WhatsApp reali senza destinatario di test autorizzato.
+6. Conservare Draft le PR impilate e risolvere l'ordine ESM/base/integrazione; nessun merge automatico.
+7. Mantenere aperti i gate per persistenza conversazionale, outbox e riconciliazione delivery, round-trip Storage reale, restart/recovery MultiVocale, media-only, benchmark audio italiano e privacy/DPA/retention.
+
+**Perimetro delle azioni:** solo letture GitHub/Vercel/Supabase/Render e analisi statica. Nessun segreto letto o modificato; nessun DDL/DML o migration; nessuna modifica env; nessun deploy/restart Render; nessun merge o Production deploy; nessun invio WhatsApp/SMS.
