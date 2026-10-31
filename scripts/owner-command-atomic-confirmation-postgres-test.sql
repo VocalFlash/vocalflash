@@ -74,6 +74,65 @@ BEGIN
   SELECT count(*) INTO v_count FROM public.mock_owner_effects WHERE source_event_id=v_source;
   IF v_count<>1 THEN RAISE EXCEPTION 'replay duplicated note effect: %',v_count; END IF;
 
+  -- A legacy NOTE_EXISTS must not be accepted when the persisted note differs.
+  v_source := '10000000-0000-4000-8000-000000000601';
+  v_proposal := '10000000-0000-4000-8000-000000000602';
+  INSERT INTO public.work_events(id,business_id,work_item_id,business_member_id,business_channel_id,
+    actor_type,direction,event_type,normalized_text,external_message_id,payload,occurred_at)
+  VALUES(v_source,v_business,v_work,v_member,v_channel,'member','inbound','owner_command_received',
+    'nota divergente','wamid-source-note-mismatch','{}'::jsonb,now()-interval '1 minute');
+  INSERT INTO public.work_events(id,business_id,work_item_id,business_member_id,actor_type,direction,
+    event_type,content_type,payload,occurred_at)
+  VALUES(v_proposal,v_business,v_work,v_member,'assistant','internal','owner_command_proposal',
+    'application/json',jsonb_build_object('intent','add_note','note','nota confermata',
+      'owner_command_source_event_id',v_source::text,'expires_at',(now()+interval '10 minutes')::text),
+    now()-interval '30 seconds');
+  INSERT INTO public.work_events(business_id,work_item_id,business_member_id,actor_type,direction,
+    event_type,content_type,normalized_text,payload)
+  VALUES(v_business,v_work,v_member,'member','internal','owner_command_note_added','text',
+    'testo differente',jsonb_build_object('owner_command_source_event_id',v_source::text,
+      'proposal_event_id',v_proposal::text,'provenance','member_statement','verification_status','unverified'));
+  v_record := public.vf_record_owner_command_confirmation_v1(
+    v_business,v_member,v_channel,'wamid-confirm-note-mismatch',v_proposal,'confermo',now(),'{}'::jsonb);
+  v_confirmation := (v_record->>'confirmation_event_id')::uuid;
+  v_result := public.vf_commit_owner_command_confirmation_v2(v_business,v_member,v_channel,v_confirmation,v_proposal);
+  IF v_result->>'status'<>'REPLAY_CONFLICT' OR v_result->>'reason'<>'NOTE_EFFECT_MISMATCH' THEN
+    RAISE EXCEPTION 'mismatched existing note was not rejected: %',v_result;
+  END IF;
+  IF (SELECT payload ? 'confirmation_consumed_at' FROM public.work_events WHERE id=v_proposal)
+     OR (SELECT payload ? 'consumed_at' FROM public.work_events WHERE id=v_confirmation) THEN
+    RAISE EXCEPTION 'mismatched existing note consumed the confirmation';
+  END IF;
+
+  -- A legacy ACTION_EXISTS must not be accepted when the persisted action differs.
+  v_source := '10000000-0000-4000-8000-000000000701';
+  v_proposal := '10000000-0000-4000-8000-000000000702';
+  v_due := now()+interval '2 hours';
+  INSERT INTO public.work_events(id,business_id,work_item_id,business_member_id,business_channel_id,
+    actor_type,direction,event_type,normalized_text,external_message_id,payload,occurred_at)
+  VALUES(v_source,v_business,v_work,v_member,v_channel,'member','inbound','owner_command_received',
+    'programma attività divergente','wamid-source-action-mismatch','{}'::jsonb,now()-interval '1 minute');
+  INSERT INTO public.work_events(id,business_id,work_item_id,business_member_id,actor_type,direction,
+    event_type,content_type,payload,occurred_at)
+  VALUES(v_proposal,v_business,v_work,v_member,'assistant','internal','owner_command_proposal',
+    'application/json',jsonb_build_object('intent','schedule_action','title','Chiamare Bianchi',
+      'due_at',v_due::text,'owner_command_source_event_id',v_source::text,
+      'expires_at',(now()+interval '10 minutes')::text),now()-interval '30 seconds');
+  INSERT INTO public.open_actions(business_id,work_item_id,action_key,title,assigned_member_id,due_at,metadata)
+  VALUES(v_business,v_work,'owner_command_reminder','Titolo errato',v_member,v_due,
+    jsonb_build_object('owner_command_source_event_id',v_source::text,'proposal_event_id',v_proposal::text));
+  v_record := public.vf_record_owner_command_confirmation_v1(
+    v_business,v_member,v_channel,'wamid-confirm-action-mismatch',v_proposal,'confermo',now(),'{}'::jsonb);
+  v_confirmation := (v_record->>'confirmation_event_id')::uuid;
+  v_result := public.vf_commit_owner_command_confirmation_v2(v_business,v_member,v_channel,v_confirmation,v_proposal);
+  IF v_result->>'status'<>'REPLAY_CONFLICT' OR v_result->>'reason'<>'ACTION_EFFECT_MISMATCH' THEN
+    RAISE EXCEPTION 'mismatched existing action was not rejected: %',v_result;
+  END IF;
+  IF (SELECT payload ? 'confirmation_consumed_at' FROM public.work_events WHERE id=v_proposal)
+     OR (SELECT payload ? 'consumed_at' FROM public.work_events WHERE id=v_confirmation) THEN
+    RAISE EXCEPTION 'mismatched existing action consumed the confirmation';
+  END IF;
+
   -- Expired proposals must not produce effects or consumption markers.
   v_source := '10000000-0000-4000-8000-000000000201';
   v_proposal := '10000000-0000-4000-8000-000000000202';
