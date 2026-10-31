@@ -200,3 +200,16 @@ La run #40493167613 è verde sul pre-audit head `06c616e40f4aedc47b76eb19eb8678b
 Nota sicurezza: RLS è attivo ma non forzato e non ci sono policy dirette sulle sei tabelle operative ispezionate. Le RPC legacy sono `SECURITY DEFINER`, owner `postgres`, `search_path=public, pg_temp`; la sicurezza tenant non può essere dedotta dalla sola presenza di RLS. Verificare i controlli business/member/channel e i grant sullo schema completo isolato. L'inventario Preview non espone segreti: variabili `VF_ASSISTANT_*` associate al branch `assistant-auth-v1`, TTL assente per il candidato.
 
 Gate invariati: baseline storico, replay migrazioni, schema completo isolato, TTL esplicito, Preview configurato con approvazione, owner autorizzato e E2E Meta/API/Supabase. Nessuna modifica live.
+
+
+## Riesame avversario — revoca membro/canale durante la finestra di conferma (31 ottobre 2026)
+
+È emerso un gap nel wrapper proposto: dopo aver registrato la conferma, un membro o un canale poteva essere disattivato prima del commit, ma la funzione non rivalidava lo stato attivo prima di invocare la RPC legacy. La proposta è stata corretta senza modificare il database live:
+
+- Il wrapper seleziona la riga del membro con `FOR SHARE` e verifica `is_active=true`.
+- Se il membro non esiste o è disattivato, restituisce `DENIED / MEMBER_NOT_ACTIVE` prima dell'effetto.
+- Ripete lo stesso controllo con `FOR SHARE` sul canale e restituisce `DENIED / CHANNEL_NOT_ACTIVE` se non è attivo.
+- I lock impediscono che una revoca concorrente si inserisca tra il controllo e la write; la transazione determina l'ordine tra revoca e commit.
+- I test isolati creano proposta e conferma mentre il membro/canale è attivo, poi disattivano il soggetto prima del commit e verificano zero effetto e zero marker di consumo.
+
+CI #41246248080: 6/6 job success sul commit `7fbbaad3c7f6adb952d05324b0a2785c38e392a3`. La verifica resta isolata, non full-schema parity o E2E. PR #10 resta Draft.

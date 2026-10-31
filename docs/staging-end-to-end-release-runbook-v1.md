@@ -458,3 +458,13 @@ Nessuna voce marcata come completata equivale a un E2E runtime. Nessuna modifica
 - Regola operativa vincolante: niente deploy/restart Render per aggiornamenti documentali o test che possono essere eseguiti in CI locale/effimera; raggruppare tutte le modifiche env in una sola finestra, fare un solo restart controllato solo dopo DB isolato, credenziali scoped e test pronti; usare il servizio staging solo per test integrati brevi e mirati. Nessun test di polling, loop o carico continuativo su Render Free.
 - I gate di rilascio non cambiano: nessun branch Supabase isolato; nessuna secret/API key dedicata sul Preview candidato; nessuna prova che le env richieste siano presenti su Render; nessun round-trip Storage reale; nessun deploy del nuovo head bot. Quindi E2E mutante e rilascio restano **NO-GO**.
 - Nessuna modifica a codice runtime, variabili, database, deploy Render, merge o Production è stata eseguita in questa fase. Sono state completate letture di stato e aggiornamento documentale soltanto.
+
+
+## Correzione ambiente Preview — inventario 31 ottobre 2026
+
+- Preview branch `owner-command-atomic-confirmation-v3`: `VF_ASSISTANT_SUPABASE_URL` presente e punta a `https://tkfyfqgtumoeywlqzmdt.supabase.co`, cioè al progetto ACTIVE_HEALTHY `VocalFlash Assistant`, non a un database isolato.
+- `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS=600` presente sul branch Preview.
+- `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS` assenti. Nessun segreto è stato decifrato o modificato.
+- Il deployment Preview sul commit applicativo/test `7fbbaad3c7f6adb952d05324b0a2785c38e392a3` è READY, ma il solo stato READY non prova che l'API possa autenticarsi né che sia collegata a un database isolato.
+
+**Blocco di sicurezza:** non aggiungere secret DB o API key a questo branch finché `VF_ASSISTANT_SUPABASE_URL` non è associata a un Supabase branch/progetto dedicato. Non fare chiamate mutanti contro l'URL attuale. Prima stimare il costo dell'ambiente isolato e ottenere approvazione esplicita.

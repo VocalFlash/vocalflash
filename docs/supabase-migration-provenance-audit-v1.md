@@ -166,3 +166,15 @@ CI #40493167613 ha passato il contratto PostgreSQL isolato e i cinque pass API s
 - Advisor Performance: **18 foreign key senza indice di copertura** e **26 indici segnalati inutilizzati** (livello INFO). Non aggiungere o rimuovere indici in massa: confrontare ogni FK con gli indici composti esistenti, i piani di query e il carico previsto, poi validare su ambiente isolato.
 - L'elenco dei branch Supabase è vuoto: nessun ambiente di sviluppo isolato esistente. Non crearne uno senza nuova quotazione e approvazione esplicita del costo.
 - Le osservazioni sono consultive; nessun DDL, indice, policy o dato è stato modificato.
+
+
+## Verifica catalogo live e ricerca baseline — 31 ottobre 2026
+
+- Confermato in sola lettura: PostgreSQL 17.6, progetto ACTIVE_HEALTHY, registro `supabase_migrations.schema_migrations` con 15 record; primo `20261001181622`, ultimo `20261004213059`.
+- Confermata la presenza delle colonne richieste dalla proposta function-only, incluse `work_events.payload/normalized_text` e `open_actions.metadata/action_key/title/due_at/assigned_member_id`. Presenti gli indici univoci di deduplica/idempotenza e le FK composite tenant-scoped sulle tabelle operative interessate.
+- Verificati RLS, privilegi di tabella, ACL RPC e privilegi CREATE sullo schema. Il modello osservato è server-only: `anon` e `authenticated` non hanno SELECT diretto sulle tabelle operative né CREATE su `public`; le RPC legacy hanno EXECUTE per `service_role` e `postgres`.
+- Le due RPC v2 candidate sono assenti dal live; non sono state installate.
+- Ricerca supplementare su branch `main`, `assistant-auth-v1`, `clean-integration-v1`, `assistant-conversation-photo-v1`, branch owner-confirmation e repository accessibili: nessun bootstrap schema pre-registry o dump SQL iniziale recuperato. Le 15 migrazioni sono sorgenti incrementali esatte, ma non ricostruiscono da sole uno schema vuoto.
+- Nessun branch Supabase di sviluppo disponibile; il progetto alternativo dell'organizzazione è INACTIVE. Non creare o ripristinare ambienti senza preventivo e approvazione del costo.
+
+**Esito:** compatibilità catalogo delle colonne usate dalla proposta = verificata; replay storico da zero e full-schema parity = ancora aperti. Nessuna scrittura/DDL live.

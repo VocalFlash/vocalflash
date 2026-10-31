@@ -795,3 +795,12 @@ La PR #1 `questionario-e2e-v1` resta Draft su `main`. La correzione proposta agg
 - Regola operativa vincolante: niente deploy/restart Render per aggiornamenti documentali o test che possono essere eseguiti in CI locale/effimera; raggruppare tutte le modifiche env in una sola finestra, fare un solo restart controllato solo dopo DB isolato, credenziali scoped e test pronti; usare il servizio staging solo per test integrati brevi e mirati. Nessun test di polling, loop o carico continuativo su Render Free.
 - I gate di rilascio non cambiano: nessun branch Supabase isolato; nessuna secret/API key dedicata sul Preview candidato; nessuna prova che le env richieste siano presenti su Render; nessun round-trip Storage reale; nessun deploy del nuovo head bot. Quindi E2E mutante e rilascio restano **NO-GO**.
 - Nessuna modifica a codice runtime, variabili, database, deploy Render, merge o Production è stata eseguita in questa fase. Sono state completate letture di stato e aggiornamento documentale soltanto.
+
+
+## Raccomandazioni vincolanti aggiunte — 31 ottobre 2026
+
+1. Non associare un Preview a un database di produzione e poi completare la configurazione aggiungendo la secret: prima deve esistere un Supabase branch/progetto isolato e verificato. L'URL Preview attuale punta al progetto Assistant attivo; le credenziali mancanti non vanno copiate.
+2. Ogni commit owner-command deve rivalidare membro e canale attivi nella stessa transazione della write, bloccando le righe contro revoche concorrenti. Una conferma valida alla ricezione non basta se membro o canale vengono disattivati prima del commit.
+3. Mantenere l'accesso DB server-only: RLS attivo, nessuna policy client generica, RPC privilegiate con ACL ristrette a `service_role`; non risolvere gli avvisi Advisor esponendo tabelle.
+4. Non dichiarare schema parity sulla sola base dei test PostgreSQL con fixture ridotta. Separare: compatibilità catalogo verificata, test fixture isolati, replay schema completo, E2E staging.
+5. Non ricostruire una baseline storica inventando DDL. Se il bootstrap non è recuperabile, documentare il limite e ottenere un ambiente isolato prima di costruire uno snapshot equivalente verificabile.

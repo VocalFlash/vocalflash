@@ -116,3 +116,17 @@ CI #40493167613 è passata sul pre-audit head `06c616e40f4aedc47b76eb19eb8678b17
 ## Corsia questionario/ESM — controllo separato, 27 ottobre 2026
 
 La PR #1 `questionario-e2e-v1` resta Draft su `main`. La correzione proposta aggiunge `type: module` per l'API ESM; i controlli Preview riportati nella PR hanno risposte HTTP attese per le route diagnostiche. Rimane però un problema separato: nel Preview del questionario `SUPABASE_URL` punta al progetto atteso, ma il `SUPABASE_SECRET_KEY` configurato restituisce HTTP 401. Non confondere questo problema con le variabili Assistant `VF_ASSISTANT_*`. Non ruotare o modificare chiavi senza diagnosi e approvazione esplicita. Prima di promuovere il questionario su `main`, risolvere ESM e validare la credenziale del progetto questionario su Preview, poi rieseguire i test sul branch finale. Nessuna credenziale è stata letta o modificata in questo audit.
+
+
+## Gate owner-confirmation aggiornati — 31 ottobre 2026
+
+- [x] Riconciliazione dell'effetto persistito prima del consumo: CI PostgreSQL isolata verde.
+- [x] Rivalidazione del membro e del canale attivi con lock `FOR SHARE` prima del primo commit: test di revoca superati nella run #41246248080.
+- [x] Compatibilità catalogo delle colonne, indici e FK usati dalla proposta verificata in sola lettura sul live.
+- [ ] Baseline bootstrap pre-registry e replay completo da zero.
+- [ ] Full-schema parity su database isolato con schema completo, RLS, FK, trigger, ACL e RPC legacy.
+- [ ] E2E API/Preview verso Supabase isolato; non usare l'URL Preview attuale che punta al progetto attivo.
+- [ ] Configurare secret DB e API key solo dopo avere collegato il Preview al database isolato; TTL Preview già presente a 600 secondi, da rivalutare prima del rilascio.
+- [ ] E2E Meta → Render → Assistant API → Supabase staging.
+
+**NO-GO rilascio:** i test isolati sono superati, ma non dimostrano full-schema parity o E2E.

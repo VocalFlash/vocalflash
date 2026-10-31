@@ -967,3 +967,11 @@ Nessun merge, deploy Production, scrittura Supabase live, migrazione live, invio
 - Regola operativa vincolante: niente deploy/restart Render per aggiornamenti documentali o test che possono essere eseguiti in CI locale/effimera; raggruppare tutte le modifiche env in una sola finestra, fare un solo restart controllato solo dopo DB isolato, credenziali scoped e test pronti; usare il servizio staging solo per test integrati brevi e mirati. Nessun test di polling, loop o carico continuativo su Render Free.
 - I gate di rilascio non cambiano: nessun branch Supabase isolato; nessuna secret/API key dedicata sul Preview candidato; nessuna prova che le env richieste siano presenti su Render; nessun round-trip Storage reale; nessun deploy del nuovo head bot. Quindi E2E mutante e rilascio restano **NO-GO**.
 - Nessuna modifica a codice runtime, variabili, database, deploy Render, merge o Production è stata eseguita in questa fase. Sono state completate letture di stato e aggiornamento documentale soltanto.
+
+
+## Gate architetturale aggiornato — 31 ottobre 2026
+
+- Owner confirmation: oltre al binding proposta/conferma e al replay verificato, la write richiede che membro e canale siano ancora attivi al momento del commit; lock `FOR SHARE` evita la race con la revoca.
+- Database: nessuna migrazione strutturale richiesta dal disegno attuale; il rilascio previsto resta function-only e versionato. Non promuovere prima di full-schema parity e staging E2E.
+- Ambiente: il Preview owner-confirmation ha URL Supabase che punta al progetto attivo, TTL 600, ma secret DB e API key mancanti. Non completare la configurazione su quell'URL; serve un database isolato.
+- Provenienza: le 15 migrazioni incrementali sono fedeli al registro, ma il bootstrap storico manca. Ricostruire da uno snapshot verificabile, non da DDL ipotizzato.
