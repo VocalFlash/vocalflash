@@ -209,8 +209,8 @@ BEGIN
   END IF;
 
   -- Membership revocation after proposal/confirmation must block the first commit.
-  v_source := '10000000-0000-4000-8000-000000000701';
-  v_proposal := '10000000-0000-4000-8000-000000000702';
+  v_source := '10000000-0000-4000-8000-000000000901';
+  v_proposal := '10000000-0000-4000-8000-000000000902';
   INSERT INTO public.work_events(id,business_id,work_item_id,business_member_id,business_channel_id,
     actor_type,direction,event_type,normalized_text,external_message_id,payload,occurred_at)
   VALUES(v_source,v_business,v_work,v_member,v_channel,'member','inbound','owner_command_received',
