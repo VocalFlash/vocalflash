@@ -69,6 +69,23 @@ CREATE TABLE public.mock_owner_effects(
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
+CREATE TABLE public.open_actions(
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id uuid NOT NULL,
+  work_item_id uuid NOT NULL,
+  action_key text NOT NULL,
+  title text NOT NULL,
+  assigned_member_id uuid,
+  due_at timestamptz,
+  metadata jsonb NOT NULL DEFAULT '{}'::jsonb
+);
+CREATE UNIQUE INDEX open_actions_owner_command_source_uidx
+  ON public.open_actions(business_id,(metadata->>'owner_command_source_event_id'))
+  WHERE metadata ? 'owner_command_source_event_id';
+CREATE UNIQUE INDEX work_events_owner_command_note_source_uidx
+  ON public.work_events(business_id,(payload->>'owner_command_source_event_id'))
+  WHERE event_type='owner_command_note_added' AND payload ? 'owner_command_source_event_id';
+
 CREATE OR REPLACE FUNCTION public.vf_commit_owner_note_v1(
   p_business_id uuid,p_work_item_id uuid,p_member_id uuid,p_source_event_id uuid,
   p_note text,p_confirmed boolean DEFAULT false,p_proposal_event_id uuid DEFAULT NULL
@@ -87,13 +104,23 @@ BEGIN
     RETURN jsonb_build_object('ok',false,'status','DENIED','reason','MOCK_PROPOSAL_MISMATCH');
   END IF;
   PERFORM pg_sleep(1);
-  INSERT INTO public.mock_owner_effects(business_id,work_item_id,member_id,source_event_id,effect_type,payload)
-  VALUES(p_business_id,p_work_item_id,p_member_id,p_source_event_id,'add_note',jsonb_build_object('note',p_note))
-  ON CONFLICT(source_event_id) DO NOTHING RETURNING id INTO v_effect_id;
-  IF p_note='__raise__' THEN RAISE EXCEPTION 'simulated failure after effect insert'; END IF;
+  INSERT INTO public.work_events(business_id,work_item_id,business_member_id,
+    actor_type,direction,event_type,content_type,normalized_text,payload)
+  VALUES(p_business_id,p_work_item_id,p_member_id,'member','internal',
+    'owner_command_note_added','text',btrim(p_note),
+    jsonb_build_object('owner_command_source_event_id',p_source_event_id::text,
+      'proposal_event_id',p_proposal_event_id::text,
+      'provenance','member_statement','verification_status','unverified'))
+  ON CONFLICT DO NOTHING RETURNING id INTO v_effect_id;
   IF v_effect_id IS NULL THEN
-    RETURN jsonb_build_object('ok',true,'status','NOTE_EXISTS','replayed',true);
+    SELECT id INTO v_effect_id FROM public.work_events
+    WHERE business_id=p_business_id AND event_type='owner_command_note_added'
+      AND payload->>'owner_command_source_event_id'=p_source_event_id::text LIMIT 1;
+    RETURN jsonb_build_object('ok',true,'status','NOTE_EXISTS','note_event_id',v_effect_id,'replayed',true);
   END IF;
+  INSERT INTO public.mock_owner_effects(business_id,work_item_id,member_id,source_event_id,effect_type,payload)
+  VALUES(p_business_id,p_work_item_id,p_member_id,p_source_event_id,'add_note',jsonb_build_object('note',p_note));
+  IF p_note='__raise__' THEN RAISE EXCEPTION 'simulated failure after effect insert'; END IF;
   RETURN jsonb_build_object('ok',true,'status','NOTE_ADDED','note_event_id',v_effect_id,'replayed',false);
 END;
 $$;
@@ -116,13 +143,21 @@ BEGIN
      OR (v_proposal->>'due_at')::timestamptz<>p_due_at OR p_confirmed IS NOT TRUE THEN
     RETURN jsonb_build_object('ok',false,'status','DENIED','reason','MOCK_PROPOSAL_MISMATCH');
   END IF;
+  INSERT INTO public.open_actions(business_id,work_item_id,action_key,title,
+    assigned_member_id,due_at,metadata)
+  VALUES(p_business_id,p_work_item_id,'owner_command_reminder',btrim(p_title),
+    p_member_id,p_due_at,jsonb_build_object('owner_command_source_event_id',p_source_event_id::text,
+      'proposal_event_id',p_proposal_event_id::text))
+  ON CONFLICT DO NOTHING RETURNING id INTO v_effect_id;
+  IF v_effect_id IS NULL THEN
+    SELECT id INTO v_effect_id FROM public.open_actions
+    WHERE business_id=p_business_id AND metadata->>'owner_command_source_event_id'=p_source_event_id::text
+    LIMIT 1;
+    RETURN jsonb_build_object('ok',true,'status','ACTION_EXISTS','action_id',v_effect_id,'replayed',true);
+  END IF;
   INSERT INTO public.mock_owner_effects(business_id,work_item_id,member_id,source_event_id,effect_type,payload)
   VALUES(p_business_id,p_work_item_id,p_member_id,p_source_event_id,'schedule_action',
-         jsonb_build_object('title',p_title,'due_at',p_due_at))
-  ON CONFLICT(source_event_id) DO NOTHING RETURNING id INTO v_effect_id;
-  IF v_effect_id IS NULL THEN
-    RETURN jsonb_build_object('ok',true,'status','ACTION_EXISTS','replayed',true);
-  END IF;
+    jsonb_build_object('title',p_title,'due_at',p_due_at));
   RETURN jsonb_build_object('ok',true,'status','ACTION_CREATED','action_id',v_effect_id,'replayed',false);
 END;
 $$;
