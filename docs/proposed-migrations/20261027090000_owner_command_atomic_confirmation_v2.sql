@@ -295,6 +295,8 @@ declare
   v_existing_action public.open_actions%rowtype;
   v_effect_id uuid;
   v_normalized_confirmation text;
+  v_member_active boolean;
+  v_channel_active boolean;
 begin
   if p_business_id is null or p_member_id is null or p_channel_id is null
      or p_confirmation_event_id is null or p_proposal_event_id is null then
@@ -367,6 +369,24 @@ begin
   exception when others then
     return jsonb_build_object('ok',false,'status','CONFIG_REQUIRED','reason','PROPOSAL_EXPIRY_INVALID','writes_performed',false);
   end;
+  -- Revalidate current authorization for every first-time commit. Lock the
+  -- membership and channel rows so revocation cannot race the business write.
+  select m.is_active into v_member_active
+  from public.business_members m
+  where m.id=p_member_id and m.business_id=p_business_id
+  for share;
+  if not found or v_member_active is distinct from true then
+    return jsonb_build_object('ok',false,'status','DENIED','reason','MEMBER_NOT_ACTIVE','writes_performed',false);
+  end if;
+
+  select c.is_active into v_channel_active
+  from public.business_channels c
+  where c.id=p_channel_id and c.business_id=p_business_id
+  for share;
+  if not found or v_channel_active is distinct from true then
+    return jsonb_build_object('ok',false,'status','DENIED','reason','CHANNEL_NOT_ACTIVE','writes_performed',false);
+  end if;
+
   if now() > v_expiry or v_confirmation.occurred_at > v_expiry
      or v_confirmation.occurred_at < v_proposal.occurred_at then
     return jsonb_build_object('ok',false,'status','DENIED','reason','CONFIRMATION_EXPIRED_OR_OUT_OF_ORDER','writes_performed',false);
