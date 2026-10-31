@@ -130,3 +130,26 @@ La PR #1 `questionario-e2e-v1` resta Draft su `main`. La correzione proposta agg
 - [ ] E2E Meta → Render → Assistant API → Supabase staging.
 
 **NO-GO rilascio:** i test isolati sono superati, ma non dimostrano full-schema parity o E2E.
+
+
+## Decisione di finalizzazione — percorso senza branch Supabase dedicato (1 novembre 2026)
+
+**Il branch Supabase isolato non è un prerequisito assoluto per continuare lo sviluppo.** È un requisito pratico per eseguire in sicurezza il collaudo mutante full-schema e l'E2E che scrive sul database. Per evitare costi e complessità premature, la fase corrente viene chiusa senza creare branch o riattivare progetti.
+
+Percorso autorizzato senza costi aggiuntivi:
+- continuare con review statica del SQL proposto, del runtime, dei grant e delle dipendenze;
+- mantenere i test PostgreSQL su database effimeri CI, ampliandoli quando emerge un caso di regressione concreto;
+- mantenere le query sul progetto Supabase attivo rigorosamente read-only;
+- verificare i contratti API con fixture/mock e test non mutanti;
+- mantenere Vercel Preview non collegato a credenziali DB mutanti finché l'URL punta al progetto Supabase attivo;
+- evitare deploy/restart Render non necessari, rispettando il vincolo del piano Free.
+
+Limiti non negoziabili:
+- i test effimeri non dimostrano full-schema parity, clean replay delle migrazioni, comportamento reale di RLS/ACL/trigger sull'intero schema o E2E Meta/Render/API/Supabase;
+- non aggiungere secret DB o API key al Preview candidato mentre l'URL punta al database attivo;
+- non applicare le RPC v2, migrazioni o DML al progetto Supabase attivo;
+- non promuovere, unire PR o inviare messaggi reali come conseguenza di questa finalizzazione.
+
+**Gate residuo per il rilascio:** prima del primo test mutante integrato deve essere disponibile un target dati isolato e verificato. Può essere un branch Supabase, un progetto dedicato già disponibile oppure un PostgreSQL isolato che riproduca fedelmente lo schema completo; non è obbligatorio acquistare un branch se si dimostra un'alternativa equivalente. Se l'unica soluzione praticabile richiede una risorsa a pagamento, prima si richiede un preventivo e poi un'approvazione separata del costo.
+
+**Stato al 1 novembre 2026:** PR #10 resta Draft; il commit verificato precedente `8da9d011628b4f6269db2ec953881117f3cd74ff` ha CI 6/6 verde (run #41246494635). La modifica documentale di questa decisione richiede una nuova CI sul nuovo head prima di poterla dichiarare verde. Nessuna branch/progetto è stato creato, nessun costo sostenuto, nessuna migrazione/scrittura live, modifica env, deploy Production, merge o invio WhatsApp/SMS eseguito.
