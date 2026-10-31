@@ -291,6 +291,9 @@ declare
   v_due_at timestamptz;
   v_source_id uuid;
   v_result jsonb;
+  v_existing_note public.work_events%rowtype;
+  v_existing_action public.open_actions%rowtype;
+  v_effect_id uuid;
   v_normalized_confirmation text;
 begin
   if p_business_id is null or p_member_id is null or p_channel_id is null
@@ -406,6 +409,28 @@ begin
     if coalesce(v_result->>'status','') not in ('NOTE_ADDED','NOTE_EXISTS') then
       return jsonb_build_object('ok',false,'status','COMMIT_REJECTED','result',v_result,'writes_performed',false);
     end if;
+
+    -- Never trust NOTE_EXISTS by status alone: reconcile the persisted effect
+    -- against the exact proposal before consuming the confirmation.
+    begin
+      v_effect_id := (v_result->>'note_event_id')::uuid;
+    exception when others then
+      return jsonb_build_object('ok',false,'status','REPLAY_CONFLICT','reason','NOTE_EFFECT_ID_INVALID','writes_performed',false);
+    end;
+    select * into v_existing_note
+    from public.work_events e
+    where e.id=v_effect_id
+    for update;
+    if not found
+       or v_existing_note.business_id is distinct from p_business_id
+       or v_existing_note.work_item_id is distinct from v_proposal.work_item_id
+       or v_existing_note.business_member_id is distinct from p_member_id
+       or v_existing_note.event_type is distinct from 'owner_command_note_added'
+       or v_existing_note.normalized_text is distinct from v_note
+       or v_existing_note.payload->>'owner_command_source_event_id' is distinct from v_source_id::text
+       or v_existing_note.payload->>'proposal_event_id' is distinct from p_proposal_event_id::text then
+      return jsonb_build_object('ok',false,'status','REPLAY_CONFLICT','reason','NOTE_EFFECT_MISMATCH','writes_performed',false);
+    end if;
   elsif v_intent='schedule_action' then
     v_title := nullif(btrim(v_payload->>'title'),'');
     if v_title is null or nullif(v_payload->>'due_at','') is null then
@@ -421,6 +446,28 @@ begin
     );
     if coalesce(v_result->>'status','') not in ('ACTION_CREATED','ACTION_EXISTS') then
       return jsonb_build_object('ok',false,'status','COMMIT_REJECTED','result',v_result,'writes_performed',false);
+    end if;
+
+    -- Reconcile the durable open_actions row, not merely the legacy RPC status.
+    begin
+      v_effect_id := (v_result->>'action_id')::uuid;
+    exception when others then
+      return jsonb_build_object('ok',false,'status','REPLAY_CONFLICT','reason','ACTION_EFFECT_ID_INVALID','writes_performed',false);
+    end;
+    select * into v_existing_action
+    from public.open_actions a
+    where a.id=v_effect_id
+    for update;
+    if not found
+       or v_existing_action.business_id is distinct from p_business_id
+       or v_existing_action.work_item_id is distinct from v_proposal.work_item_id
+       or v_existing_action.action_key is distinct from 'owner_command_reminder'
+       or v_existing_action.title is distinct from v_title
+       or v_existing_action.due_at is distinct from v_due_at
+       or v_existing_action.assigned_member_id is distinct from p_member_id
+       or v_existing_action.metadata->>'owner_command_source_event_id' is distinct from v_source_id::text
+       or v_existing_action.metadata->>'proposal_event_id' is distinct from p_proposal_event_id::text then
+      return jsonb_build_object('ok',false,'status','REPLAY_CONFLICT','reason','ACTION_EFFECT_MISMATCH','writes_performed',false);
     end if;
   else
     return jsonb_build_object('ok',false,'status','DENIED','reason','PROPOSAL_INTENT_UNSUPPORTED','writes_performed',false);
