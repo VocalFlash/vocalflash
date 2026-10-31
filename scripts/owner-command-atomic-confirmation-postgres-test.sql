@@ -208,6 +208,62 @@ BEGIN
     RAISE EXCEPTION 'expected committed schedule action, got %',v_result;
   END IF;
 
+  -- Membership revocation after proposal/confirmation must block the first commit.
+  v_source := '10000000-0000-4000-8000-000000000601';
+  v_proposal := '10000000-0000-4000-8000-000000000602';
+  INSERT INTO public.work_events(id,business_id,work_item_id,business_member_id,business_channel_id,
+    actor_type,direction,event_type,normalized_text,external_message_id,payload,occurred_at)
+  VALUES(v_source,v_business,v_work,v_member,v_channel,'member','inbound','owner_command_received',
+    'nota dopo revoca','wamid-source-revoked-member','{}'::jsonb,now()-interval '1 minute');
+  INSERT INTO public.work_events(id,business_id,work_item_id,business_member_id,actor_type,direction,
+    event_type,content_type,payload,occurred_at)
+  VALUES(v_proposal,v_business,v_work,v_member,'assistant','internal','owner_command_proposal',
+    'application/json',jsonb_build_object('intent','add_note','note','non autorizzare',
+      'owner_command_source_event_id',v_source::text,'expires_at',(now()+interval '10 minutes')::text),
+    now()-interval '30 seconds');
+  v_record := public.vf_record_owner_command_confirmation_v1(
+    v_business,v_member,v_channel,'wamid-confirm-revoked-member',v_proposal,'confermo',now(),'{}'::jsonb);
+  v_confirmation := (v_record->>'confirmation_event_id')::uuid;
+  UPDATE public.business_members SET is_active=false WHERE id=v_member AND business_id=v_business;
+  v_result := public.vf_commit_owner_command_confirmation_v2(v_business,v_member,v_channel,v_confirmation,v_proposal);
+  IF v_result->>'status'<>'DENIED' OR v_result->>'reason'<>'MEMBER_NOT_ACTIVE' THEN
+    RAISE EXCEPTION 'revoked member was not denied: %',v_result;
+  END IF;
+  IF EXISTS (SELECT 1 FROM public.mock_owner_effects WHERE source_event_id=v_source)
+     OR EXISTS (SELECT 1 FROM public.work_events WHERE id=v_confirmation AND payload ? 'consumed_at')
+     OR EXISTS (SELECT 1 FROM public.work_events WHERE id=v_proposal AND payload ? 'confirmation_consumed_at') THEN
+    RAISE EXCEPTION 'revoked member caused effect or consumption';
+  END IF;
+  UPDATE public.business_members SET is_active=true WHERE id=v_member AND business_id=v_business;
+
+  -- Channel deactivation after confirmation must also block the first commit.
+  v_source := '10000000-0000-4000-8000-000000000611';
+  v_proposal := '10000000-0000-4000-8000-000000000612';
+  INSERT INTO public.work_events(id,business_id,work_item_id,business_member_id,business_channel_id,
+    actor_type,direction,event_type,normalized_text,external_message_id,payload,occurred_at)
+  VALUES(v_source,v_business,v_work,v_member,v_channel,'member','inbound','owner_command_received',
+    'nota dopo canale disattivato','wamid-source-revoked-channel','{}'::jsonb,now()-interval '1 minute');
+  INSERT INTO public.work_events(id,business_id,work_item_id,business_member_id,actor_type,direction,
+    event_type,content_type,payload,occurred_at)
+  VALUES(v_proposal,v_business,v_work,v_member,'assistant','internal','owner_command_proposal',
+    'application/json',jsonb_build_object('intent','add_note','note','non autorizzare canale',
+      'owner_command_source_event_id',v_source::text,'expires_at',(now()+interval '10 minutes')::text),
+    now()-interval '30 seconds');
+  v_record := public.vf_record_owner_command_confirmation_v1(
+    v_business,v_member,v_channel,'wamid-confirm-revoked-channel',v_proposal,'confermo',now(),'{}'::jsonb);
+  v_confirmation := (v_record->>'confirmation_event_id')::uuid;
+  UPDATE public.business_channels SET is_active=false WHERE id=v_channel AND business_id=v_business;
+  v_result := public.vf_commit_owner_command_confirmation_v2(v_business,v_member,v_channel,v_confirmation,v_proposal);
+  IF v_result->>'status'<>'DENIED' OR v_result->>'reason'<>'CHANNEL_NOT_ACTIVE' THEN
+    RAISE EXCEPTION 'inactive channel was not denied: %',v_result;
+  END IF;
+  IF EXISTS (SELECT 1 FROM public.mock_owner_effects WHERE source_event_id=v_source)
+     OR EXISTS (SELECT 1 FROM public.work_events WHERE id=v_confirmation AND payload ? 'consumed_at')
+     OR EXISTS (SELECT 1 FROM public.work_events WHERE id=v_proposal AND payload ? 'confirmation_consumed_at') THEN
+    RAISE EXCEPTION 'inactive channel caused effect or consumption';
+  END IF;
+  UPDATE public.business_channels SET is_active=true WHERE id=v_channel AND business_id=v_business;
+
   -- If the bounded resolver scan reaches 50 rows, it must not claim a unique match:
   -- older proposals could exist beyond the scan window.
   FOR v_i IN 1..51 LOOP
