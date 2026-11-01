@@ -1573,3 +1573,27 @@ Questa sezione aggiorna e supera lo stato provvisorio riportato in 11.12.
 Il risultato CI copre i test automatizzati del repository e il contratto PostgreSQL su database effimeri/schema minimo, incluse le RPC legacy recuperate. Il Preview READY dimostra la build/deploy Preview per lo SHA esatto. Nessuno dei due dimostra full-schema parity, connessione autenticata a un Supabase isolato, storage round-trip, restart Render o E2E Meta→Render→Assistant API→Supabase.
 
 **Gate invariati:** nessuna migrazione/RPC v2 installata sul progetto Supabase attivo; nessuna scrittura DML live; nessuna secret o variabile aggiunta; nessun invio WhatsApp/SMS; nessuna promozione Production. La PR rimane Draft fino ai gate di sicurezza e staging già descritti.
+
+
+### 11.14 Audit d'integrazione API ↔ bot e configurazione Preview — 1 novembre 2026
+
+Verifica read-only dei sorgenti effettivi sui due repository, del head PR e dell'inventario Vercel senza decifrare segreti.
+
+**Integrazione software: IMPLEMENTATA NELLE BRANCH CANDIDATE, NON ANCORA COLLAUDATA END-TO-END.**
+- `VocalFlash/vocalflash/api/v1/assistant.js` espone l'Assistant API autenticata con `X-VocalFlash-Assistant-Key`, riceve `external_account_id`, `sender_wa_id`, `external_message_id` e `normalized_text`, risolve l'origine del messaggio e instrada cliente o titolare.
+- `VocalFlash/vocalflash-bot/customer_text_bridge.py` inoltra i normali messaggi WhatsApp di testo a `VOCALFLASH_ASSISTANT_API_URL` usando la chiave dedicata `VOCALFLASH_ASSISTANT_API_KEY` nell'header corretto; non riutilizza la chiave di trascrizione `X-API-Key`.
+- `app_customer.py` invia su WhatsApp soltanto `assistant_message` esplicitamente restituito dall'API. La deduplica outbound Redis è **at-most-once**, non exactly-once; un timeout ambiguo conserva il marker e richiede riconciliazione operativa.
+- Audio e comandi MultiVocale sono instradati dal bot al runtime MultiVocale V2, non al percorso Assistant API testuale. Il ramo media/foto e l'ingestione media completa restano fuori dal percorso verificato.
+- Il test bot `test_customer_text_bridge.py` verifica payload, header, separazione credenziali, risposta e guardia duplicati; il test API `api/v1/assistant.test.js` verifica health/auth con `fetch` mockato. Sono test automatizzati, non chiamate reali tra Render, Vercel, Supabase e Meta.
+
+**Configurazione Vercel rilevata per il branch owner-command:**
+- Presente `VF_ASSISTANT_SUPABASE_URL` in Preview branch-specific; il valore non segreto coincide con il progetto Supabase principale `tkfyfqgtumoeywlqzmdt`, quindi NON è un database isolato nonostante il commento della variabile lo descriva come Preview isolato.
+- Presente `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS=600` in Preview branch-specific.
+- Assenti dall'inventario del branch `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS`.
+- Le due variabili mancanti risultano invece configurate nello scope Preview di `assistant-auth-v1`; non sono state decifrate né copiate. Non trasferire segreti tra branch senza approvazione e verifica del target.
+- L'API `health` richiede anche `OPENAI_API_KEY` e `VOCALFLASH_API_KEYS` per il routing; il probe Supabase è read-only e non dimostra che tutte le RPC operative siano presenti.
+- Il deployment Vercel `dpl_5rcrZcUzB6Jr5yDnFSUxznV8skzs` è READY sullo SHA `870e06f48efbe9485eca3f1da0c8bea341fbacd3`. Questo prova build/deploy Preview, non readiness runtime: con secret/API key mancanti l'API non può completare il flusso autenticato.
+
+**Catena PR riletta:** API #3 è Draft su `assistant-auth-v1` → `assistant-conversation-photo-v1`; API #10 è Draft su `assistant-conversation-photo-v1` → `owner-command-atomic-confirmation-v3`; bot #2 è Draft su `multivocale-runtime-v2` → `assistant-conversation-photo-v1` e dichiara dipendenza da API #3. PR #1 riguarda soltanto `type: module` su un branch separato `questionario-e2e-v1`; non è il parent della catena Assistant API. PR #9 (Bird/SMS) resta indipendente e fuori dal percorso minimo.
+
+**Gate e decisione tecnica:** mantenere PR #1/#3/#10 e bot #2 Draft; non retargetare o unire alla cieca. Prima definire una promozione ordinata dei branch e risolvere la divergenza di `main`. Prima di un E2E, serve un target Supabase realmente isolato e configurazione Preview completa approvata. Non aggiungere la secret live al Preview che punta al progetto principale. Nessuna variabile/segreto è stata modificata, nessuna RPC v2 è stata installata, nessun invio o deploy Production è avvenuto.
