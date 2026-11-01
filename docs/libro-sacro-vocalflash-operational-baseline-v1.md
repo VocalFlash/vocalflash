@@ -1416,3 +1416,115 @@ Limiti non negoziabili:
 **Gate residuo per il rilascio:** prima del primo test mutante integrato deve essere disponibile un target dati isolato e verificato. Può essere un branch Supabase, un progetto dedicato già disponibile oppure un PostgreSQL isolato che riproduca fedelmente lo schema completo; non è obbligatorio acquistare un branch se si dimostra un'alternativa equivalente. Se l'unica soluzione praticabile richiede una risorsa a pagamento, prima si richiede un preventivo e poi un'approvazione separata del costo.
 
 **Stato al 1 novembre 2026:** PR #10 resta Draft; il commit verificato precedente `8da9d011628b4f6269db2ec953881117f3cd74ff` ha CI 6/6 verde (run #41246494635). La modifica documentale di questa decisione richiede una nuova CI sul nuovo head prima di poterla dichiarare verde. Nessuna branch/progetto è stato creato, nessun costo sostenuto, nessuna migrazione/scrittura live, modifica env, deploy Production, merge o invio WhatsApp/SMS eseguito.
+
+
+---
+
+## 11. Ricostruzione storica e audit complessivo delle fonti — 1 novembre 2026
+
+Questa sezione consolida la ricostruzione delle prime fasi di VocalFlash, il confronto dei sorgenti disponibili, il questionario, le specifiche operative e lo stato tecnico ricostruito dai registri e checkpoint. È un addendum di continuità: non sostituisce le evidenze più recenti né trasforma attività progettate in funzionalità operative.
+
+### 11.1 Perimetro e qualità delle fonti
+
+Sono stati esaminati il registro di continuità del 1 ottobre, il checkpoint del 2 ottobre, specifiche del titolare, sorgenti Python/JavaScript, file HTML del questionario e dei risultati, e informazioni GitHub aggiornate al 1 novembre. Sono state trovate anche esportazioni di conversazioni Meta AI, che sono state tenute separate dalle conversazioni ChatGPT.
+
+**Limite documentale:** non è stata recuperata una trascrizione integrale di tutte le prime chat ChatGPT. I registri e i file presenti consentono una ricostruzione sostanziale, ma non autorizzano ad affermare che ogni messaggio originale sia stato consultato. I file allegati non sono una prova automatica di deploy o di esecuzione in produzione.
+
+### 11.2 Cronologia consolidata
+
+- **5–10 settembre:** prima generazione del bot Flask/Meta: webhook, download audio, trascrizione e risposta. I primi sorgenti mostrano Graph API v20.0 e chiamata diretta a OpenAI. Codice storico, non prova di deploy.
+- **14 settembre:** emerge la necessità di comprendere il contesto professionale. L'esportazione Meta AI contiene indicazioni su edilizia/cantiere, finanziario-creditizio, immobiliare, legale, medico-sanitario e contesto generico, con regola di non inventare terminologia specialistica. Questa è una fonte Meta AI, non una chat ChatGPT.
+- **17–18 settembre:** documentazione API e presentazione; vengono distinte la modalità di inoltro vocale a VocalFlash e l'integrazione più profonda con WhatsApp Business aziendale. La seconda è una direzione progettuale, non una prova che l'integrazione fosse già attiva.
+- **23–24 settembre:** sorgenti con Graph API v26.0, API centrale VocalFlash, autenticazione X-API-Key e VOCALFLASH_API_URL; sviluppo MultiVocale manuale/automatico, batch e sintesi. I sorgenti segnalano esplicitamente che parte dello stato era in RAM e non sopravviveva ai riavvii o ai processi multipli.
+- **24 settembre:** test V3 documentato su cinque vocali; rimaneva l'errore residuo di riconoscimento «Via Etnea → via Tenea». Non generalizzare il test a ogni accento, settore o condizione audio.
+- **25–26 settembre:** questionario, pagina risultati e API di submit/results/export, con rewrites Vercel. Nel registro risultano due risposte reali. Il percorso completo invio→persistenza→risultati→CSV non va considerato collaudato E2E sulla sola base dei file HTML.
+- **29 settembre–3 ottobre:** evoluzione verso Assistente WhatsApp «Dal vocale all'azione», database operativo, Resolver, Decomposer, policy, identità e scritture protette. I checkpoint riportano test progressivi, ma i loro perimetri restano distinti.
+- **ottobre–1 novembre:** hardening della conferma atomica, verifiche schema, CI PostgreSQL effimera, branch e Preview. PR #10 resta Draft e non integrata in main.
+
+### 11.3 Evoluzione dei sorgenti
+
+**Prima generazione:** Flask/webhook Meta, Graph API v20.0, download audio, chiamata diretta OpenAI e variabili legacy per token e chiavi.
+
+**Seconda generazione:** Graph API v26.0, API centrale, VOCALFLASH_API_URL, X-API-Key, separazione tra bot e motore di elaborazione. Il bot diventa progressivamente un adapter/canale e l'API centrale il punto di elaborazione.
+
+**MultiVocale:** i sorgenti documentano raccolta di più vocali, ordinamento, quiet window, riepilogo manuale e automatico, protezione del primo audio e limiti di batch. La presenza di Redis per deduplica/lock non dimostra la persistenza completa di sessioni, audio e timer. La prova di storage deve includere upload, download, cancellazione, restart, concorrenza, recupero e no-double-reply.
+
+**Conseguenza architetturale:** non confondere il bot di trascrizione con l'Assistant API e non considerare completata l'integrazione operativa solo perché i singoli moduli hanno test verdi.
+
+### 11.4 Questionario
+
+I file esaminati contengono otto domande su uso lavorativo di WhatsApp, volume dei vocali, riascolto, dimenticanze, funzioni desiderate, gestione delle richieste dei clienti, disponibilità a pagare e principale perdita di tempo. Sono presenti:
+- questionario responsive con controlli dei campi;
+- invio a /api/questionario-submit;
+- pagina risultati con accesso riservato;
+- distribuzioni e risposte complete;
+- esportazione CSV tramite /api/questionario-export.
+
+Il registro segnala due risposte reali. Il questionario è da conservare come ricerca preliminare, non come validazione di mercato. Resta da chiudere il collaudo E2E e la diagnosi della credenziale del suo Preview, mantenendo separata questa corsia dal database Assistant.
+
+### 11.5 Modello operativo e test documentati
+
+Il modello dati è centrato su business, canali, membri, contatti, workflow, policy, vocabolario, work item, partecipanti, eventi, dati, azioni e appuntamenti. È documentata anche work_event_links in una fase successiva. Il principio vincolante resta: la memoria durevole è la pratica e la sua sequenza di eventi, non la sola chat.
+
+Risultati registrati nei checkpoint, con il loro perimetro:
+- Work Resolver V1: batteria 16 casi; gpt-6-luna 16/16, zero false MATCH e zero errori API nel test documentato.
+- Decomposer V2: 40/40 PASS nel checkpoint successivo.
+- Write Path V2: test su MATCH, retry/idempotenza, AMBIGUOUS e casi misti nel perimetro documentato.
+- Comandi deterministici del titolare: 27/27 test locali per il prototipo di policy; non equivale a test AI o E2E WhatsApp.
+- Adattatore autorizzativo: 9/9 test nel checkpoint.
+- E2E autorizzativo Supabase: 3/3 nel perimetro indicato dal checkpoint.
+- Conferma atomica: PR #10 con test PostgreSQL effimeri/isolati. Non equivale a full-schema parity, test mutativo sul database attivo o E2E Meta→Render→API→Supabase.
+
+Non riaprire questi test senza una ragione documentata; prima verificare il collegamento reale e l'eventuale regressione.
+
+### 11.6 Stato GitHub aggiornato al 1 novembre
+
+- Repository Assistant: VocalFlash/vocalflash.
+- PR #10: aperta, Draft, non merged; base assistant-conversation-photo-v1; head owner-command-atomic-confirmation-v3.
+- Head verificato: 652a2f49e20f9765d10854865697555ceed57d50.
+- GitHub Actions run 41252897837: completed/success sullo SHA esatto, 6/6 job secondo il registro/check della PR.
+- Vercel Preview deployment dpl_4Qn7qAGAVgDsqDpSJKanJ195noVG: READY; URL https://vocalflash-git-owner-command-atomic-confirmation-v3-vocal-flash.vercel.app. È prova di build Preview, non di runtime autenticato o E2E.
+- PR #10 contiene 20 file modificati e rimane Draft; nessun merge o deploy Production autorizzato.
+
+### 11.7 Gate Supabase e Preview: precisazione aggiornata
+
+La verifica più recente riportata nei documenti del branch indica:
+- 15 migrazioni registrate nel progetto Supabase principale, ma baseline storica pre-registry e replay completo da zero non recuperati;
+- nessun branch Supabase di sviluppo disponibile;
+- le RPC candidate v2 non sono installate nel progetto live;
+- il Preview ha TTL esplicito 600 e URL Supabase presente, ma l'URL punta al progetto ACTIVE_HEALTHY principale, non a un database isolato;
+- mancano sul Preview candidato VF_ASSISTANT_SUPABASE_SECRET_KEY e VOCALFLASH_ASSISTANT_API_KEYS;
+- non aggiungere segreti al Preview e non eseguire DDL/DML sul progetto attivo finché il target non è isolato.
+
+La scelta economica già registrata è proseguire senza acquistare/creare un branch Supabase in questa fase: CI PostgreSQL effimera, fixture/mock, review statica e Supabase live esclusivamente read-only. Un ambiente isolato equivalente diventa necessario prima di test mutativi full-schema/E2E; se richiede un costo, preventivo e approvazione separata.
+
+### 11.8 Valutazione conclusiva e direzione
+
+VocalFlash ha superato la fase di semplice trascrizione. Il valore di prodotto risiede nel ciclo: messaggio → identità/canale → intent → settore/workflow → pratica → dati mancanti → chiarimento → aggiornamento autorizzato → azione.
+
+Il rischio principale non è la mancanza di ulteriori moduli, ma l'integrazione incompleta dei moduli già sviluppati. La priorità tecnica è quindi:
+1. verificare la catena bot WhatsApp → Assistant API → persistenza → risposta;
+2. completare e provare identità, membership e conferma atomica;
+3. chiudere persistenza e recovery MultiVocale/storage;
+4. rendere effettivi workflow e vocabolario multi-settore;
+5. chiudere privacy, retention, outbox/reconciliation e readiness commerciale.
+
+Non riprogettare Resolver, Decomposer o Write Path senza evidenza di regressione. Non dichiarare pronto il prodotto sulla base di CI verde o Preview READY isolati.
+
+### 11.9 Decisioni e attività riservate al titolare — stato consolidato
+
+Queste voci sono registrate anche nel Libro delle raccomandazioni. Restano aperte finché il titolare non fornisce una decisione esplicita.
+
+| ID | Decisione/intervento | Stato | Vincolo |
+|---|---|---|---|
+| D1 | Supabase branch/progetto isolato a pagamento, se necessario | NON APPROVATO / NON NECESSARIO PER LO SVILUPPO CORRENTE | Prima preventivo aggiornato e approvazione; preferire alternativa isolata senza costi |
+| D2 | SMS/OTP e provider Bird | NON APPROVATO | Verificare costo totale, mittente, account e condizioni; nessuna attivazione o spesa senza consenso |
+| D3 | Metodi di pagamento, piani e prezzi | DECISIONE COMMERCIALE APERTA | Definire carte/wallet/SEPA, piani, prezzi, rinnovi, prova, cancellazioni e rimborsi prima dell'implementazione |
+| D4 | Eventuale risorsa/servizio esterno a pagamento per staging, hosting o altri provider | NON APPROVATO | Presentare preventivo e motivazione prima dell'acquisto |
+| D5 | Attivazione commerciale/Meta e destinatari reali di test | NON AUTORIZZATA | Serve approvazione del titolare prima di modifiche o invii reali |
+
+La decisione D1 non deve essere interpretata come richiesta di acquistare subito una branch: il percorso corrente resta quello senza costi. D2 non autorizza a configurare SMS né a creare account. D3 non autorizza a creare account Stripe o attivare pagamenti.
+
+### 11.10 Perimetro delle azioni effettuate con questo addendum
+
+Questo addendum è una ricostruzione documentale. Non ha applicato migrazioni, eseguito DML, modificato variabili o segreti, creato risorse a pagamento, unito PR, distribuito in Production, riavviato Render o inviato messaggi WhatsApp/SMS.
