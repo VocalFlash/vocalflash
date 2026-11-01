@@ -1558,3 +1558,18 @@ Il confronto conferma che le PR #1, #3, #9, #10 e bot #2 non costituiscono un'un
 - Il check Vercel per il nuovo head risulta pending. Il precedente Preview READY `dpl_4Qn7qAGAVgDsqDpSJKanJ195noVG` si riferisce al precedente head `652a2f49...`, non prova il Preview del nuovo head documentale.
 
 Non dichiarare i libri aggiornati e il nuovo head testati fino alla conclusione della run `41350939667` e alla verifica del deployment Preview associato allo stesso SHA. La modifica è documentale; non cambia l'autorizzazione NO-GO per E2E mutativo, merge o Production.
+
+
+### 11.13 Chiusura verifica post-aggiornamento libri — 1 novembre 2026
+
+Questa sezione aggiorna e supera lo stato provvisorio riportato in 11.12.
+
+- Head finale verificato della PR #10: `2cb5c045dbee10cbc0ffef35bb9e54edf6a22552`.
+- GitHub Actions run **#41351024940**, run number 801: **completed / success** sullo SHA esatto; tutti e sei i job sono completati con successo: cinque pass Assistant API e il job PostgreSQL transaction contract.
+- Check Vercel sullo stesso SHA: **success**.
+- Deployment Preview esatto: `dpl_DRUXEcQiYSB93hsWhC37QxHtHphr`, stato **READY**, URL https://vocalflash-a6nrs62n0-vocal-flash.vercel.app. Il deployment è associato al branch e allo SHA sopra.
+- PR #10 resta **open / Draft / not merged**; base `assistant-conversation-photo-v1`. Nessun merge o deploy Production.
+
+Il risultato CI copre i test automatizzati del repository e il contratto PostgreSQL su database effimeri/schema minimo, incluse le RPC legacy recuperate. Il Preview READY dimostra la build/deploy Preview per lo SHA esatto. Nessuno dei due dimostra full-schema parity, connessione autenticata a un Supabase isolato, storage round-trip, restart Render o E2E Meta→Render→Assistant API→Supabase.
+
+**Gate invariati:** nessuna migrazione/RPC v2 installata sul progetto Supabase attivo; nessuna scrittura DML live; nessuna secret o variabile aggiunta; nessun invio WhatsApp/SMS; nessuna promozione Production. La PR rimane Draft fino ai gate di sicurezza e staging già descritti.
