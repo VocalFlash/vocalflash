@@ -1528,3 +1528,33 @@ La decisione D1 non deve essere interpretata come richiesta di acquistare subito
 ### 11.10 Perimetro delle azioni effettuate con questo addendum
 
 Questo addendum è una ricostruzione documentale. Non ha applicato migrazioni, eseguito DML, modificato variabili o segreti, creato risorse a pagamento, unito PR, distribuito in Production, riavviato Render o inviato messaggi WhatsApp/SMS.
+
+
+### 11.11 Riconciliazione branch e dipendenze PR — refresh 1 novembre 2026
+
+Confronti GitHub read-only eseguiti dopo l'aggiornamento dei libri:
+
+- `main` → `assistant-auth-v1`: **diverged**, 91 commit avanti e 1 indietro.
+- `assistant-auth-v1` → `assistant-conversation-photo-v1`: **diverged**, 423 commit avanti e 3 indietro.
+- `assistant-conversation-photo-v1` → `owner-command-atomic-confirmation-v3`: **ahead**, 148 commit avanti, 0 indietro.
+
+Quindi la PR #10 è direttamente basata sul ramo `assistant-conversation-photo-v1` e non ha divergenza rispetto alla sua base, ma la catena a monte verso `main` è ancora impilata e divergente. Non fare merge diretto né retarget automatico: serve un piano di promozione per livelli, verificando ESM, dipendenze API, migrazioni, customer pipeline e bot.
+
+Snapshot PR read-only:
+- API PR #1: Draft, base `main`, head `questionario-e2e-v1`, SHA `61481acc4eddf03b960f9c6233b5e3d060655181`.
+- API PR #3: Draft, base `assistant-auth-v1`, head `assistant-conversation-photo-v1`, SHA `737d42184f618ff6abc009df7af241f30d29131a`.
+- API PR #9: Draft, base `main`, head `auth-bird-sms-hook-v1`, SHA `ca1d3f46cef0f8fa38a8c534eb70985500481dcc`.
+- API PR #10: Draft, base `assistant-conversation-photo-v1`, head `owner-command-atomic-confirmation-v3`, SHA prima dell'aggiornamento documentale `652a2f49e20f9765d10854865697555ceed57d50`; ora il nuovo head contiene anche gli aggiornamenti dei libri.
+- Bot PR #2: Draft, base `multivocale-runtime-v2`, head `assistant-conversation-photo-v1`, SHA `73dd4516c704d7dbdff08906cb594a8b152b0040`.
+
+Il confronto conferma che le PR #1, #3, #9, #10 e bot #2 non costituiscono un'unica sequenza lineare già pronta al merge. Il bot dipende dalla disponibilità dell'Assistant API e non va promosso prima del contratto API e del test integrato.
+
+### 11.12 Verifica CI dopo gli aggiornamenti dei libri
+
+- Aggiornamento del Libro sacro: commit `3d77429f894add6a6d61fa590a2b5c7b488162aa`.
+- Aggiornamento del Libro raccomandazioni: commit `778e04912f26a3908acc8ba8814c8c3a712daaae`.
+- Nuovo head PR #10: `778e04912f26a3908acc8ba8814c8c3a712daaae`.
+- GitHub Actions run `41350939667` è stata avviata sul nuovo head. Al momento del controllo: pass 1 e pass 2 completati con successo; pass 3, 4 e 5 in coda; job PostgreSQL transaction contract in esecuzione. **CI complessiva non ancora conclusa**.
+- Il check Vercel per il nuovo head risulta pending. Il precedente Preview READY `dpl_4Qn7qAGAVgDsqDpSJKanJ195noVG` si riferisce al precedente head `652a2f49...`, non prova il Preview del nuovo head documentale.
+
+Non dichiarare i libri aggiornati e il nuovo head testati fino alla conclusione della run `41350939667` e alla verifica del deployment Preview associato allo stesso SHA. La modifica è documentale; non cambia l'autorizzazione NO-GO per E2E mutativo, merge o Production.
