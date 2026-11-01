@@ -827,3 +827,45 @@ Limiti non negoziabili:
 **Gate residuo per il rilascio:** prima del primo test mutante integrato deve essere disponibile un target dati isolato e verificato. Può essere un branch Supabase, un progetto dedicato già disponibile oppure un PostgreSQL isolato che riproduca fedelmente lo schema completo; non è obbligatorio acquistare un branch se si dimostra un'alternativa equivalente. Se l'unica soluzione praticabile richiede una risorsa a pagamento, prima si richiede un preventivo e poi un'approvazione separata del costo.
 
 **Stato al 1 novembre 2026:** PR #10 resta Draft; il commit verificato precedente `8da9d011628b4f6269db2ec953881117f3cd74ff` ha CI 6/6 verde (run #41246494635). La modifica documentale di questa decisione richiede una nuova CI sul nuovo head prima di poterla dichiarare verde. Nessuna branch/progetto è stato creato, nessun costo sostenuto, nessuna migrazione/scrittura live, modifica env, deploy Production, merge o invio WhatsApp/SMS eseguito.
+
+
+---
+
+## Registro decisioni del titolare — aggiornamento 1 novembre 2026
+
+Le seguenti decisioni sono riservate al titolare e non devono essere considerate approvate per silenzio o per il solo fatto che esistano implementazioni tecniche candidate.
+
+### D1 — Supabase branch o database isolato
+- **Stato:** non approvato; non richiesto per proseguire lo sviluppo corrente.
+- **Decisione attuale di percorso:** continuare senza costi con PostgreSQL effimero CI, fixture/mock, review statica e Supabase principale soltanto read-only.
+- **Quando servirà:** prima di prove mutative full-schema o E2E che richiedano persistenza reale. È accettabile anche un PostgreSQL isolato equivalente, purché riproduca lo schema completo e le dipendenze.
+- **Azione richiesta al titolare:** solo se l'unica soluzione sicura richiede una risorsa a pagamento, ricevere preventivo aggiornato e decidere sì/no prima della creazione.
+- **Divieto:** non creare branch, riattivare progetti o sostenere costi senza approvazione.
+
+### D2 — SMS/OTP per identità del titolare
+- **Stato:** non approvato; nessun account/provider/mittente configurato.
+- **Ipotesi tecnica da verificare:** Supabase Auth con Bird Send SMS Hook, coerente con la decisione progettuale precedente; non attivare Bird Verify o altri servizi per supposizione.
+- **Azione richiesta al titolare:** approvare o rifiutare il provider soltanto dopo aver ricevuto costo complessivo, costi accessori, condizioni account, mittente e stima d'uso.
+- **Divieto:** nessuna spesa, attivazione SMS o modifica Auth senza consenso esplicito.
+
+### D3 — Metodi di pagamento, piani e prezzi
+- **Stato:** decisione commerciale aperta; nessun account Stripe, piano o prezzo attivato.
+- **Decisioni da prendere prima dell'implementazione:** carte e wallet oppure anche SEPA Direct Debit; piani e prezzi; prova gratuita; periodicità; gestione insoluti; sospensione; cancellazione e rimborsi.
+- **Azione richiesta al titolare:** definire il modello commerciale dopo una proposta con costi e impatto sui margini.
+- **Divieto:** nessuna creazione account, Checkout live, Billing o pagamento senza approvazione separata.
+
+### D4 — Altre risorse o servizi a pagamento
+- **Stato:** non approvati.
+- **Regola:** per staging, database, hosting, SMS, provider AI o servizi terzi, presentare prima motivazione, alternative gratuite, costo una tantum/ricorrente e conseguenze. Nessun acquisto o upgrade automatico.
+
+### D5 — Attivazione commerciale e prove reali
+- **Stato:** non autorizzata.
+- **Regola:** Meta, numeri aziendali, destinatari reali, invii WhatsApp/SMS e piloti con dati di clienti richiedono una decisione esplicita e un piano di test con destinatari autorizzati.
+
+### Cosa NON richiede una decisione immediata
+- Audit statici, letture GitHub/Vercel/Supabase, test su PostgreSQL effimero, fixture/mock, confronto dei documenti, analisi del codice e aggiornamenti documentali.
+- Non chiedere al titolare di scegliere ora un branch Supabase: il percorso senza costi resta quello corrente.
+- Non chiedere la scelta dei metodi di pagamento prima di aver completato una proposta commerciale ragionata.
+
+### Regola di aggiornamento
+Quando il titolare decide, registrare data, formulazione esplicita, ambito autorizzato, eventuale tetto di spesa e condizioni. Una decisione su un costo unitario non autorizza costi fissi, servizi differenti o spese oltre il limite approvato. Le decisioni revocabili devono essere annotate come tali.
