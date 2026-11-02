@@ -869,3 +869,11 @@ Le seguenti decisioni sono riservate al titolare e non devono essere considerate
 
 ### Regola di aggiornamento
 Quando il titolare decide, registrare data, formulazione esplicita, ambito autorizzato, eventuale tetto di spesa e condizioni. Una decisione su un costo unitario non autorizza costi fissi, servizi differenti o spese oltre il limite approvato. Le decisioni revocabili devono essere annotate come tali.
+
+
+## Aggiornamento 2 novembre 2026 — gate integrazione risposta titolare
+
+- Mantenere bot PR #2 Draft: il mapping titolare ora ha un solo helper, richiede `owner.ok === true` e non annuncia completamento senza `effect_applied === true`.
+- Parser API verificato: «confermo» è una conferma esplicita accettata. Test wrapper aggiunti; CI run `41417732924` superata con 67 test.
+- Prima di promuovere o unire: verificare la catena API #3 → API #10 → bot #2 e completare un E2E in ambiente isolato. Non usare il progetto Supabase principale per test mutativi.
+- Nessuna autorizzazione implicita a merge, deploy, uso di dati reali, invii Meta, costi o modifiche Production.
