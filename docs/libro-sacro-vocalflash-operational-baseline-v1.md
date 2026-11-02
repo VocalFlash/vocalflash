@@ -1597,3 +1597,10 @@ Verifica read-only dei sorgenti effettivi sui due repository, del head PR e dell
 **Catena PR riletta:** API #3 è Draft su `assistant-auth-v1` → `assistant-conversation-photo-v1`; API #10 è Draft su `assistant-conversation-photo-v1` → `owner-command-atomic-confirmation-v3`; bot #2 è Draft su `multivocale-runtime-v2` → `assistant-conversation-photo-v1` e dichiara dipendenza da API #3. PR #1 riguarda soltanto `type: module` su un branch separato `questionario-e2e-v1`; non è il parent della catena Assistant API. PR #9 (Bird/SMS) resta indipendente e fuori dal percorso minimo.
 
 **Gate e decisione tecnica:** mantenere PR #1/#3/#10 e bot #2 Draft; non retargetare o unire alla cieca. Prima definire una promozione ordinata dei branch e risolvere la divergenza di `main`. Prima di un E2E, serve un target Supabase realmente isolato e configurazione Preview completa approvata. Non aggiungere la secret live al Preview che punta al progetto principale. Nessuna variabile/segreto è stata modificata, nessuna RPC v2 è stata installata, nessun invio o deploy Production è avvenuto.
+
+
+## Addendum 2 novembre 2026 — risposta titolare nel bot
+
+Nel bot `VocalFlash/vocalflash-bot`, branch `assistant-conversation-photo-v1`, la doppia definizione di `build_owner_whatsapp_response` è stata eliminata (commit `7d9316d`). La funzione ora richiede `origin: owner`, `result.owner` strutturato e `owner.ok === true`; l'esito di completamento viene comunicato soltanto con `effect_applied === true`. La frase di conferma «confermo» è stata verificata sul parser API `lib/owner-command-confirmation-v1.js`, che la accetta esattamente.
+
+Aggiunti test integrati del wrapper bot per proposta in attesa, commit confermato e risposta fail-closed senza `owner.ok` (commit `51dfcaad59e3751a4993f06ffdf76a8414a7f40e`). GitHub Actions run `41417732924`: **67 test, OK**, job success. PR bot #2 resta Draft. I test usano dipendenze simulate: non sono E2E Render/Vercel/Supabase/Meta. Nessun merge, deploy, modifica env/segreti, migrazione o invio reale.
