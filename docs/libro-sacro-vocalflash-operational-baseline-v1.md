@@ -1604,3 +1604,30 @@ Verifica read-only dei sorgenti effettivi sui due repository, del head PR e dell
 Nel bot `VocalFlash/vocalflash-bot`, branch `assistant-conversation-photo-v1`, la doppia definizione di `build_owner_whatsapp_response` è stata eliminata (commit `7d9316d`). La funzione ora richiede `origin: owner`, `result.owner` strutturato e `owner.ok === true`; l'esito di completamento viene comunicato soltanto con `effect_applied === true`. La frase di conferma «confermo» è stata verificata sul parser API `lib/owner-command-confirmation-v1.js`, che la accetta esattamente.
 
 Aggiunti test integrati del wrapper bot per proposta in attesa, commit confermato e risposta fail-closed senza `owner.ok` (commit `51dfcaad59e3751a4993f06ffdf76a8414a7f40e`). GitHub Actions run `41417732924`: **67 test, OK**, job success. PR bot #2 resta Draft. I test usano dipendenze simulate: non sono E2E Render/Vercel/Supabase/Meta. Nessun merge, deploy, modifica env/segreti, migrazione o invio reale.
+
+
+
+## Audit integrazione branch e prerequisiti webhook — 2 novembre 2026
+
+### Stato PR e dipendenze rilevato
+- API PR #3: Draft, base `assistant-auth-v1`, head `assistant-conversation-photo-v1`, SHA `737d42184f618ff6abc009df7af241f30d29131a`; CI associata al commit verificata success.
+- API PR #10: Draft, base esatta API PR #3 (`assistant-conversation-photo-v1`), head `owner-command-atomic-confirmation-v3`, aggiornato ai documenti SHA `b2abef870623043972e6f9c1a52953f73c7e6ee8`; CI run `41417965059` superata: 5 pass API + job PostgreSQL 16 isolato.
+- Bot PR #2: Draft, base `multivocale-runtime-v2`, head `assistant-conversation-photo-v1`, SHA `51dfcaad59e3751a4993f06ffdf76a8414a7f40e`; CI run `41417732924` superata, 67 test.
+- La catena API #3 → API #10 è lineare (153 commit aggiuntivi sul secondo branch, senza divergenza rispetto al suo base). Bot #2 è una catena distinta nel repository bot, 88 commit avanti rispetto al suo base. I branch omonimi dei due repository non sono lo stesso branch.
+- API branch corrente risulta 1 commit dietro `main`; il commit mancante è un documento di proposta audio API, non una modifica runtime. Non è stato eseguito merge né retarget. PR #1 ESM e PR #9 SMS/Bird restano corsie separate e non prerequisiti per questa integrazione.
+
+### Contratto API ↔ Bot verificato staticamente
+- API risponde con `origin` top-level e `result.owner` per titolare; per cliente include `assistant_message` esplicito.
+- Bot invia soltanto il testo esplicito ricevuto dall'API per il cliente; per titolare costruisce acknowledgement deterministico dal risultato verificato.
+- L'helper titolare richiede `owner.ok === true`; il runtime API restituisce `ok: true` per `CONFIRMATION_REQUIRED`, quindi il caso di proposta non applicata è coerente.
+- Il parser API accetta `confermo` esatto.
+- La guardia outbound Redis è at-most-once con marker di 24 ore. Timeout Meta ambiguo mantiene il marker e impedisce retry cieco; non è outbox durevole né exactly-once.
+
+### Nuovo gate obbligatorio per il bot
+Il branch bot ora richiede `META_APP_SECRET` per ogni POST webhook: se manca, risponde HTTP 503; se manca o non è valida `X-Hub-Signature-256`, risponde 403. Il controllo è intenzionalmente fail-closed e ha test unitari. **Prima di qualsiasi deploy del branch bot è quindi necessario verificare/configurare il Meta App Secret nel servizio Render corretto**, senza inserirlo in chat o nei documenti. Non è stato verificato che la variabile sia già presente su Render. L'avvio del modulo registra anche la readiness; il controllo non costituisce prova di connettività E2E.
+
+### Readiness e limiti
+- Assistant API health richiede Assistant API key, URL/secret Supabase, OpenAI API key e routing API key, oltre al probe read-only di Supabase.
+- I test CI API usano PostgreSQL 16 effimero e fixture/RPC legacy recuperate; non dimostrano parità con lo schema live completo o E2E.
+- Nessuna modifica Render/Vercel env, nessun secret aggiunto, nessun DDL/DML live, nessun deploy, merge o invio WhatsApp reale.
+- **NO-GO promozione:** prima definire il piano coordinato di rilascio API #3 → API #10 e Bot #2, verificare env Meta/Render e API Preview su target dati isolato, e completare smoke/E2E autorizzati. Non collegare Preview al Supabase attivo con credenziali mutative.
