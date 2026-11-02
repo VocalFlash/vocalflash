@@ -877,3 +877,15 @@ Quando il titolare decide, registrare data, formulazione esplicita, ambito autor
 - Parser API verificato: «confermo» è una conferma esplicita accettata. Test wrapper aggiunti; CI run `41417732924` superata con 67 test.
 - Prima di promuovere o unire: verificare la catena API #3 → API #10 → bot #2 e completare un E2E in ambiente isolato. Non usare il progetto Supabase principale per test mutativi.
 - Nessuna autorizzazione implicita a merge, deploy, uso di dati reali, invii Meta, costi o modifiche Production.
+
+
+
+## Audit branch e prerequisiti di rilascio — 2 novembre 2026
+
+1. Tenere API PR #3, API PR #10 e Bot PR #2 Draft finché non è approvato un piano di promozione coordinato. API #10 dipende direttamente da API #3; Bot #2 è nel repository separato e deve essere rilasciato compatibilmente con il contratto API.
+2. Non unire PR #1 (ESM/questionario) o PR #9 (SMS/Bird) come scorciatoia: sono corsie separate.
+3. Prima di qualunque deploy del bot, verificare nel servizio Render la presenza di `META_APP_SECRET`. Il branch rifiuta tutti i POST Meta se la variabile manca (503) o se la firma HMAC non è valida (403). Non incollare il segreto in chat; non modificarlo senza autorizzazione.
+4. Verificare Preview API con credenziali solo dopo avere scelto un target DB isolato. L'health API ora richiede anche le chiavi dipendenti e fa una probe read-only Supabase.
+5. Conservare la semantica outbound at-most-once; non chiamarla exactly-once e non ritentare automaticamente timeout WhatsApp ambigui. Progettare outbox/reconciliation prima del pilot.
+6. CI attuale: API run `41417965059` verde (5 pass + PostgreSQL 16 effimero); Bot run `41417732924` verde (67 test). Questi risultati non sono E2E né autorizzano merge/deploy.
+7. Nessuna spesa, branch Supabase, migration, modifica secret/env, invio reale o attivazione commerciale è approvata da questo audit.
