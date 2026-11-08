@@ -1161,3 +1161,473 @@ Non rifare il recupero o il confronto dei 15 SQL (15/15 PASS), né dichiarare E2
 ## Riscontro schema live aggiuntivo — 26 ottobre 2026, sola lettura
 
 L'inventario delle colonne di public.work_events conferma che la tabella ha occurred_at e created_at, ma non una colonna dedicata expires_at o consumed_at. Le proposte/conferme sono eventi con payload JSONB. Questo non prova che nel payload non esista alcuna convenzione, quindi prima di implementare occorre cercare e validare le convenzioni effettive nei payload e in tutti i chiamanti; non inventare una scadenza o uno stato di consumo. Se il modello attuale non offre una rappresentazione affidabile di scadenza/consumo, la migrazione forward dovrà introdurre un modello esplicito e atomico, provato soltanto nel database isolato. Nessuna scrittura è stata eseguita.
+
+
+## Aggiornamento 27 ottobre 2026 — conferma titolare v2 isolata
+
+È stato creato il draft PR #10 sul branch `owner-command-atomic-confirmation-v3`. Il runtime ora instrada le conferme esplicite verso un resolver di proposta pendente e una nuova RPC atomica proposta; i test runtime dedicati sono inclusi nel workflow CI. Nessun merge, deploy, modifica a Supabase live o invio WhatsApp.
+
+La scadenza è obbligatoria ma non viene inventata: il runtime richiede `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` e, se manca, restituisce `CONFIG_REQUIRED` senza creare la proposta. Il SQL rimane in `docs/proposed-migrations/`, fuori dall'inventario delle 15 migrazioni recuperate, per non falsare il controllo di provenienza.
+
+Stato non ancora GO: CI del draft da attendere; SQL non eseguito su PostgreSQL isolato; baseline storica da recuperare; replay/concorrenza/rollback e privilegi da testare su DB isolato; TTL da decidere/configurare prima dell'eventuale staging. `ATOMIC_CONFIRMATION_NOT_ENABLED` resta il fallback se mancano le nuove dipendenze di persistenza.
+
+
+## Stato finale verificato del draft owner confirmation v2 — 27 ottobre 2026
+
+- Draft PR #10, branch `owner-command-atomic-confirmation-v3`, head applicativo `9550ac57510585a41ff6522062095e416f850f8b`.
+- GitHub Actions run #40479095192 sul medesimo head: **success**, tutti e cinque i job/pass completati con successo. Comprende i test runtime aggiunti e i controlli statici del contratto SQL; non è un'esecuzione SQL su PostgreSQL.
+- La registrazione di conferma rifiuta ora il riuso conflittuale dell'identificativo esterno confrontando attività, membro, canale, tipo evento, testo, proposta e sorgente. La persistenza verifica anche il testo nel replay.
+- Il SQL proposto rimane in `docs/proposed-migrations/`; il manifesto recuperato delle 15 migrazioni non è stato alterato. Nessuna scrittura Supabase live, merge, deploy o invio WhatsApp.
+- **NO-GO rilascio:** mancano ancora baseline storica autorevole, test transazionali/concorrenza/rollback su PostgreSQL isolato e staging E2E. `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non è stata verificata nel target e non ha un default nel codice: il runtime fallisce chiuso senza proposta finché la durata non viene decisa e configurata esplicitamente.
+
+
+## Risultato PostgreSQL isolato — 27 ottobre 2026
+
+Il commit applicativo `fb181f162ee3fa3351f45761fc397d53b9dc120d` ha superato GitHub Actions run #40480060789: **tutti i cinque pass JavaScript e il job PostgreSQL isolato sono verdi**.
+
+Il job PostgreSQL ha caricato il SQL proposto su PostgreSQL 16 effimero, prima con mock e poi con i corpi legacy recuperati, e ha superato: commit nota, commit azione pianificata, replay identico, replay conflittuale, conferma scaduta, rollback dopo errore simulato, consumo monouso sotto due commit concorrenti e controllo privilegi `service_role`/ `anon`.
+
+**Limite del test:** il job usa uno schema minimo e mock delle due RPC di scrittura preesistenti; prova la sintassi e l'atomicità del wrapper proposto, ma non sostituisce l'esecuzione contro lo schema completo e le policy reali di VocalFlash. Nessuna migrazione è stata applicata a Supabase live. Il SQL resta in `docs/proposed-migrations/` finché baseline storica e provenienza non saranno risolte.
+
+Il gate di rilascio resta NO-GO: baseline storica non recuperata; integrazione con lo schema completo da verificare; staging E2E WhatsApp da eseguire; valore di `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non verificato nel target e senza default nel codice. Se la variabile manca, il runtime non crea la proposta.
+
+
+## Estensione del test PostgreSQL con le RPC legacy recuperate — 27 ottobre 2026
+
+Ulteriore CI verde: run #40480990100 sul commit `bb7c3b3dc99d41bea640adcb1bfb34368ca98d6f`, con tutti i cinque pass JavaScript e il job PostgreSQL completati con successo.
+
+Il job ora esegue due profili isolati: (1) schema minimo con RPC di scrittura simulate per verificare la transazione del wrapper; (2) database separato con i corpi delle RPC legacy `vf_commit_owner_note_v1` e `vf_commit_owner_schedule_action_v1` recuperati dalla migrazione sorgente, con policy, permessi, tabella note/azioni e trigger di test. Anche nel secondo profilo passano nota, azione pianificata, replay identico e conflittuale, scadenza, rollback e due commit concorrenti con una sola azione.
+
+Questo è un controllo più forte, ma non è ancora una copia integrale dello schema live né un E2E su Supabase/WhatsApp. Il SQL proposto resta fuori da `supabase/migrations/`; nessuna modifica live, merge o deploy.
+
+
+## Riesame progetto owner confirmation e schema live — 27 ottobre 2026
+
+- CI sul head corrente `9dde053f67874a609d29387c5e6b4b1395a4aeb2`: run #40489729525 **success**, cinque pass API e contratto PostgreSQL isolato completati.
+- Il candidato runtime è collegato in `api/v1/assistant.js` attraverso il dispatcher WhatsApp. Le nuove RPC v2 sono però soltanto nella proposta SQL e non esistono ancora nel database live: non considerare il flusso abilitato né testato end-to-end.
+- In sola lettura: RLS attivo su `work_events`, `work_items`, `open_actions`, `appointments`, `business_members`, `business_channels`; nessuna policy diretta trovata su queste tabelle nella catalog query. Le RPC owner-command live ispezionate sono `SECURITY DEFINER`, owner postgres, `search_path=public, pg_temp`, ACL osservata `service_role` soltanto. Indici di unicità per external message ID, proposta/nota per source event e azione per source event presenti. Nessun trigger non interno trovato su `work_events`.
+- **NO-GO invariato:** schema completo isolato e baseline pre-registry da ricostruire/replayare; TTL target da decidere/verificare; staging E2E Meta → Assistant API → Supabase da eseguire con destinatario autorizzato.
+- Nessun SQL applicato, nessuna scrittura live, nessun merge o messaggio WhatsApp eseguito nel presente riesame.
+
+
+## Inventario complessivo PR/branch — 27 ottobre 2026
+
+Riesame read-only delle PR aperte nel repository:
+- **PR #1 — ESM su main:** ancora Draft; `main/package.json` non contiene `"type": "module"`, mentre `assistant-auth-v1` e `assistant-conversation-photo-v1` sì. Prima di promuovere l'API va risolta esplicitamente la modalità ESM su main (PR #1 o modifica equivalente verificata), senza assumere che il fix sia già entrato in main.
+- **PR #3 — pipeline conversazioni/nuovo lavoro:** Draft e base `assistant-auth-v1`. I check osservati sul suo head sono verdi, ma la branch è una linea di lavoro molto divergente da main e il suo merge path va riconciliato.
+- **PR #9 — Supabase Auth SMS Hook/Bird:** Draft; cinque pass Deno duplicati risultano verdi sul head noto (11 test per pass). Non sono stati verificati deploy Supabase, configurazione Auth hook, sender/account Bird o invio OTP reale; ogni costo e attivazione richiede approvazione esplicita.
+- **PR #10 — conferma atomica titolare:** Draft, basata su `assistant-conversation-photo-v1` (la branch della PR #3). Non è una PR indipendente da main: prima del rilascio bisogna riconciliare la catena di branch e il target base, non unire direttamente alla cieca.
+
+La comparazione GitHub ha rilevato `assistant-auth-v1` a **91 commit avanti e 1 indietro rispetto a main**, e `assistant-conversation-photo-v1` a **423 commit avanti e 3 indietro rispetto a assistant-auth-v1**. Questo non è di per sé un errore funzionale, ma è un rischio concreto di promozione: definire una sequenza di integrazione, aggiornare le basi e rieseguire CI sul risultato finale prima di qualunque merge.
+
+**Ordine di lavoro suggerito:** (1) fissare e verificare la strategia ESM/base su main; (2) fare review e integrazione controllata della pipeline PR #3; (3) mantenere PR #10 subordinata a schema SQL function-only, baseline/replay, TTL ed E2E; (4) tenere PR #9 separata con gate di costo e attivazione SMS. Nessuna PR è stata unita da questo audit.
+
+
+## Verifica ambiente Preview Vercel — 27 ottobre 2026, sola lettura
+
+È stato controllato il progetto Vercel `vocalflash` senza decifrare né leggere i valori dei segreti:
+- La query filtrata per branch `owner-command-atomic-confirmation-v3` non restituisce variabili branch-specific.
+- `VF_ASSISTANT_SUPABASE_URL`, `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS` risultano associate a Preview del branch `assistant-auth-v1`, non al branch candidato corrente. La secret Supabase è anche presente come target Development, ma non è una configurazione Preview generale.
+- `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non compare nell'inventario delle variabili Vercel.
+- Esistono variabili generiche `SUPABASE_URL`/`SUPABASE_SECRET_KEY`, ma il codice `api/v1/assistant.js` usa esplicitamente le variabili `VF_ASSISTANT_*`: le generiche non sostituiscono automaticamente quelle attese.
+
+**Conseguenza:** il Preview del branch candidato non è configurato per eseguire correttamente il percorso Assistant DB/owner confirmation. Senza le variabili `VF_ASSISTANT_*` il codice risponde con errore di configurazione DB; senza TTL la creazione della proposta fallisce chiusa. Nessun valore è stato decifrato, nessuna variabile è stata modificata. Prima dell'E2E occorre approvare e configurare esplicitamente lo scope Preview corretto e scegliere un TTL; non riutilizzare automaticamente segreti di un altro branch.
+
+
+## Correzione da review avversaria — limite scansione proposte, 27 ottobre 2026
+
+Durante il riesame è emerso un caso limite reale: il resolver leggeva al massimo 50 proposte ma, se trovava una sola proposta valida in quelle 50 righe, poteva dichiararla univoca senza sapere se esistessero altre proposte valide oltre il limite. È stato corretto il SQL proposto: se la scansione raggiunge 50 righe, restituisce ora `AMBIGUOUS_PENDING_PROPOSAL` con `CANDIDATE_SCAN_LIMIT_REACHED` e non registra né consuma alcuna conferma. È stato aggiunto un caso PostgreSQL che crea 51 proposte, con una proposta valida dentro la finestra e una più vecchia oltre il limite, per provare il fail-closed.
+
+**Stato prova:** modifica e test aggiunti al branch; il risultato CI sul nuovo head è ancora da attendere. Non è stato eseguito SQL live e non è stata cambiata alcuna configurazione ambiente.
+
+
+## Esito CI del fix limite scansione — 27 ottobre 2026
+
+La run GitHub Actions **#40492732210** è terminata con **success** sul commit `7cbf6c357e0f29f9fa97f11d1e9cd2a6121a024b`: cinque pass Assistant API e il job PostgreSQL transazionale sono verdi. Il job PostgreSQL ha caricato il SQL proposto in due database effimeri, inclusa la fixture con le RPC legacy recuperate; il nuovo caso con 51 proposte e limite di scansione ha superato il controllo fail-closed. Questo non equivale a un test sullo schema completo live o a un E2E Meta/WhatsApp. Nessuna migrazione live applicata.
+
+
+## Riconciliazione branch legacy — 27 ottobre 2026
+
+La branch `assistant-owner-command-integration-v1` è stata confrontata con `assistant-conversation-photo-v1`: risulta 439 commit indietro e non contiene commit unici rispetto alla branch più recente. Trattarla come branch legacy/stale, non come sorgente da integrare o base di rilascio. La branch `main` risulta attualmente senza protezione GitHub secondo l'inventario API; nessuna regola è stata modificata. Prima di una promozione reale, definire la sequenza di integrazione e i controlli obbligatori sul branch finale.
+
+
+## Riconciliazione issue aperte di progetto — 27 ottobre 2026
+
+- **Issue #6 — readiness Assistant:** nel branch di lavoro il codice ora chiama `checkAssistantReadiness`, che controlla configurazione AI/routing/DB e fa una probe Supabase read-only con timeout; i test coprono config mancante, errore HTTP, timeout e chiavi moderne/legacy. L'issue resta aperta finché non è verificata la coerenza con la readiness del bot e la correzione non è promossa attraverso la catena branch.
+- **Issue #7 — credenziali Supabase:** nel branch di lavoro i moduli ispezionati (ingest, dispatcher, new-work e owner persistence) usano `supabaseRestHeaders`, che non costruisce Bearer JWT da una moderna chiave `sb_secret_`; ci sono test mirati. L'issue resta aperta finché la verifica cross-module completa e il percorso finale di rilascio non sono chiusi.
+- **Issue #4 — database di sviluppo isolato:** ancora bloccata; nessun branch Supabase a pagamento creato. Ricalcolare il prezzo corrente e chiedere approvazione prima di creare risorse.
+- **Issue #5 — corpus regressione trascrizione italiana:** ancora aperta; i casi storici “sopralluogo”, “Via Etnea” e “controllare le misure del locale” non sono ancora un benchmark ripetibile revisionato. Non sostituire il percorso audio funzionante prima del benchmark.
+- **Issue #8 — privacy/DPA/retention:** ancora aperta; notice pre-lancio e obblighi B2B devono essere finalizzati con dati legali reali e revisione qualificata prima del pilota commerciale.
+
+Nessuna issue è stata chiusa automaticamente: la presenza di fix su una branch non equivale alla promozione su main né al superamento di tutti i criteri di accettazione.
+
+
+## Audit integrato del progetto — 27 ottobre 2026, 11:05 UTC
+
+### Stato verificato
+- **CI owner-confirmation:** run `40493167613` completata con successo sul commit `06c616e40f4aedc47b76eb19eb8678b17fa9cfc3`: cinque pass Assistant API e contratto PostgreSQL transazionale verdi. È una prova isolata del candidato, non una prova E2E o di parità con lo schema live.
+- **Supabase live, sola lettura:** 15 migrazioni registrate; 0 utenti Auth, 0 membri business, 1 work item, 4 work events, 1 workflow attivo, 1 policy attiva, 14 voci di vocabolario attive; 0 eventi owner-command di tipo proposta, conferma o ricevuto. Non creare artificialmente identità o eventi.
+- **RPC live:** presenti le versioni legacy `vf_record_owner_command_confirmation_v1`, `vf_commit_owner_note_v1` e `vf_commit_owner_schedule_action_v1`; assenti le RPC candidate `vf_resolve_pending_owner_command_proposal_v2` e `vf_commit_owner_command_confirmation_v2`. La proposta SQL non è applicata.
+- **Sicurezza DB:** RLS attivo ma non forzato sulle tabelle operative esaminate (`work_events`, `work_items`, `open_actions`, `appointments`, `business_members`, `business_channels`); la catalog query rileva zero policy dirette su queste tabelle. Le RPC legacy esaminate sono `SECURITY DEFINER`, proprietario `postgres`, `search_path=public, pg_temp`, con privilegio EXECUTE osservato. Quindi RLS da solo non dimostra l'isolamento tenant per queste RPC: controlli espliciti business/member/channel e ACL server-only devono restare parte del contratto e dei test.
+- **Idempotenza/schema:** indici univoci live confermati su canale + external message ID, source-event per proposta/nota e source-event per azione; nessun trigger non interno trovato su `work_events`; trigger `updated_at` su canali, membri, azioni e pratiche.
+- **Configurazione Vercel, senza decifrare segreti:** `VF_ASSISTANT_SUPABASE_URL`, `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS` sono configurate per Preview del branch `assistant-auth-v1`, non per `owner-command-atomic-confirmation-v3`; `VF_ASSISTANT_SUPABASE_SECRET_KEY` è presente anche in Development. `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non è presente. Le variabili generiche `SUPABASE_URL`/`SUPABASE_SECRET_KEY` non sostituiscono i nomi `VF_ASSISTANT_*` letti da `api/v1/assistant.js`. Preview non pronto per E2E; nessun segreto letto o modificato.
+- **PR/branch:** PR #1 ESM su `main`, #3 customer pipeline su `assistant-auth-v1`, #9 Auth SMS/Bird su `main`, #10 owner confirmation su `assistant-conversation-photo-v1` sono Draft. PR #2 è stata unita a `assistant-auth-v1`, non prova un rilascio su `main`. La catena è impilata e divergente: non fare merge diretti senza riconciliare base, ESM e CI sul risultato finale.
+- **Issue aperte di progetto:** #4 approvazione/costo ambiente Supabase isolato; #5 benchmark di trascrizione italiana; #6 readiness dipendenze; #7 standardizzazione chiavi Supabase; #8 privacy/DPA/retention/subprocessor. Per #6 e #7 esistono correzioni e test nel branch di lavoro, ma non sono chiuse finché non sono integrate e verificate sulla catena di rilascio.
+- **Preview:** il progetto Vercel riporta un deployment `READY`, ma questo non dimostra che il Preview della branch owner-confirmation abbia le variabili necessarie né che l'E2E funzioni.
+
+### Decisione e prossimi passi obbligatori
+1. Tenere PR #10 Draft e il rilascio **NO-GO**.
+2. Recuperare il baseline storico pre-registry e riconciliare le 15 migrazioni con le sorgenti; costruire un database isolato a schema completo soltanto dopo approvazione esplicita del costo.
+3. Eseguire replay completo delle migrazioni e i test PostgreSQL della proposta su schema completo; verificare RPC, policy, grants, funzioni `SECURITY DEFINER`, indici e trigger.
+4. Scegliere esplicitamente il TTL, poi associare le sole variabili necessarie al Preview corretto senza copiare segreti tra branch automaticamente.
+5. Creare un'identità owner sintetica/verificata soltanto con autorizzazione, quindi E2E staging Meta → API → Supabase con destinatario autorizzato.
+6. Risolvere l'ordine di integrazione PR #1/#3/#9/#10 e rieseguire CI sul branch finale; non chiudere automaticamente issue #4–#8.
+7. Prima del pilota commerciale, completare benchmark audio, media-only, stato conversazionale persistente, outbox/reconciliation, onboarding/billing e revisione privacy legale.
+
+**Sicurezza del riesame:** tutte le query Supabase di questa sezione sono read-only. Nessun DDL o dato live modificato; nessuna migrazione applicata; nessun merge o deploy di produzione; nessun invio WhatsApp/SMS; nessuna variabile ambiente cambiata. I check CI sono legati allo SHA esatto: verificare sempre i check della PR sullo head corrente prima di qualsiasi promozione; un run precedente non copre commit successivi.
+
+
+## Corsia questionario/ESM — controllo separato, 27 ottobre 2026
+
+La PR #1 `questionario-e2e-v1` resta Draft su `main`. La correzione proposta aggiunge `type: module` per l'API ESM; i controlli Preview riportati nella PR hanno risposte HTTP attese per le route diagnostiche. Rimane però un problema separato: nel Preview del questionario `SUPABASE_URL` punta al progetto atteso, ma il `SUPABASE_SECRET_KEY` configurato restituisce HTTP 401. Non confondere questo problema con le variabili Assistant `VF_ASSISTANT_*`. Non ruotare o modificare chiavi senza diagnosi e approvazione esplicita. Prima di promuovere il questionario su `main`, risolvere ESM e validare la credenziale del progetto questionario su Preview, poi rieseguire i test sul branch finale. Nessuna credenziale è stata letta o modificata in questo audit.
+
+
+## Refresh advisor Supabase — 27 ottobre 2026, 11:17 UTC
+
+- Advisor Security: `rls_enabled_no_policy` = **15 tabelle** (livello INFO), tutte con RLS attivo ma senza policy; nessuna policy è stata aggiunta. Va documentato e testato il modello di accesso server-only, specialmente per le RPC `SECURITY DEFINER`.
+- Advisor Performance: **18 foreign key senza indice di copertura** e **26 indici segnalati inutilizzati** (livello INFO). Non aggiungere o rimuovere indici in massa: confrontare ogni FK con gli indici composti esistenti, i piani di query e il carico previsto, poi validare su ambiente isolato.
+- L'elenco dei branch Supabase è vuoto: nessun ambiente di sviluppo isolato esistente. Non crearne uno senza nuova quotazione e approvazione esplicita del costo.
+- Le osservazioni sono consultive; nessun DDL, indice, policy o dato è stato modificato.
+
+
+## Registro operativo — audit credenziali e isolamento, 27 ottobre 2026
+
+**Fatto e verificato**
+- Inventario Vercel del branch Preview `owner-command-atomic-confirmation-v3` eseguito senza decifrare valori segreti.
+- Presenti: `VF_ASSISTANT_SUPABASE_URL=https://tkfyfqgtumoeywlqzmdt.supabase.co` e `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS=600`.
+- Assenti dal branch candidato: `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS`. Le variabili omonime risultano sul Preview di `assistant-auth-v1`, non su questo branch; non sono state copiate.
+- Supabase `VocalFlash Assistant` risulta ACTIVE_HEALTHY, ma non esistono branch Supabase. L'isolamento del DB non è dimostrato. Nessuna query di scrittura, migrazione o modifica dati è stata eseguita.
+- Render staging è `vocalflash-bot-staging`, branch `multivocale-runtime-v2`, auto-deploy OFF, Free. Nessun env update, deploy o restart.
+- Nessun segreto è stato letto, creato, esposto o modificato. Nessuna modifica a Production, nessun merge, nessun messaggio WhatsApp reale.
+
+**Correzione di stato**
+Una nota precedente indicava TTL assente sul candidato. L'inventario corrente la mostra invece presente con valore `600`; prevale il controllo corrente.
+
+**Gate ancora bloccante**
+Non aggiungere la secret Supabase al candidato né eseguire E2E con scritture finché non è confermato un database isolato. Non usare chiavi anon/publishable come segreto server-side e non riutilizzare automaticamente la variabile generica `SUPABASE_SECRET_KEY`. Dopo aver chiarito l'isolamento, completare l'autenticazione server-to-server Preview/staging e pianificare l'eventuale restart Render per limitare consumo delle ore Free.
+
+
+## Riesame autonomo completo e aggiornamento stato — 31 ottobre 2026
+
+### Evidenze verificate in questa sessione
+
+**GitHub / CI**
+- PR API #10 è ancora aperta e Draft; base `assistant-conversation-photo-v1`, head `owner-command-atomic-confirmation-v3`, SHA corrente `acbb440194f910210d9010f381bb66e2b032fc70`. La CI sullo SHA esatto ha concluso con successo: run [#40584486714](https://github.com/VocalFlash/vocalflash/actions/runs/40584486714), cinque pass Assistant API e job PostgreSQL transaction-contract verdi. Il job include schema minimo isolato, corpi delle RPC legacy recuperate e test di concorrenza/single-use. Non è schema parity completo né E2E Supabase/Meta.
+- PR API #3 è ancora Draft, base `assistant-auth-v1`, head `assistant-conversation-photo-v1`, SHA `737d42184f618ff6abc009df7af241f30d29131a`; CI run #40400561646 è success sul relativo head. La PR resta impilata e non integrata in `main`.
+- PR bot #2 è ancora Draft, base `multivocale-runtime-v2`, head `assistant-conversation-photo-v1`, SHA `73dd4516c704d7dbdff08906cb594a8b152b0040`; CI run #40494481293 è success. Il run automatizzato usa Redis effimero; la documentazione precedente registra 62 test OK. Non prova restart Render, storage reale o delivery Meta.
+- Il Preview Vercel del commit documentale API #10 `acbb440194f910210d9010f381bb66e2b032fc70` è READY: deployment `dpl_9NcqL9viTRYMd44jgzHguhAA8vPC`. È un build Preview, non una verifica runtime dell'API o un rilascio Production.
+
+**Vercel — inventario senza decifrare segreti**
+- Sul Preview branch `owner-command-atomic-confirmation-v3` risultano presenti `VF_ASSISTANT_SUPABASE_URL` e `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS=600`.
+- Sul medesimo branch non risultano `VF_ASSISTANT_SUPABASE_SECRET_KEY` né `VOCALFLASH_ASSISTANT_API_KEYS`. L'API richiede entrambe per autenticazione e accesso DB; l'endpoint health richiede inoltre `OPENAI_API_KEY` e `VOCALFLASH_API_KEYS`.
+- Il percorso storage richiede anche configurazione server-side del bucket e mappatura scope `VOCALFLASH_ASSISTANT_API_KEY_SCOPES`; non è stata dimostrata la configurazione runtime di tali dipendenze sul target candidato.
+- Nessun segreto è stato decifrato, generato, copiato o modificato. Nessuna variabile Vercel è stata modificata.
+
+**Supabase — sola lettura**
+- Progetto `VocalFlash Assistant` (`tkfyfqgtumoeywlqzmdt`) è ACTIVE_HEALTHY, PostgreSQL 17.6. Il secondo progetto dell'organizzazione `VocalFlash's Project` (`miavlccjtknaemnmjoqb`) risulta INACTIVE; non è stato assunto come staging né ripristinato.
+- `list_branches` restituisce ancora zero branch di sviluppo sul progetto Assistant. L'isolamento del database non è dimostrato: non eseguire scritture o migrazioni su questo target come se fosse staging.
+- Registro migrazioni live: 15 versioni, fino a `customer_whatsapp_replay_conflict_v1`.
+- La query catalogo conferma 15 tabelle `public` con RLS abilitato e zero policy dirette su ciascuna. Questo è coerente solo con un modello server-side se i GRANT e le RPC sono rigorosamente limitati; la verifica completa dei GRANT non è stata conclusa in questa sessione. Non aggiungere policy generiche e non esporre accesso client per eliminare l'avviso.
+- Advisor aggiornati il 31 ottobre 2026: Security `rls_enabled_no_policy` = 15 (INFO); Performance = 18 FK senza indice di copertura e 26 indici segnalati inutilizzati (INFO). Non creare/eliminare indici in massa: verificare gli indici composti esistenti e i piani di query su un database isolato.
+- Conteggi read-only: 0 utenti Auth, 0 membri business, 1 business, 1 work item e 4 work events. Non creare identità owner fittizie né usare questi dati come prova di staging sintetico.
+- Le RPC legacy owner-command e le RPC candidate v2 non sono state installate/abilitate da questa sessione. Nessuna query DDL/DML, migrazione o modifica dati è stata eseguita.
+
+**Render staging**
+- Servizio `vocalflash-bot-staging`: branch `multivocale-runtime-v2`, piano Free, auto-deploy OFF, regione Oregon, URL staging noto.
+- Il deployment attualmente live è ancora il commit `34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5` del 4 ottobre 2026. Non corrisponde all'head bot della PR #2. Quindi il codice candidato non è dimostrato in esecuzione su Render.
+- La lettura corrente delle variabili Render non è disponibile tramite l'inventario esposto in questa sessione; non dichiarare configurati `META_APP_SECRET`, Assistant API key/URL, storage URL/key, Redis o token WhatsApp.
+- Nessuna env Render modificata, nessun deploy/restart eseguito. Auto-deploy OFF resta utile per evitare riavvii involontari e contenere il consumo del piano Free.
+
+### Riesame del codice e dipendenze
+- `api/v1/assistant.js` autentica con `VOCALFLASH_ASSISTANT_API_KEYS`; usa `VF_ASSISTANT_SUPABASE_URL` e `VF_ASSISTANT_SUPABASE_SECRET_KEY`; la readiness controlla anche `OPENAI_API_KEY` e `VOCALFLASH_API_KEYS`. L'assenza della API key e della secret DB sul branch impedisce una prova runtime autenticata completa.
+- `api/v1/multivocale-storage.js` fallisce chiuso se manca la mappatura scope della chiave; applica namespace separati agli oggetti e rifiuta download/cancellazioni cross-scope. Il suo health verifica la creazione della signed-upload URL, non un round-trip upload/download/delete: mantenere separati i due livelli di evidenza.
+- `customer_text_bridge.py` inoltra testo ordinario alla Assistant API con `VOCALFLASH_ASSISTANT_API_URL` e `VOCALFLASH_ASSISTANT_API_KEY`; `app_customer.py` verifica Redis, Assistant, storage, configurazione WhatsApp e chiave trascrizione al boot. La verifica del codice non dimostra che tali variabili siano impostate nel servizio Render live.
+- Il runtime owner-command richiede identità verificata e dipendenze di persistenza; in assenza delle funzioni di resolve/record/commit atomico restituisce `ATOMIC_CONFIRMATION_NOT_ENABLED` senza scritture. Il TTL 600 è configurato sul Preview branch, ma non rende disponibili la secret DB o la API key mancanti.
+- Nessuna modifica applicativa è stata fatta in questo audit: i test esistenti sono verdi, ma non è sicuro tentare un fix runtime o E2E mutante senza database isolato e credenziali correttamente scoped.
+
+### Decisione operativa aggiornata
+
+**NO-GO per E2E mutante e rilascio; GO per ulteriori verifiche statiche e preparazione isolata.**
+
+1. Non usare il progetto Supabase ACTIVE_HEALTHY come staging finché l'isolamento non è provato; il progetto alternativo è INACTIVE e non è stato ripristinato.
+2. Prima di creare un branch/progetto Supabase, aggiornare il preventivo e ottenere approvazione esplicita del costo. Nessuna risorsa a pagamento è stata creata.
+3. Dopo disponibilità di un DB isolato, verificare il replay completo delle 15 migrazioni e il baseline pre-registry; quindi testare le RPC candidate sullo schema completo, grants, RLS, tenant binding, rollback e concorrenza.
+4. Configurare un'unica chiave server-to-server dedicata solo sul Preview branch e Render staging, con scope separati e senza toccare Production o `assistant-auth-v1`; aggiungere la secret DB solo del progetto isolato. Prima controllare l'inventario e poi pianificare un solo restart Render.
+5. Portare il bot sul commit candidato solo dopo i gate, con deploy manuale staging e test di firma webhook. Non inviare messaggi WhatsApp reali senza destinatario di test autorizzato.
+6. Conservare Draft le PR impilate e risolvere l'ordine ESM/base/integrazione; nessun merge automatico.
+7. Mantenere aperti i gate per persistenza conversazionale, outbox e riconciliazione delivery, round-trip Storage reale, restart/recovery MultiVocale, media-only, benchmark audio italiano e privacy/DPA/retention.
+
+**Perimetro delle azioni:** solo letture GitHub/Vercel/Supabase/Render e analisi statica. Nessun segreto letto o modificato; nessun DDL/DML o migration; nessuna modifica env; nessun deploy/restart Render; nessun merge o Production deploy; nessun invio WhatsApp/SMS.
+
+
+## Chiusura verifiche successive e vincolo ore Render — 31 ottobre 2026
+
+- Correzione dell'istantanea CI: la run [#41200935062](https://github.com/VocalFlash/vocalflash/actions/runs/41200935062), inizialmente osservata in coda, è stata ricontrollata a completamento ed è **success** sullo SHA esatto `08828fcd136e36d76680922daaec7eac1abfcc1b`. Tutti i sei job osservati (cinque Assistant API + contratto PostgreSQL transazionale) sono completati con successo.
+- Il deployment Vercel Preview dello stesso SHA è stato ricontrollato ed è **READY**. Resta solo Preview documentale/candidato: non prova runtime autenticato, connessione Supabase, Storage round-trip o Production.
+- Render: confermati servizio Free, auto-deploy OFF, branch `multivocale-runtime-v2`; il deploy live è ancora `34c63efb6e0e720e8dc07c10c3c457a5d59ae5b5` del 4 ottobre 2026. Non sono stati triggerati deploy, restart, build o chiamate che risveglino il servizio.
+- **Vincolo consumo Render:** ultimo dato disponibile registrato nel precedente checkpoint: 621/750 ore Free consumate, 129 ore residue. Questo numero è storico e non è stato possibile verificarne il saldo aggiornato dal pannello account tramite gli strumenti disponibili. Trattare 129 ore come tetto prudenziale massimo noto, non come saldo garantito. Prima di qualsiasi attività che possa consumare ore, rilevare il saldo corrente nel dashboard Render.
+- Regola operativa vincolante: niente deploy/restart Render per aggiornamenti documentali o test che possono essere eseguiti in CI locale/effimera; raggruppare tutte le modifiche env in una sola finestra, fare un solo restart controllato solo dopo DB isolato, credenziali scoped e test pronti; usare il servizio staging solo per test integrati brevi e mirati. Nessun test di polling, loop o carico continuativo su Render Free.
+- I gate di rilascio non cambiano: nessun branch Supabase isolato; nessuna secret/API key dedicata sul Preview candidato; nessuna prova che le env richieste siano presenti su Render; nessun round-trip Storage reale; nessun deploy del nuovo head bot. Quindi E2E mutante e rilascio restano **NO-GO**.
+- Nessuna modifica a codice runtime, variabili, database, deploy Render, merge o Production è stata eseguita in questa fase. Sono state completate letture di stato e aggiornamento documentale soltanto.
+
+
+## Riesame aggiuntivo — 31 ottobre 2026, audit schema e conferma atomica
+
+- Il controllo read-only sul progetto Supabase attivo `VocalFlash Assistant` (PostgreSQL 17.6) conferma che le colonne usate dal wrapper proposto esistono con i tipi attesi: `work_events.normalized_text/payload/business_member_id/business_channel_id/work_item_id`; `open_actions.action_key/title/due_at/assigned_member_id/metadata`; `business_members.is_active`; `business_channels.is_active`; e i riferimenti business/work item. Sono presenti le FK composite tenant-scoped e gli indici univoci per messaggio esterno, source event, proposta, nota e azione. Questo prova compatibilità catalogo delle dipendenze usate, non replay completo.
+- RLS è abilitato ma non forzato sulle sei tabelle operative; non risultano policy dirette. `anon` e `authenticated` non hanno SELECT diretto né CREATE su `public`; le RPC legacy osservate sono `SECURITY DEFINER`, owner `postgres`, `search_path=public, pg_temp`, EXECUTE limitato a `service_role` e `postgres`. `service_role` non ha UPDATE diretto su `work_events`: i marker vengono aggiornati nel contesto privilegiato della RPC. Non aggiungere policy client generiche.
+- Le RPC candidate `vf_resolve_pending_owner_command_proposal_v2` e `vf_commit_owner_command_confirmation_v2` sono assenti dal live; il registro mantiene 15 migrazioni, dalla `20261001181622` alla `20261004213059`. Nessuna migrazione o scrittura è stata eseguita.
+- La ricerca di branch e file accessibili non ha recuperato un bootstrap schema pre-registry: le branch storiche ispezionate non contengono una baseline SQL iniziale. Le 15 migrazioni incrementali restano fedeli al registro ma non bastano per un clean replay da zero.
+- Nuovo hardening: per ogni primo commit, dopo aver bloccato proposta e conferma, il wrapper blocca con `FOR SHARE` la riga del membro e quella del canale, verificando che siano ancora attivi. Una revoca concorrente viene serializzata rispetto alla write. Se membro o canale sono disattivati dopo la conferma ma prima del commit, il wrapper nega senza effetto e senza consumare la conferma.
+- Aggiunti test PostgreSQL isolati per revoca membro e canale dopo la registrazione della conferma. GitHub Actions run [#41246248080](https://github.com/VocalFlash/vocalflash/actions/runs/41246248080) ha completato con successo tutti e sei i job sul commit applicativo/test `7fbbaad3c7f6adb952d05324b0a2785c38e392a3`. Non è full-schema parity né E2E Supabase/Meta.
+- Vercel Preview per quel commit è READY (deployment `dpl_425ZC6asDswKLr13GG6HYBYd6mph`), ma è solo build. L'inventario non decifrato del branch mostra `VF_ASSISTANT_SUPABASE_URL` e `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS=600`; mancano `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS`. Attenzione: l'URL punta al progetto Supabase ACTIVE_HEALTHY, non a un database isolato. Non aggiungere credenziali né fare E2E su questo Preview finché l'URL non punta a un database dedicato.
+- Supabase `list_branches` restituisce zero branch di sviluppo; il secondo progetto dell'organizzazione è INACTIVE. Nessun ambiente è stato creato o ripristinato.
+
+**Decisione invariata: NO-GO per migrazione live, E2E mutante e rilascio.** Prima serve un ambiente Supabase isolato (eventuale costo da preventivare e approvare), poi replay schema disponibile, test RPC su schema completo e staging E2E. Nessun merge, deploy Production, modifica env, invio WhatsApp/SMS o scrittura Supabase live.
+
+
+## Decisione di finalizzazione — percorso senza branch Supabase dedicato (1 novembre 2026)
+
+**Il branch Supabase isolato non è un prerequisito assoluto per continuare lo sviluppo.** È un requisito pratico per eseguire in sicurezza il collaudo mutante full-schema e l'E2E che scrive sul database. Per evitare costi e complessità premature, la fase corrente viene chiusa senza creare branch o riattivare progetti.
+
+Percorso autorizzato senza costi aggiuntivi:
+- continuare con review statica del SQL proposto, del runtime, dei grant e delle dipendenze;
+- mantenere i test PostgreSQL su database effimeri CI, ampliandoli quando emerge un caso di regressione concreto;
+- mantenere le query sul progetto Supabase attivo rigorosamente read-only;
+- verificare i contratti API con fixture/mock e test non mutanti;
+- mantenere Vercel Preview non collegato a credenziali DB mutanti finché l'URL punta al progetto Supabase attivo;
+- evitare deploy/restart Render non necessari, rispettando il vincolo del piano Free.
+
+Limiti non negoziabili:
+- i test effimeri non dimostrano full-schema parity, clean replay delle migrazioni, comportamento reale di RLS/ACL/trigger sull'intero schema o E2E Meta/Render/API/Supabase;
+- non aggiungere secret DB o API key al Preview candidato mentre l'URL punta al database attivo;
+- non applicare le RPC v2, migrazioni o DML al progetto Supabase attivo;
+- non promuovere, unire PR o inviare messaggi reali come conseguenza di questa finalizzazione.
+
+**Gate residuo per il rilascio:** prima del primo test mutante integrato deve essere disponibile un target dati isolato e verificato. Può essere un branch Supabase, un progetto dedicato già disponibile oppure un PostgreSQL isolato che riproduca fedelmente lo schema completo; non è obbligatorio acquistare un branch se si dimostra un'alternativa equivalente. Se l'unica soluzione praticabile richiede una risorsa a pagamento, prima si richiede un preventivo e poi un'approvazione separata del costo.
+
+**Stato al 1 novembre 2026:** PR #10 resta Draft; il commit verificato precedente `8da9d011628b4f6269db2ec953881117f3cd74ff` ha CI 6/6 verde (run #41246494635). La modifica documentale di questa decisione richiede una nuova CI sul nuovo head prima di poterla dichiarare verde. Nessuna branch/progetto è stato creato, nessun costo sostenuto, nessuna migrazione/scrittura live, modifica env, deploy Production, merge o invio WhatsApp/SMS eseguito.
+
+
+---
+
+## 11. Ricostruzione storica e audit complessivo delle fonti — 1 novembre 2026
+
+Questa sezione consolida la ricostruzione delle prime fasi di VocalFlash, il confronto dei sorgenti disponibili, il questionario, le specifiche operative e lo stato tecnico ricostruito dai registri e checkpoint. È un addendum di continuità: non sostituisce le evidenze più recenti né trasforma attività progettate in funzionalità operative.
+
+### 11.1 Perimetro e qualità delle fonti
+
+Sono stati esaminati il registro di continuità del 1 ottobre, il checkpoint del 2 ottobre, specifiche del titolare, sorgenti Python/JavaScript, file HTML del questionario e dei risultati, e informazioni GitHub aggiornate al 1 novembre. Sono state trovate anche esportazioni di conversazioni Meta AI, che sono state tenute separate dalle conversazioni ChatGPT.
+
+**Limite documentale:** non è stata recuperata una trascrizione integrale di tutte le prime chat ChatGPT. I registri e i file presenti consentono una ricostruzione sostanziale, ma non autorizzano ad affermare che ogni messaggio originale sia stato consultato. I file allegati non sono una prova automatica di deploy o di esecuzione in produzione.
+
+### 11.2 Cronologia consolidata
+
+- **5–10 settembre:** prima generazione del bot Flask/Meta: webhook, download audio, trascrizione e risposta. I primi sorgenti mostrano Graph API v20.0 e chiamata diretta a OpenAI. Codice storico, non prova di deploy.
+- **14 settembre:** emerge la necessità di comprendere il contesto professionale. L'esportazione Meta AI contiene indicazioni su edilizia/cantiere, finanziario-creditizio, immobiliare, legale, medico-sanitario e contesto generico, con regola di non inventare terminologia specialistica. Questa è una fonte Meta AI, non una chat ChatGPT.
+- **17–18 settembre:** documentazione API e presentazione; vengono distinte la modalità di inoltro vocale a VocalFlash e l'integrazione più profonda con WhatsApp Business aziendale. La seconda è una direzione progettuale, non una prova che l'integrazione fosse già attiva.
+- **23–24 settembre:** sorgenti con Graph API v26.0, API centrale VocalFlash, autenticazione X-API-Key e VOCALFLASH_API_URL; sviluppo MultiVocale manuale/automatico, batch e sintesi. I sorgenti segnalano esplicitamente che parte dello stato era in RAM e non sopravviveva ai riavvii o ai processi multipli.
+- **24 settembre:** test V3 documentato su cinque vocali; rimaneva l'errore residuo di riconoscimento «Via Etnea → via Tenea». Non generalizzare il test a ogni accento, settore o condizione audio.
+- **25–26 settembre:** questionario, pagina risultati e API di submit/results/export, con rewrites Vercel. Nel registro risultano due risposte reali. Il percorso completo invio→persistenza→risultati→CSV non va considerato collaudato E2E sulla sola base dei file HTML.
+- **29 settembre–3 ottobre:** evoluzione verso Assistente WhatsApp «Dal vocale all'azione», database operativo, Resolver, Decomposer, policy, identità e scritture protette. I checkpoint riportano test progressivi, ma i loro perimetri restano distinti.
+- **ottobre–1 novembre:** hardening della conferma atomica, verifiche schema, CI PostgreSQL effimera, branch e Preview. PR #10 resta Draft e non integrata in main.
+
+### 11.3 Evoluzione dei sorgenti
+
+**Prima generazione:** Flask/webhook Meta, Graph API v20.0, download audio, chiamata diretta OpenAI e variabili legacy per token e chiavi.
+
+**Seconda generazione:** Graph API v26.0, API centrale, VOCALFLASH_API_URL, X-API-Key, separazione tra bot e motore di elaborazione. Il bot diventa progressivamente un adapter/canale e l'API centrale il punto di elaborazione.
+
+**MultiVocale:** i sorgenti documentano raccolta di più vocali, ordinamento, quiet window, riepilogo manuale e automatico, protezione del primo audio e limiti di batch. La presenza di Redis per deduplica/lock non dimostra la persistenza completa di sessioni, audio e timer. La prova di storage deve includere upload, download, cancellazione, restart, concorrenza, recupero e no-double-reply.
+
+**Conseguenza architetturale:** non confondere il bot di trascrizione con l'Assistant API e non considerare completata l'integrazione operativa solo perché i singoli moduli hanno test verdi.
+
+### 11.4 Questionario
+
+I file esaminati contengono otto domande su uso lavorativo di WhatsApp, volume dei vocali, riascolto, dimenticanze, funzioni desiderate, gestione delle richieste dei clienti, disponibilità a pagare e principale perdita di tempo. Sono presenti:
+- questionario responsive con controlli dei campi;
+- invio a /api/questionario-submit;
+- pagina risultati con accesso riservato;
+- distribuzioni e risposte complete;
+- esportazione CSV tramite /api/questionario-export.
+
+Il registro segnala due risposte reali. Il questionario è da conservare come ricerca preliminare, non come validazione di mercato. Resta da chiudere il collaudo E2E e la diagnosi della credenziale del suo Preview, mantenendo separata questa corsia dal database Assistant.
+
+### 11.5 Modello operativo e test documentati
+
+Il modello dati è centrato su business, canali, membri, contatti, workflow, policy, vocabolario, work item, partecipanti, eventi, dati, azioni e appuntamenti. È documentata anche work_event_links in una fase successiva. Il principio vincolante resta: la memoria durevole è la pratica e la sua sequenza di eventi, non la sola chat.
+
+Risultati registrati nei checkpoint, con il loro perimetro:
+- Work Resolver V1: batteria 16 casi; gpt-6-luna 16/16, zero false MATCH e zero errori API nel test documentato.
+- Decomposer V2: 40/40 PASS nel checkpoint successivo.
+- Write Path V2: test su MATCH, retry/idempotenza, AMBIGUOUS e casi misti nel perimetro documentato.
+- Comandi deterministici del titolare: 27/27 test locali per il prototipo di policy; non equivale a test AI o E2E WhatsApp.
+- Adattatore autorizzativo: 9/9 test nel checkpoint.
+- E2E autorizzativo Supabase: 3/3 nel perimetro indicato dal checkpoint.
+- Conferma atomica: PR #10 con test PostgreSQL effimeri/isolati. Non equivale a full-schema parity, test mutativo sul database attivo o E2E Meta→Render→API→Supabase.
+
+Non riaprire questi test senza una ragione documentata; prima verificare il collegamento reale e l'eventuale regressione.
+
+### 11.6 Stato GitHub aggiornato al 1 novembre
+
+- Repository Assistant: VocalFlash/vocalflash.
+- PR #10: aperta, Draft, non merged; base assistant-conversation-photo-v1; head owner-command-atomic-confirmation-v3.
+- Head verificato: 652a2f49e20f9765d10854865697555ceed57d50.
+- GitHub Actions run 41252897837: completed/success sullo SHA esatto, 6/6 job secondo il registro/check della PR.
+- Vercel Preview deployment dpl_4Qn7qAGAVgDsqDpSJKanJ195noVG: READY; URL https://vocalflash-git-owner-command-atomic-confirmation-v3-vocal-flash.vercel.app. È prova di build Preview, non di runtime autenticato o E2E.
+- PR #10 contiene 20 file modificati e rimane Draft; nessun merge o deploy Production autorizzato.
+
+### 11.7 Gate Supabase e Preview: precisazione aggiornata
+
+La verifica più recente riportata nei documenti del branch indica:
+- 15 migrazioni registrate nel progetto Supabase principale, ma baseline storica pre-registry e replay completo da zero non recuperati;
+- nessun branch Supabase di sviluppo disponibile;
+- le RPC candidate v2 non sono installate nel progetto live;
+- il Preview ha TTL esplicito 600 e URL Supabase presente, ma l'URL punta al progetto ACTIVE_HEALTHY principale, non a un database isolato;
+- mancano sul Preview candidato VF_ASSISTANT_SUPABASE_SECRET_KEY e VOCALFLASH_ASSISTANT_API_KEYS;
+- non aggiungere segreti al Preview e non eseguire DDL/DML sul progetto attivo finché il target non è isolato.
+
+La scelta economica già registrata è proseguire senza acquistare/creare un branch Supabase in questa fase: CI PostgreSQL effimera, fixture/mock, review statica e Supabase live esclusivamente read-only. Un ambiente isolato equivalente diventa necessario prima di test mutativi full-schema/E2E; se richiede un costo, preventivo e approvazione separata.
+
+### 11.8 Valutazione conclusiva e direzione
+
+VocalFlash ha superato la fase di semplice trascrizione. Il valore di prodotto risiede nel ciclo: messaggio → identità/canale → intent → settore/workflow → pratica → dati mancanti → chiarimento → aggiornamento autorizzato → azione.
+
+Il rischio principale non è la mancanza di ulteriori moduli, ma l'integrazione incompleta dei moduli già sviluppati. La priorità tecnica è quindi:
+1. verificare la catena bot WhatsApp → Assistant API → persistenza → risposta;
+2. completare e provare identità, membership e conferma atomica;
+3. chiudere persistenza e recovery MultiVocale/storage;
+4. rendere effettivi workflow e vocabolario multi-settore;
+5. chiudere privacy, retention, outbox/reconciliation e readiness commerciale.
+
+Non riprogettare Resolver, Decomposer o Write Path senza evidenza di regressione. Non dichiarare pronto il prodotto sulla base di CI verde o Preview READY isolati.
+
+### 11.9 Decisioni e attività riservate al titolare — stato consolidato
+
+Queste voci sono registrate anche nel Libro delle raccomandazioni. Restano aperte finché il titolare non fornisce una decisione esplicita.
+
+| ID | Decisione/intervento | Stato | Vincolo |
+|---|---|---|---|
+| D1 | Supabase branch/progetto isolato a pagamento, se necessario | NON APPROVATO / NON NECESSARIO PER LO SVILUPPO CORRENTE | Prima preventivo aggiornato e approvazione; preferire alternativa isolata senza costi |
+| D2 | SMS/OTP e provider Bird | NON APPROVATO | Verificare costo totale, mittente, account e condizioni; nessuna attivazione o spesa senza consenso |
+| D3 | Metodi di pagamento, piani e prezzi | DECISIONE COMMERCIALE APERTA | Definire carte/wallet/SEPA, piani, prezzi, rinnovi, prova, cancellazioni e rimborsi prima dell'implementazione |
+| D4 | Eventuale risorsa/servizio esterno a pagamento per staging, hosting o altri provider | NON APPROVATO | Presentare preventivo e motivazione prima dell'acquisto |
+| D5 | Attivazione commerciale/Meta e destinatari reali di test | NON AUTORIZZATA | Serve approvazione del titolare prima di modifiche o invii reali |
+
+La decisione D1 non deve essere interpretata come richiesta di acquistare subito una branch: il percorso corrente resta quello senza costi. D2 non autorizza a configurare SMS né a creare account. D3 non autorizza a creare account Stripe o attivare pagamenti.
+
+### 11.10 Perimetro delle azioni effettuate con questo addendum
+
+Questo addendum è una ricostruzione documentale. Non ha applicato migrazioni, eseguito DML, modificato variabili o segreti, creato risorse a pagamento, unito PR, distribuito in Production, riavviato Render o inviato messaggi WhatsApp/SMS.
+
+
+### 11.11 Riconciliazione branch e dipendenze PR — refresh 1 novembre 2026
+
+Confronti GitHub read-only eseguiti dopo l'aggiornamento dei libri:
+
+- `main` → `assistant-auth-v1`: **diverged**, 91 commit avanti e 1 indietro.
+- `assistant-auth-v1` → `assistant-conversation-photo-v1`: **diverged**, 423 commit avanti e 3 indietro.
+- `assistant-conversation-photo-v1` → `owner-command-atomic-confirmation-v3`: **ahead**, 148 commit avanti, 0 indietro.
+
+Quindi la PR #10 è direttamente basata sul ramo `assistant-conversation-photo-v1` e non ha divergenza rispetto alla sua base, ma la catena a monte verso `main` è ancora impilata e divergente. Non fare merge diretto né retarget automatico: serve un piano di promozione per livelli, verificando ESM, dipendenze API, migrazioni, customer pipeline e bot.
+
+Snapshot PR read-only:
+- API PR #1: Draft, base `main`, head `questionario-e2e-v1`, SHA `61481acc4eddf03b960f9c6233b5e3d060655181`.
+- API PR #3: Draft, base `assistant-auth-v1`, head `assistant-conversation-photo-v1`, SHA `737d42184f618ff6abc009df7af241f30d29131a`.
+- API PR #9: Draft, base `main`, head `auth-bird-sms-hook-v1`, SHA `ca1d3f46cef0f8fa38a8c534eb70985500481dcc`.
+- API PR #10: Draft, base `assistant-conversation-photo-v1`, head `owner-command-atomic-confirmation-v3`, SHA prima dell'aggiornamento documentale `652a2f49e20f9765d10854865697555ceed57d50`; ora il nuovo head contiene anche gli aggiornamenti dei libri.
+- Bot PR #2: Draft, base `multivocale-runtime-v2`, head `assistant-conversation-photo-v1`, SHA `73dd4516c704d7dbdff08906cb594a8b152b0040`.
+
+Il confronto conferma che le PR #1, #3, #9, #10 e bot #2 non costituiscono un'unica sequenza lineare già pronta al merge. Il bot dipende dalla disponibilità dell'Assistant API e non va promosso prima del contratto API e del test integrato.
+
+### 11.12 Verifica CI dopo gli aggiornamenti dei libri
+
+- Aggiornamento del Libro sacro: commit `3d77429f894add6a6d61fa590a2b5c7b488162aa`.
+- Aggiornamento del Libro raccomandazioni: commit `778e04912f26a3908acc8ba8814c8c3a712daaae`.
+- Nuovo head PR #10: `778e04912f26a3908acc8ba8814c8c3a712daaae`.
+- GitHub Actions run `41350939667` è stata avviata sul nuovo head. Al momento del controllo: pass 1 e pass 2 completati con successo; pass 3, 4 e 5 in coda; job PostgreSQL transaction contract in esecuzione. **CI complessiva non ancora conclusa**.
+- Il check Vercel per il nuovo head risulta pending. Il precedente Preview READY `dpl_4Qn7qAGAVgDsqDpSJKanJ195noVG` si riferisce al precedente head `652a2f49...`, non prova il Preview del nuovo head documentale.
+
+Non dichiarare i libri aggiornati e il nuovo head testati fino alla conclusione della run `41350939667` e alla verifica del deployment Preview associato allo stesso SHA. La modifica è documentale; non cambia l'autorizzazione NO-GO per E2E mutativo, merge o Production.
+
+
+### 11.13 Chiusura verifica post-aggiornamento libri — 1 novembre 2026
+
+Questa sezione aggiorna e supera lo stato provvisorio riportato in 11.12.
+
+- Head finale verificato della PR #10: `2cb5c045dbee10cbc0ffef35bb9e54edf6a22552`.
+- GitHub Actions run **#41351024940**, run number 801: **completed / success** sullo SHA esatto; tutti e sei i job sono completati con successo: cinque pass Assistant API e il job PostgreSQL transaction contract.
+- Check Vercel sullo stesso SHA: **success**.
+- Deployment Preview esatto: `dpl_DRUXEcQiYSB93hsWhC37QxHtHphr`, stato **READY**, URL https://vocalflash-a6nrs62n0-vocal-flash.vercel.app. Il deployment è associato al branch e allo SHA sopra.
+- PR #10 resta **open / Draft / not merged**; base `assistant-conversation-photo-v1`. Nessun merge o deploy Production.
+
+Il risultato CI copre i test automatizzati del repository e il contratto PostgreSQL su database effimeri/schema minimo, incluse le RPC legacy recuperate. Il Preview READY dimostra la build/deploy Preview per lo SHA esatto. Nessuno dei due dimostra full-schema parity, connessione autenticata a un Supabase isolato, storage round-trip, restart Render o E2E Meta→Render→Assistant API→Supabase.
+
+**Gate invariati:** nessuna migrazione/RPC v2 installata sul progetto Supabase attivo; nessuna scrittura DML live; nessuna secret o variabile aggiunta; nessun invio WhatsApp/SMS; nessuna promozione Production. La PR rimane Draft fino ai gate di sicurezza e staging già descritti.
+
+
+### 11.14 Audit d'integrazione API ↔ bot e configurazione Preview — 1 novembre 2026
+
+Verifica read-only dei sorgenti effettivi sui due repository, del head PR e dell'inventario Vercel senza decifrare segreti.
+
+**Integrazione software: IMPLEMENTATA NELLE BRANCH CANDIDATE, NON ANCORA COLLAUDATA END-TO-END.**
+- `VocalFlash/vocalflash/api/v1/assistant.js` espone l'Assistant API autenticata con `X-VocalFlash-Assistant-Key`, riceve `external_account_id`, `sender_wa_id`, `external_message_id` e `normalized_text`, risolve l'origine del messaggio e instrada cliente o titolare.
+- `VocalFlash/vocalflash-bot/customer_text_bridge.py` inoltra i normali messaggi WhatsApp di testo a `VOCALFLASH_ASSISTANT_API_URL` usando la chiave dedicata `VOCALFLASH_ASSISTANT_API_KEY` nell'header corretto; non riutilizza la chiave di trascrizione `X-API-Key`.
+- `app_customer.py` invia su WhatsApp soltanto `assistant_message` esplicitamente restituito dall'API. La deduplica outbound Redis è **at-most-once**, non exactly-once; un timeout ambiguo conserva il marker e richiede riconciliazione operativa.
+- Audio e comandi MultiVocale sono instradati dal bot al runtime MultiVocale V2, non al percorso Assistant API testuale. Il ramo media/foto e l'ingestione media completa restano fuori dal percorso verificato.
+- Il test bot `test_customer_text_bridge.py` verifica payload, header, separazione credenziali, risposta e guardia duplicati; il test API `api/v1/assistant.test.js` verifica health/auth con `fetch` mockato. Sono test automatizzati, non chiamate reali tra Render, Vercel, Supabase e Meta.
+
+**Configurazione Vercel rilevata per il branch owner-command:**
+- Presente `VF_ASSISTANT_SUPABASE_URL` in Preview branch-specific; il valore non segreto coincide con il progetto Supabase principale `tkfyfqgtumoeywlqzmdt`, quindi NON è un database isolato nonostante il commento della variabile lo descriva come Preview isolato.
+- Presente `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS=600` in Preview branch-specific.
+- Assenti dall'inventario del branch `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS`.
+- Le due variabili mancanti risultano invece configurate nello scope Preview di `assistant-auth-v1`; non sono state decifrate né copiate. Non trasferire segreti tra branch senza approvazione e verifica del target.
+- L'API `health` richiede anche `OPENAI_API_KEY` e `VOCALFLASH_API_KEYS` per il routing; il probe Supabase è read-only e non dimostra che tutte le RPC operative siano presenti.
+- Il deployment Vercel `dpl_5rcrZcUzB6Jr5yDnFSUxznV8skzs` è READY sullo SHA `870e06f48efbe9485eca3f1da0c8bea341fbacd3`. Questo prova build/deploy Preview, non readiness runtime: con secret/API key mancanti l'API non può completare il flusso autenticato.
+
+**Catena PR riletta:** API #3 è Draft su `assistant-auth-v1` → `assistant-conversation-photo-v1`; API #10 è Draft su `assistant-conversation-photo-v1` → `owner-command-atomic-confirmation-v3`; bot #2 è Draft su `multivocale-runtime-v2` → `assistant-conversation-photo-v1` e dichiara dipendenza da API #3. PR #1 riguarda soltanto `type: module` su un branch separato `questionario-e2e-v1`; non è il parent della catena Assistant API. PR #9 (Bird/SMS) resta indipendente e fuori dal percorso minimo.
+
+**Gate e decisione tecnica:** mantenere PR #1/#3/#10 e bot #2 Draft; non retargetare o unire alla cieca. Prima definire una promozione ordinata dei branch e risolvere la divergenza di `main`. Prima di un E2E, serve un target Supabase realmente isolato e configurazione Preview completa approvata. Non aggiungere la secret live al Preview che punta al progetto principale. Nessuna variabile/segreto è stata modificata, nessuna RPC v2 è stata installata, nessun invio o deploy Production è avvenuto.
+
+
+## Addendum 2 novembre 2026 — risposta titolare nel bot
+
+Nel bot `VocalFlash/vocalflash-bot`, branch `assistant-conversation-photo-v1`, la doppia definizione di `build_owner_whatsapp_response` è stata eliminata (commit `7d9316d`). La funzione ora richiede `origin: owner`, `result.owner` strutturato e `owner.ok === true`; l'esito di completamento viene comunicato soltanto con `effect_applied === true`. La frase di conferma «confermo» è stata verificata sul parser API `lib/owner-command-confirmation-v1.js`, che la accetta esattamente.
+
+Aggiunti test integrati del wrapper bot per proposta in attesa, commit confermato e risposta fail-closed senza `owner.ok` (commit `51dfcaad59e3751a4993f06ffdf76a8414a7f40e`). GitHub Actions run `41417732924`: **67 test, OK**, job success. PR bot #2 resta Draft. I test usano dipendenze simulate: non sono E2E Render/Vercel/Supabase/Meta. Nessun merge, deploy, modifica env/segreti, migrazione o invio reale.
+
+
+
+## Audit integrazione branch e prerequisiti webhook — 2 novembre 2026
+
+### Stato PR e dipendenze rilevato
+- API PR #3: Draft, base `assistant-auth-v1`, head `assistant-conversation-photo-v1`, SHA `737d42184f618ff6abc009df7af241f30d29131a`; CI associata al commit verificata success.
+- API PR #10: Draft, base esatta API PR #3 (`assistant-conversation-photo-v1`), head `owner-command-atomic-confirmation-v3`, aggiornato ai documenti SHA `b2abef870623043972e6f9c1a52953f73c7e6ee8`; CI run `41417965059` superata: 5 pass API + job PostgreSQL 16 isolato.
+- Bot PR #2: Draft, base `multivocale-runtime-v2`, head `assistant-conversation-photo-v1`, SHA `51dfcaad59e3751a4993f06ffdf76a8414a7f40e`; CI run `41417732924` superata, 67 test.
+- La catena API #3 → API #10 è lineare (153 commit aggiuntivi sul secondo branch, senza divergenza rispetto al suo base). Bot #2 è una catena distinta nel repository bot, 88 commit avanti rispetto al suo base. I branch omonimi dei due repository non sono lo stesso branch.
+- API branch corrente risulta 1 commit dietro `main`; il commit mancante è un documento di proposta audio API, non una modifica runtime. Non è stato eseguito merge né retarget. PR #1 ESM e PR #9 SMS/Bird restano corsie separate e non prerequisiti per questa integrazione.
+
+### Contratto API ↔ Bot verificato staticamente
+- API risponde con `origin` top-level e `result.owner` per titolare; per cliente include `assistant_message` esplicito.
+- Bot invia soltanto il testo esplicito ricevuto dall'API per il cliente; per titolare costruisce acknowledgement deterministico dal risultato verificato.
+- L'helper titolare richiede `owner.ok === true`; il runtime API restituisce `ok: true` per `CONFIRMATION_REQUIRED`, quindi il caso di proposta non applicata è coerente.
+- Il parser API accetta `confermo` esatto.
+- La guardia outbound Redis è at-most-once con marker di 24 ore. Timeout Meta ambiguo mantiene il marker e impedisce retry cieco; non è outbox durevole né exactly-once.
+
+### Nuovo gate obbligatorio per il bot
+Il branch bot ora richiede `META_APP_SECRET` per ogni POST webhook: se manca, risponde HTTP 503; se manca o non è valida `X-Hub-Signature-256`, risponde 403. Il controllo è intenzionalmente fail-closed e ha test unitari. **Prima di qualsiasi deploy del branch bot è quindi necessario verificare/configurare il Meta App Secret nel servizio Render corretto**, senza inserirlo in chat o nei documenti. Non è stato verificato che la variabile sia già presente su Render. L'avvio del modulo registra anche la readiness; il controllo non costituisce prova di connettività E2E.
+
+### Readiness e limiti
+- Assistant API health richiede Assistant API key, URL/secret Supabase, OpenAI API key e routing API key, oltre al probe read-only di Supabase.
+- I test CI API usano PostgreSQL 16 effimero e fixture/RPC legacy recuperate; non dimostrano parità con lo schema live completo o E2E.
+- Nessuna modifica Render/Vercel env, nessun secret aggiunto, nessun DDL/DML live, nessun deploy, merge o invio WhatsApp reale.
+- **NO-GO promozione:** prima definire il piano coordinato di rilascio API #3 → API #10 e Bot #2, verificare env Meta/Render e API Preview su target dati isolato, e completare smoke/E2E autorizzati. Non collegare Preview al Supabase attivo con credenziali mutative.

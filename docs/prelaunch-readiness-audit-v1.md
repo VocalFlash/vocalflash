@@ -100,3 +100,56 @@ The earlier snapshot above is historical; the current counts differ. Direct SELE
 - Existing counts for `work_items` (1), `work_events` (4), and `event_routing_decisions` (2) remain as observed by the same count query.
 
 No row content containing names, phone numbers, customer messages, or external account identifiers was retrieved. No data was inserted, updated, or deleted. The staging workflow/policy setup is more complete than the 22 October snapshot, but **zero business members** remains a decisive blocker; do not fabricate one or run a real owner flow without a verified Auth identity and explicit pilot authorization. The active policy's `confirm` mode does not override the runtime's `ATOMIC_CONFIRMATION_NOT_ENABLED` guard.
+
+
+## Refresh di stato live e ambiente candidato — 27 ottobre 2026
+
+Read-only Supabase: 0 Auth users, 0 business members, 1 work item, 4 work events, 1 workflow attivo, 1 policy attiva, 14 termini di vocabolario attivi; 0 eventi owner-command proposta/conferma/ricevuto. Non esiste quindi una identità owner valida né un caso reale da confermare; non fabbricare utenti o eventi.
+
+Le nuove RPC owner-confirmation v2 non risultano installate nel database live. Le sei tabelle operative ispezionate hanno RLS abilitato ma non forzato e nessuna policy diretta nella catalog query; le RPC legacy esaminate sono `SECURITY DEFINER`, proprietario postgres e `search_path=public, pg_temp`. La verifica deve includere esplicitamente i controlli tenant/member/channel delle funzioni e gli ACL.
+
+L'inventario Vercel, eseguito senza decifrare segreti, mostra che le variabili Preview `VF_ASSISTANT_SUPABASE_URL`, `VF_ASSISTANT_SUPABASE_SECRET_KEY` e `VOCALFLASH_ASSISTANT_API_KEYS` sono associate al branch `assistant-auth-v1`, non alla branch owner-confirmation; `OWNER_COMMAND_CONFIRMATION_TTL_SECONDS` non è presente. Non eseguire l'E2E fino a quando l'ambiente non è configurato con approvazione esplicita.
+
+CI #40493167613 è passata sul pre-audit head `06c616e40f4aedc47b76eb19eb8678b17fa9cfc3` (cinque pass API e contratto PostgreSQL isolato). Questo non prova la parità con schema completo, il Preview configurato o il percorso Meta/WhatsApp. Il baseline pre-registry, il replay completo e i gate legali/privacy restano aperti.
+
+
+## Corsia questionario/ESM — controllo separato, 27 ottobre 2026
+
+La PR #1 `questionario-e2e-v1` resta Draft su `main`. La correzione proposta aggiunge `type: module` per l'API ESM; i controlli Preview riportati nella PR hanno risposte HTTP attese per le route diagnostiche. Rimane però un problema separato: nel Preview del questionario `SUPABASE_URL` punta al progetto atteso, ma il `SUPABASE_SECRET_KEY` configurato restituisce HTTP 401. Non confondere questo problema con le variabili Assistant `VF_ASSISTANT_*`. Non ruotare o modificare chiavi senza diagnosi e approvazione esplicita. Prima di promuovere il questionario su `main`, risolvere ESM e validare la credenziale del progetto questionario su Preview, poi rieseguire i test sul branch finale. Nessuna credenziale è stata letta o modificata in questo audit.
+
+
+## Gate owner-confirmation aggiornati — 31 ottobre 2026
+
+- [x] Riconciliazione dell'effetto persistito prima del consumo: CI PostgreSQL isolata verde.
+- [x] Rivalidazione del membro e del canale attivi con lock `FOR SHARE` prima del primo commit: test di revoca superati nella run #41246248080.
+- [x] Compatibilità catalogo delle colonne, indici e FK usati dalla proposta verificata in sola lettura sul live.
+- [ ] Baseline bootstrap pre-registry e replay completo da zero.
+- [ ] Full-schema parity su database isolato con schema completo, RLS, FK, trigger, ACL e RPC legacy.
+- [ ] E2E API/Preview verso Supabase isolato; non usare l'URL Preview attuale che punta al progetto attivo.
+- [ ] Configurare secret DB e API key solo dopo avere collegato il Preview al database isolato; TTL Preview già presente a 600 secondi, da rivalutare prima del rilascio.
+- [ ] E2E Meta → Render → Assistant API → Supabase staging.
+
+**NO-GO rilascio:** i test isolati sono superati, ma non dimostrano full-schema parity o E2E.
+
+
+## Decisione di finalizzazione — percorso senza branch Supabase dedicato (1 novembre 2026)
+
+**Il branch Supabase isolato non è un prerequisito assoluto per continuare lo sviluppo.** È un requisito pratico per eseguire in sicurezza il collaudo mutante full-schema e l'E2E che scrive sul database. Per evitare costi e complessità premature, la fase corrente viene chiusa senza creare branch o riattivare progetti.
+
+Percorso autorizzato senza costi aggiuntivi:
+- continuare con review statica del SQL proposto, del runtime, dei grant e delle dipendenze;
+- mantenere i test PostgreSQL su database effimeri CI, ampliandoli quando emerge un caso di regressione concreto;
+- mantenere le query sul progetto Supabase attivo rigorosamente read-only;
+- verificare i contratti API con fixture/mock e test non mutanti;
+- mantenere Vercel Preview non collegato a credenziali DB mutanti finché l'URL punta al progetto Supabase attivo;
+- evitare deploy/restart Render non necessari, rispettando il vincolo del piano Free.
+
+Limiti non negoziabili:
+- i test effimeri non dimostrano full-schema parity, clean replay delle migrazioni, comportamento reale di RLS/ACL/trigger sull'intero schema o E2E Meta/Render/API/Supabase;
+- non aggiungere secret DB o API key al Preview candidato mentre l'URL punta al database attivo;
+- non applicare le RPC v2, migrazioni o DML al progetto Supabase attivo;
+- non promuovere, unire PR o inviare messaggi reali come conseguenza di questa finalizzazione.
+
+**Gate residuo per il rilascio:** prima del primo test mutante integrato deve essere disponibile un target dati isolato e verificato. Può essere un branch Supabase, un progetto dedicato già disponibile oppure un PostgreSQL isolato che riproduca fedelmente lo schema completo; non è obbligatorio acquistare un branch se si dimostra un'alternativa equivalente. Se l'unica soluzione praticabile richiede una risorsa a pagamento, prima si richiede un preventivo e poi un'approvazione separata del costo.
+
+**Stato al 1 novembre 2026:** PR #10 resta Draft; il commit verificato precedente `8da9d011628b4f6269db2ec953881117f3cd74ff` ha CI 6/6 verde (run #41246494635). La modifica documentale di questa decisione richiede una nuova CI sul nuovo head prima di poterla dichiarare verde. Nessuna branch/progetto è stato creato, nessun costo sostenuto, nessuna migrazione/scrittura live, modifica env, deploy Production, merge o invio WhatsApp/SMS eseguito.

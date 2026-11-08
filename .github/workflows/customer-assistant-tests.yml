@@ -35,4 +35,92 @@ jobs:
         run: node scripts/validate-supabase-migrations.mjs
 
       - name: Run focused assistant tests
-        run: node --test api/v1/multivocale-storage.test.js lib/audio-assistant-event-normalizer-v1.test.js api/v1/assistant.test.js lib/supabase-rest-headers-v1.test.js lib/assistant-readiness-v1.test.js lib/new-work-required-data-extractor-v1.test.js lib/customer-assistant-reply-v1.test.js lib/customer-whatsapp-pipeline-v1.test.js lib/business-vocabulary-context-v1.test.js lib/request-classifier-validation-v2.test.js lib/new-work-intake-plan-v1.test.js lib/new-work-creation-policy-v1.test.js lib/owner-command-runtime-v1.test.js lib/owner-command-confirmation-v1.test.js lib/assistant-whatsapp-dispatch-v1.test.js
+        run: node --test api/v1/multivocale-storage.test.js lib/audio-assistant-event-normalizer-v1.test.js api/v1/assistant.test.js lib/supabase-rest-headers-v1.test.js lib/assistant-readiness-v1.test.js lib/new-work-required-data-extractor-v1.test.js lib/customer-assistant-reply-v1.test.js lib/customer-whatsapp-pipeline-v1.test.js lib/business-vocabulary-context-v1.test.js lib/request-classifier-validation-v2.test.js lib/new-work-intake-plan-v1.test.js lib/new-work-creation-policy-v1.test.js lib/owner-command-runtime-v1.test.js lib/owner-command-atomic-confirmation-v2.test.js lib/owner-command-confirmation-v1.test.js scripts/owner-command-runtime-v1-test.mjs scripts/owner-command-atomic-confirmation-sql-contract-v2-test.mjs lib/assistant-whatsapp-dispatch-v1.test.js
+
+
+  owner-confirmation-postgres-contract:
+    name: Owner confirmation PostgreSQL transaction contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+      - name: Load minimal isolated schema and proposed SQL
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: postgres
+        run: |
+          psql -v ON_ERROR_STOP=1 -f scripts/owner-command-atomic-confirmation-postgres-fixture.sql
+          psql -v ON_ERROR_STOP=1 -f docs/proposed-migrations/20261027090000_owner_command_atomic_confirmation_v2.sql
+          psql -v ON_ERROR_STOP=1 -f scripts/owner-command-atomic-confirmation-postgres-test.sql
+      - name: Test with recovered legacy write RPCs
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: |
+          createdb owner_confirmation_real
+          PGDATABASE=owner_confirmation_real psql -v ON_ERROR_STOP=1 -f scripts/owner-command-atomic-confirmation-real-rpc-fixture.sql
+          PGDATABASE=owner_confirmation_real psql -v ON_ERROR_STOP=1 -f docs/proposed-migrations/20261027090000_owner_command_atomic_confirmation_v2.sql
+          PGDATABASE=owner_confirmation_real psql -v ON_ERROR_STOP=1 -f scripts/owner-command-atomic-confirmation-postgres-test.sql
+      - name: Verify real legacy RPC concurrency is single-use
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: owner_confirmation_real
+        run: |
+          CONFIRMATION_ID="$(psql -Atqc "select id from public.work_events where external_message_id='wamid-confirm-concurrent' and event_type='owner_command_confirmation'")"
+          test -n "$CONFIRMATION_ID"
+          psql -v ON_ERROR_STOP=1 -c "select public.vf_commit_owner_command_confirmation_v2('10000000-0000-4000-8000-000000000001'::uuid,'10000000-0000-4000-8000-000000000002'::uuid,'10000000-0000-4000-8000-000000000003'::uuid,'$CONFIRMATION_ID'::uuid,'10000000-0000-4000-8000-000000000402'::uuid)" > /tmp/owner-confirmation-real-a.log &
+          PID_A=$!
+          psql -v ON_ERROR_STOP=1 -c "select public.vf_commit_owner_command_confirmation_v2('10000000-0000-4000-8000-000000000001'::uuid,'10000000-0000-4000-8000-000000000002'::uuid,'10000000-0000-4000-8000-000000000003'::uuid,'$CONFIRMATION_ID'::uuid,'10000000-0000-4000-8000-000000000402'::uuid)" > /tmp/owner-confirmation-real-b.log &
+          PID_B=$!
+          wait "$PID_A"
+          wait "$PID_B"
+          grep -q "CONFIRMATION_COMMITTED" /tmp/owner-confirmation-real-a.log
+          grep -q "CONFIRMATION_COMMITTED" /tmp/owner-confirmation-real-b.log
+          psql -v ON_ERROR_STOP=1 -f scripts/owner-command-atomic-confirmation-postgres-concurrency-assert.sql
+
+      - name: Verify concurrent commits are single-use
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: postgres
+        run: |
+          CONFIRMATION_ID="$(psql -Atqc "select id from public.work_events where external_message_id='wamid-confirm-concurrent' and event_type='owner_command_confirmation'")"
+          test -n "$CONFIRMATION_ID"
+          psql -v ON_ERROR_STOP=1 -c "select public.vf_commit_owner_command_confirmation_v2('10000000-0000-4000-8000-000000000001'::uuid,'10000000-0000-4000-8000-000000000002'::uuid,'10000000-0000-4000-8000-000000000003'::uuid,'$CONFIRMATION_ID'::uuid,'10000000-0000-4000-8000-000000000402'::uuid)" > /tmp/owner-confirmation-a.log &
+          PID_A=$!
+          psql -v ON_ERROR_STOP=1 -c "select public.vf_commit_owner_command_confirmation_v2('10000000-0000-4000-8000-000000000001'::uuid,'10000000-0000-4000-8000-000000000002'::uuid,'10000000-0000-4000-8000-000000000003'::uuid,'$CONFIRMATION_ID'::uuid,'10000000-0000-4000-8000-000000000402'::uuid)" > /tmp/owner-confirmation-b.log &
+          PID_B=$!
+          wait "$PID_A"
+          wait "$PID_B"
+          grep -q "CONFIRMATION_COMMITTED" /tmp/owner-confirmation-a.log
+          grep -q "CONFIRMATION_COMMITTED" /tmp/owner-confirmation-b.log
+          psql -v ON_ERROR_STOP=1 -f scripts/owner-command-atomic-confirmation-postgres-concurrency-assert.sql
