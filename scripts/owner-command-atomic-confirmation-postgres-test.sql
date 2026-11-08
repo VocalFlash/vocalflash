@@ -55,6 +55,13 @@ BEGIN
   IF v_count<>1 THEN RAISE EXCEPTION 'expected one note effect, got %',v_count; END IF;
 
   v_resolved := public.vf_resolve_pending_owner_command_proposal_v2(
+    v_business,v_member,v_channel,'wamid-non-confirmation','ciao');
+  IF v_resolved->>'status'<>'DENIED'
+     OR v_resolved->>'reason'<>'EXPLICIT_CONFIRMATION_REQUIRED' THEN
+    RAISE EXCEPTION 'resolver disclosed a proposal for non-confirmation text: %',v_resolved;
+  END IF;
+
+  v_resolved := public.vf_resolve_pending_owner_command_proposal_v2(
     v_business,v_member,v_channel,'wamid-confirm-note','confermo');
   IF v_resolved->>'status'<>'EXISTING_CONFIRMATION'
      OR v_resolved->>'proposal_event_id'<>v_proposal::text THEN
