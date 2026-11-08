@@ -22,6 +22,8 @@ test("proposed SQL requires explicit expiry and locks proposal plus confirmation
 
 test("proposed SQL binds exact proposal, validates affirmative text, and rejects conflicting replay",()=>{
   assert.ok(sql.includes("CONFIRMATION_PROPOSAL_MISMATCH"));
+  assert.ok(sql.includes("v_confirmation_text"));
+  assert.ok(sql.includes("EXPLICIT_CONFIRMATION_REQUIRED"));
   assert.ok(sql.includes("EXPLICIT_CONFIRMATION_REQUIRED"));
   assert.ok(sql.includes("REPLAY_CONFLICT"));
   assert.ok(sql.includes("CONFIRMATION_OR_PROPOSAL_ALREADY_CONSUMED"));
