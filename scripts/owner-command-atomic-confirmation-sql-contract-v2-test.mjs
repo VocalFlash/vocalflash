@@ -20,11 +20,16 @@ test("proposed SQL requires explicit expiry and locks proposal plus confirmation
   assert.ok(sql.includes("CONFIRMATION_EXPIRED_OR_OUT_OF_ORDER"));
 });
 
-test("proposed SQL binds exact proposal, validates affirmative text, and rejects conflicting replay",()=>{
+test("proposed SQL binds exact proposal, validates affirmative text before resolving, and rejects conflicting replay",()=>{
+  const resolverStart=sql.indexOf("create or replace function public.vf_resolve_pending_owner_command_proposal_v2(");
+  const commitStart=sql.indexOf("create or replace function public.vf_commit_owner_command_confirmation_v2(",resolverStart);
+  assert.ok(resolverStart>=0&&commitStart>resolverStart);
+  const resolver=sql.slice(resolverStart,commitStart);
   assert.ok(sql.includes("CONFIRMATION_PROPOSAL_MISMATCH"));
-  assert.ok(sql.includes("v_confirmation_text"));
-  assert.ok(sql.includes("EXPLICIT_CONFIRMATION_REQUIRED"));
-  assert.ok(sql.includes("EXPLICIT_CONFIRMATION_REQUIRED"));
+  assert.ok(resolver.includes("v_confirmation_text"));
+  assert.ok(resolver.includes("EXPLICIT_CONFIRMATION_REQUIRED"));
+  assert.ok(resolver.indexOf("EXPLICIT_CONFIRMATION_REQUIRED")<resolver.indexOf("-- Resolve exact retries"));
+  assert.ok(resolver.indexOf("EXPLICIT_CONFIRMATION_REQUIRED")<resolver.indexOf("for v_row in"));
   assert.ok(sql.includes("REPLAY_CONFLICT"));
   assert.ok(sql.includes("CONFIRMATION_OR_PROPOSAL_ALREADY_CONSUMED"));
   assert.ok(sql.includes("CONFIRMATION_BINDING_MISMATCH"));
